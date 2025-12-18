@@ -754,7 +754,7 @@
     <script>
         // PDF 열기 함수
         function openPdf() {
-            const pdfUrl = 'https://sookmyongcal.netlify.app/2026%ED%95%99%EB%85%84%EB%8F%84%EC%8B%A0%EC%9E%85%EC%83%9D%ED%95%A9%EA%B2%A9%EC%9E%90%EC%95%88%EB%82%B4%EC%82%AC%ED%95%AD(20251212).pdf';
+            const pdfUrl = 'https://sookmyongcal.netlify.app/2026학년도신입생합격자안내사항(20251212).pdf';
             window.open(pdfUrl, '_blank');
         }
 
@@ -1015,7 +1015,7 @@
             // PDF 특정 페이지 열기 함수
             window.openPdfPage = function(pageNumber) {
                 // 기존 방식으로 되돌아가되, 모바일에서는 안내 메시지 표시
-                const pdfUrl = `https://sookmyongcal.netlify.app/2026%ED%95%99%EB%85%84%EB%8F%84%EC%8B%A0%EC%9E%85%EC%83%9D%ED%95%A8%EA%B2%A9%EC%9E%90%EC%95%88%EB%82%B4%EC%82%AC%ED%95%AD(20251212).pdf#page=${pageNumber}`;
+                const pdfUrl = `https://sookmyongcal.netlify.app/2026학년도신입생합격자안내사항(20251212).pdf#page=${pageNumber}`;
                 
                 // 모바일 환경 감지
                 const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
@@ -1023,7 +1023,7 @@
                 if (isMobile) {
                     // 모바일에서는 페이지 이동이 안된다는 안내와 함께 PDF 열기
                     if (confirm(`PDF를 열겠습니다.\n모바일에서는 자동 페이지 이동이 지원되지 않을 수 있습니다.\n수동으로 ${pageNumber}페이지로 이동해주세요.\n\n열기를 누르면 PDF가 열립니다.`)) {
-                        window.open('https://sookmyongcal.netlify.app/2026%ED%95%99%EB%85%84%EB%8F%84%EC%8B%A0%EC%9E%85%EC%83%9D%ED%95%A8%EA%B2%A9%EC%9E%90%EC%95%88%EB%82%B4%EC%82%AC%ED%95%AD(20251212).pdf', '_blank');
+                        window.open('https://sookmyongcal.netlify.app/2026학년도신입생합격자안내사항(20251212).pdf', '_blank');
                     }
                 } else {
                     // PC에서는 기존 방식대로
