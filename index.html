@@ -297,7 +297,7 @@
                         <td class="event-day"><a href="#event-12-2" class="day-number">16</a><span class="event-marker"></span></td>
                         <td class="event-day"><a href="#event-12-3" class="day-number">17</a><span class="event-marker"></span></td>
                         <td class="event-day"><a href="#event-12-4" class="day-number">18</a><span class="event-marker"></span></td>
-                        <td class="event-day today"><a href="#event-12-5" class="day-number">19</a><span class="event-marker"></span><span class="now-indicator">Now</span></td>
+                        <td class="event-day"><a href="#event-12-5" class="day-number">19</a><span class="event-marker"></span></td>
                         <td>20</td>
                     </tr>
                     <tr>
@@ -813,6 +813,36 @@
             const todayMonth = today.getMonth() + 1;
             const todayYear = today.getFullYear();
             
+            // 모든 날짜 셀에서 오늘 날짜 찾아서 하이라이트
+            function highlightTodayDate() {
+                // 모든 날짜 셀 찾기
+                const allDayCells = document.querySelectorAll('td');
+                allDayCells.forEach(cell => {
+                    const dayNumber = cell.querySelector('.day-number');
+                    if (dayNumber) {
+                        const cellDate = parseInt(dayNumber.textContent);
+                        
+                        // 달력의 월 확인 (월 헤더에서 찾기)
+                        const calendar = cell.closest('.calendar');
+                        const monthHeader = calendar.querySelector('.month-header').textContent;
+                        const calendarMonth = parseInt(monthHeader.match(/(\d+)월/)[1]);
+                        
+                        // 오늘 날짜와 일치하면 하이라이트 적용
+                        if (calendarMonth === todayMonth && cellDate === todayDate) {
+                            cell.classList.add('today');
+                            
+                            // Now 표시가 없으면 추가
+                            if (!cell.querySelector('.now-indicator')) {
+                                const nowSpan = document.createElement('span');
+                                nowSpan.className = 'now-indicator';
+                                nowSpan.textContent = 'Now';
+                                cell.appendChild(nowSpan);
+                            }
+                        }
+                    }
+                });
+            }
+            
             // 날짜 범위 확인 함수
             function isDateInRange(dateText, startDay, endDay, month) {
                 if (month !== todayMonth) return false;
@@ -895,8 +925,9 @@
                 });
             }
             
+            highlightTodayDate();
             addNowToMonthlyEvents();
-            // 각주를 모두 제거했으므로 참조 링크 변환 기능 비활성화
+             // 각주를 모두 제거했으므로 참조 링크 변환 기능 비활성화
             
             // 날짜 링크 클릭 시 팝업 표시 기능 추가
             const dayLinks = document.querySelectorAll('.day-number');
