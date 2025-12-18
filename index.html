@@ -1014,8 +1014,19 @@
             
             // PDF 특정 페이지 열기 함수
             window.openPdfPage = function(pageNumber) {
-                const pdfUrl = 'https://sookmyongcal.netlify.app/2026%ED%95%99%EB%85%84%EB%8F%84%EC%8B%A0%EC%9E%85%EC%83%9D%ED%95%A9%EA%B2%A9%EC%9E%90%EC%95%88%EB%82%B4%EC%82%AC%ED%95%AD(20251212).pdf#page=' + pageNumber;
-                window.open(pdfUrl, '_blank');
+                // 모바일 환경 감지
+                const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+                
+                if (isMobile) {
+                    // 모바일에서는 PDF.js 뷰어 사용하여 페이지 지정
+                    const pdfUrl = `https://sookmyongcal.netlify.app/2026%ED%95%99%EB%85%84%EB%8F%84%EC%8B%A0%EC%9E%85%EC%83%9D%ED%95%A9%EA%B2%A9%EC%9E%90%EC%95%88%EB%82%B4%EC%82%AC%ED%95%AD(20251212).pdf#page=${pageNumber}`;
+                    const viewerUrl = `https://mozilla.github.io/pdf.js/web/viewer.html?file=${encodeURIComponent(pdfUrl)}`;
+                    window.open(viewerUrl, '_blank');
+                } else {
+                    // PC에서는 직접 PDF 링크 사용
+                    const pdfUrl = `https://sookmyongcal.netlify.app/2026%ED%95%99%EB%85%84%EB%8F%84%EC%8B%A0%EC%9E%85%EC%83%9D%ED%95%A9%EA%B2%A9%EC%9E%90%EC%95%88%EB%82%B4%EC%82%AC%ED%95%AD(20251212).pdf#page=${pageNumber}`;
+                    window.open(pdfUrl, '_blank');
+                }
             };
             
             // 검색 기능
