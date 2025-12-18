@@ -195,12 +195,43 @@
         }
         
         /* Clickable reference links (각주 제거로 비활성화) */
+        
+        /* 중요 일정 강조 스타일 */
+        .important-event {
+            font-weight: bold;
+            background-color: #fff0f0;
+            border-left: 4px solid #a31f33;
+            padding: 8px 12px;
+            margin: 5px 0;
+            border-radius: 0 4px 4px 0;
+        }
+        
+        /* 클릭 가능한 링크 스타일 */
+        .clickable-link {
+            color: #a31f33;
+            cursor: pointer;
+            text-decoration: underline;
+        }
 
     </style>
 </head>
 <body>
 
     <h1 style="text-align: center;">2026학년도 숙명여대 신입생 주요일정</h1>
+    
+    <!-- 검색창 추가 -->
+    <div style="text-align: center; margin: 20px 0;">
+        <input type="text" id="searchInput" placeholder="일정 검색 (예: 수시, 영어배치고사, 등록금)" style="padding: 10px; width: 300px; border: 1px solid #ccc; border-radius: 5px; font-size: 14px;">
+        <button onclick="searchEvents()" style="background-color: #a31f33; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; font-size: 14px; margin-left: 5px;">검색</button>
+        <button onclick="clearSearch()" style="background-color: #666; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; font-size: 14px; margin-left: 5px;">검색 초기화</button>
+    </div>
+    
+    <!-- 검색 결과 표시 영역 -->
+    <div id="searchResults" style="display: none; margin: 20px auto; max-width: 800px; background-color: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
+        <h3 style="color: #a31f33; margin-top: 0;">검색 결과</h3>
+        <div id="searchResultsList"></div>
+    </div>
+    
     <p style="margin: 20px 0; text-align: center;">굵게 표시된 날짜는 주요 일정이 있는 날입니다. 날짜를 클릭하면 상세 내용을 확인할 수 있습니다. <button onclick="openPdf()" style="background-color: #a31f33; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; font-size: 16px; vertical-align: middle;">합격자 안내사항 보기</button></p>
 
     <div class="calendar-container">
@@ -208,10 +239,6 @@
         <!-- 2025년 12월 달력 -->
         <div class="calendar">
             <div class="month-header">2025년 12월</div>
-            <div class="month-events-summary">
-                <h4>12월 일정 요약</h4>
-                <ul id="december-events"></ul>
-            </div>
             <table>
                 <thead>
                     <tr><th>일</th><th>월</th><th>화</th><th>수</th><th>목</th><th>금</th><th>토</th></tr>
@@ -246,15 +273,15 @@
                     </tr>
                 </tbody>
             </table>
+            <div class="month-events-summary">
+                <h4>12월 일정</h4>
+                <ul id="december-events"></ul>
+            </div>
         </div>
 
         <!-- 2026년 1월 달력 -->
         <div class="calendar">
             <div class="month-header">2026년 1월</div>
-            <div class="month-events-summary">
-                <h4>1월 일정 요약</h4>
-                <ul id="january-events"></ul>
-            </div>
             <table>
                 <thead>
                     <tr><th>일</th><th>월</th><th>화</th><th>수</th><th>목</th><th>금</th><th>토</th></tr>
@@ -307,15 +334,15 @@
                     </tr>
                 </tbody>
             </table>
+            <div class="month-events-summary">
+                <h4>1월 일정</h4>
+                <ul id="january-events"></ul>
+            </div>
         </div>
         
         <!-- 2026년 2월 달력 -->
         <div class="calendar">
             <div class="month-header">2026년 2월</div>
-            <div class="month-events-summary">
-                <h4>2월 일정 요약</h4>
-                <ul id="february-events"></ul>
-            </div>
             <table>
                 <thead>
                     <tr><th>일</th><th>월</th><th>화</th><th>수</th><th>목</th><th>금</th><th>토</th></tr>
@@ -359,15 +386,15 @@
                     </tr>
                 </tbody>
             </table>
+            <div class="month-events-summary">
+                <h4>2월 일정</h4>
+                <ul id="february-events"></ul>
+            </div>
         </div>
 
         <!-- 2026년 3월 달력 -->
         <div class="calendar">
             <div class="month-header">2026년 3월</div>
-            <div class="month-events-summary">
-                <h4>3월 일정 요약</h4>
-                <ul id="march-events"></ul>
-            </div>
             <table>
                 <thead>
                     <tr><th>일</th><th>월</th><th>화</th><th>수</th><th>목</th><th>금</th><th>토</th></tr>
@@ -420,6 +447,10 @@
                     </tr>
                 </tbody>
             </table>
+            <div class="month-events-summary">
+                <h4>3월 일정</h4>
+                <ul id="march-events"></ul>
+            </div>
         </div>
     </div>
     
@@ -723,7 +754,7 @@
     <script>
         // PDF 열기 함수
         function openPdf() {
-            const pdfUrl = './2026학년도신입생합격자안내사항(20251212).pdf';
+            const pdfUrl = 'https://sookmyongcal.netlify.app/2026%ED%95%99%EB%85%84%EB%8F%84%EC%8B%A0%EC%9E%85%EC%83%9D%ED%95%A9%EA%B2%A9%EC%9E%90%EC%95%88%EB%82%B4%EC%82%AC%ED%95%AD(20251212).pdf';
             window.open(pdfUrl, '_blank');
         }
 
@@ -793,6 +824,302 @@
                         history.pushState("", document.title, window.location.pathname);
                     }
                 });
+            });
+            
+            // 월별 이벤트 요약 생성 함수
+            function generateEventSummaries() {
+                // 12월 이벤트 요약 (모든 이벤트 포함)
+                const decemberEvents = [
+                    { date: '12월 15일~17일', desc: '수시 온라인 문서등록' },
+                    { date: '12월 17일~24일', desc: '등록 후 포기 신청' },
+                    { date: '12월 18일', desc: '충원 2차 합격자 발표 및 문서등록 시작' },
+                    { date: '12월 19일', desc: '충원 3차 합격자 발표 및 문서등록 시작' },
+                    { date: '12월 22일~23일', desc: '충원 4차 이후 합격자 발표' }
+                ];
+                
+                // 1월 이벤트 요약 (모든 이벤트 포함)
+                const januaryEvents = [
+                    { date: '1월 6일~13일', desc: '영어배치고사(GELT) 1차 접수' },
+                    { date: '1월 7일', desc: '신입생 예비대학 영어 집중강좌 및 교환학생제도 설명회' },
+                    { date: '1월 7일~13일', desc: '신입생 영어 집중과정(SMART) 1차 신청' },
+                    { date: '1월 19일~23일', desc: '영어배치고사(GELT) 1차 응시' },
+                    { date: '1월 19일~23일', desc: '매화장학금(장애학생) 신청' },
+                    { date: '1월 19일~30일', desc: 'SMART 영어 집중과정 1차 강의' },
+                    { date: '1월 21일~27일', desc: '신입생 영어 집중과정(SMART) 2차 신청' },
+                    { date: '1월 26일~2월 3일', desc: '청파장학금 등 장학금 신청' },
+                    { date: '1월 30일', desc: 'SMART 영어 집중과정 1차 강의 마감' }
+                ];
+                
+                // 2월 이벤트 요약 (모든 이벤트 포함)
+                const februaryEvents = [
+                    { date: '2월 2일~13일', desc: 'SMART 영어 집중과정 2차 강의' },
+                    { date: '2월 3일', desc: '본등록금 고지서 출력 시작' },
+                    { date: '2월 3일~5일', desc: '본등록금 납부' },
+                    { date: '2월 3일', desc: '장학금 증명 서류 제출 마감' },
+                    { date: '2월 4일~6일', desc: '학생생활관(기숙사) 입사 신청' },
+                    { date: '2월 5일', desc: '본등록금 납부 마감 및 1차 수강신청 시작' },
+                    { date: '2월 5일~9일', desc: '1차 수강신청' },
+                    { date: '2월 6일', desc: '영어배치고사(GELT) 2차 접수 마감' },
+                    { date: '2월 9일', desc: '1차 수강신청 마감' },
+                    { date: '2월 9일', desc: '기숙사 입사 합격자 발표' },
+                    { date: '2월 9일~11일', desc: '기숙사비 납부' },
+                    { date: '2월 10일', desc: '영어배치고사(GELT) 2차 응시' },
+                    { date: '2월 10일~12일', desc: '기숙사 서류 제출' },
+                    { date: '2월 11일', desc: '기숙사비 납부 기간 마감' },
+                    { date: '2월 12일', desc: '1차 수강신청 확정 결과 조회' },
+                    { date: '2월 13일', desc: 'SMART 영어 집중과정 2차 강의 마감' },
+                    { date: '2월 19일', desc: '영어배치고사(GELT) 3차 접수 시작' },
+                    { date: '2월 23일', desc: '입학식 및 신입생 환영회' },
+                    { date: '2월 24일~26일', desc: '신체검사' },
+                    { date: '2월 25일~26일', desc: '신입생 오리엔테이션' },
+                    { date: '2월 27일', desc: '영어배치고사(GELT) 4차 접수 시작' }
+                ];
+                
+                // 3월 이벤트 요약 (모든 이벤트 포함)
+                const marchEvents = [
+                    { date: '3월 3일', desc: '개강일' },
+                    { date: '3월 3일', desc: '도서관 이용 안내' },
+                    { date: '3월 3일', desc: '신입생 첫 대출 이벤트 시작' },
+                    { date: '3월 3일~31일', desc: '영어 교양필수 이수면제 신청' },
+                    { date: '3월 4일', desc: '영어배치고사(GELT) 4차 응시' },
+                    { date: '3월 31일', desc: '영어 교양필수 이수면제 신청 마감' }
+                ];
+                
+                // 각 월별 이벤트 목록을 DOM에 추가
+                const decemberList = document.getElementById('december-events');
+                const januaryList = document.getElementById('january-events');
+                const februaryList = document.getElementById('february-events');
+                const marchList = document.getElementById('march-events');
+                
+                // 기존 내용 삭제 (중복 방지)
+                if (decemberList) decemberList.innerHTML = '';
+                if (januaryList) januaryList.innerHTML = '';
+                if (februaryList) februaryList.innerHTML = '';
+                if (marchList) marchList.innerHTML = '';
+                
+                // 중요 일정 키워드 목록
+                const importantKeywords = ['본등록금 납부', '1차 수강신청', '입학식 및 신입생 환영회', '신입생 오리엔테이션', '개강일'];
+                
+                // 12월 이벤트 추가
+                if (decemberList) {
+                    decemberEvents.forEach(event => {
+                        const li = document.createElement('li');
+                        const isImportant = importantKeywords.some(keyword => event.desc.includes(keyword));
+                        
+                        if (isImportant) {
+                            li.className = 'important-event';
+                            li.innerHTML = `${event.date}: <span style="color: #a31f33;">${event.desc}</span>`;
+                        } else {
+                            li.textContent = `${event.date}: ${event.desc}`;
+                        }
+                        
+                        decemberList.appendChild(li);
+                    });
+                }
+                
+                // 1월 이벤트 추가
+                if (januaryList) {
+                    januaryEvents.forEach(event => {
+                        const li = document.createElement('li');
+                        const isImportant = importantKeywords.some(keyword => event.desc.includes(keyword));
+                        
+                        if (event.desc.includes('영어배치고사(GELT) 1차 접수')) {
+                            li.innerHTML = `${event.date}: <span class="clickable-link" onclick="openPdfPage(11)">${event.desc}</span>`;
+                        } else if (event.desc.includes('신입생 예비대학 영어 집중강좌 및 교환학생제도 설명회')) {
+                            li.innerHTML = `${event.date}: <span class="clickable-link" onclick="openPdfPage(13)">${event.desc}</span>`;
+                        } else if (event.desc.includes('본등록금 납부')) {
+                            li.innerHTML = `${event.date}: <span class="clickable-link" onclick="openPdfPage(4)">${event.desc}</span>`;
+                        } else if (event.desc.includes('영어배치고사(GELT) 1차 응시')) {
+                            li.innerHTML = `${event.date}: <span class="clickable-link" onclick="openPdfPage(11)">${event.desc}</span>`;
+                        } else if (event.desc.includes('영어배치고사(GELT) 3차 접수 시작')) {
+                            li.innerHTML = `${event.date}: <span class="clickable-link" onclick="openPdfPage(11)">${event.desc}</span>`;
+                        } else if (event.desc.includes('입학식 및 신입생 환영회')) {
+                            li.innerHTML = `${event.date}: <span class="clickable-link" onclick="openPdfPage(2)">${event.desc}</span>`;
+                        } else if (event.desc.includes('신입생 오리엔테이션')) {
+                            li.innerHTML = `${event.date}: <span class="clickable-link" onclick="openPdfPage(2)">${event.desc}</span>`;
+                        } else if (event.desc.includes('개강일')) {
+                            li.textContent = `${event.date}: ${event.desc}`;
+                        } else if (event.desc.includes('1차 수강신청')) {
+                            li.innerHTML = `${event.date}: <span class="clickable-link" onclick="openPdfPage(8)">${event.desc}</span>`;
+                        } else {
+                            li.textContent = `${event.date}: ${event.desc}`;
+                        }
+                        
+                        januaryList.appendChild(li);
+                    });
+                }
+                
+                // 2월 이벤트 추가
+                if (februaryList) {
+                    februaryEvents.forEach(event => {
+                        const li = document.createElement('li');
+                        const isImportant = importantKeywords.some(keyword => event.desc.includes(keyword));
+                        
+                        if (event.desc.includes('본등록금 납부')) {
+                            li.innerHTML = `${event.date}: <span class="clickable-link" onclick="openPdfPage(4)">${event.desc}</span>`;
+                        } else if (event.desc.includes('영어배치고사(GELT) 2차 응시')) {
+                            li.innerHTML = `${event.date}: <span class="clickable-link" onclick="openPdfPage(11)">${event.desc}</span>`;
+                        } else if (event.desc.includes('영어배치고사(GELT) 3차 접수 시작')) {
+                            li.innerHTML = `${event.date}: <span class="clickable-link" onclick="openPdfPage(11)">${event.desc}</span>`;
+                        } else if (event.desc.includes('입학식 및 신입생 환영회')) {
+                            li.innerHTML = `${event.date}: <span class="clickable-link" onclick="openPdfPage(2)">${event.desc}</span>`;
+                        } else if (event.desc.includes('신입생 오리엔테이션')) {
+                            li.innerHTML = `${event.date}: <span class="clickable-link" onclick="openPdfPage(2)">${event.desc}</span>`;
+                        } else if (event.desc.includes('개강일')) {
+                            li.textContent = `${event.date}: ${event.desc}`;
+                        } else if (event.desc.includes('1차 수강신청')) {
+                            li.innerHTML = `${event.date}: <span class="clickable-link" onclick="openPdfPage(8)">${event.desc}</span>`;
+                        } else {
+                            li.textContent = `${event.date}: ${event.desc}`;
+                        }
+                        
+                        februaryList.appendChild(li);
+                    });
+                }
+                
+                // 3월 이벤트 추가
+                if (marchList) {
+                    marchEvents.forEach(event => {
+                        const li = document.createElement('li');
+                        const isImportant = importantKeywords.some(keyword => event.desc.includes(keyword));
+                        
+                        if (event.desc.includes('개강일')) {
+                            li.textContent = `${event.date}: ${event.desc}`;
+                        } else {
+                            li.textContent = `${event.date}: ${event.desc}`;
+                        }
+                        
+                        marchList.appendChild(li);
+                    });
+                }
+            }
+            
+            // 함수 호출
+            generateEventSummaries();
+            
+            // PDF 특정 페이지 열기 함수
+            window.openPdfPage = function(pageNumber) {
+                const pdfUrl = 'https://sookmyongcal.netlify.app/2026%ED%95%99%EB%85%84%EB%8F%84%EC%8B%A0%EC%9E%85%EC%83%9D%ED%95%A9%EA%B2%A9%EC%9E%90%EC%95%88%EB%82%B4%EC%82%AC%ED%95%AD(20251212).pdf#page=' + pageNumber;
+                window.open(pdfUrl, '_blank');
+            };
+            
+            // 검색 기능
+            window.searchEvents = function() {
+                const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+                const searchResults = document.getElementById('searchResults');
+                const searchResultsList = document.getElementById('searchResultsList');
+                
+                if (!searchTerm) {
+                    searchResults.style.display = 'none';
+                    return;
+                }
+                
+                // 모든 이벤트 데이터
+                const allEvents = [
+                    // 12월 이벤트
+                    { month: '12월', date: '12월 15일', desc: '수시 온라인 문서등록 시작', fullDesc: '10시부터 입학처 홈페이지에서 온라인 등록이 시작됩니다. 수시모집 충원 세부일정: 최초합격자 등록 기간이 시작됩니다.' },
+                    { month: '12월', date: '12월 16일', desc: '수시 온라인 문서등록 진행 중', fullDesc: '등록 마감일은 12월 17일 16시입니다.' },
+                    { month: '12월', date: '12월 17일', desc: '수시 온라인 문서등록 마감 및 충원 1차 합격자 발표', fullDesc: '16시까지 최초 합격자의 등록이 마감됩니다. 등록 후 포기 신청 시작: 17시부터 12월 24일 16시까지 입학처 홈페이지에서 등록 포기 신청이 가능합니다. 충원 1차 합격자 발표 및 문서등록 시작: 23시부터 진행됩니다.' },
+                    { month: '12월', date: '12월 18일', desc: '충원 2차 합격자 발표 및 문서등록 시작', fullDesc: '17시부터 진행됩니다.' },
+                    { month: '12월', date: '12월 19일', desc: '충원 3차 합격자 발표 및 문서등록 시작', fullDesc: '17시부터 진행됩니다.' },
+                    { month: '12월', date: '12월 22일', desc: '충원 4차 이후 합격자 발표 시작', fullDesc: '14시부터 개별 통보 방식이 시작됩니다.' },
+                    { month: '12월', date: '12월 23일', desc: '충원 4차 이후 합격자 개별 통보 마감', fullDesc: '18시가 충원 합격 통보 마감 시각입니다.' },
+                    { month: '12월', date: '12월 24일', desc: '문서등록 후 포기 신청 마감', fullDesc: '16시까지 우리 대학교 입학처 홈페이지에서 신청해야 합니다.' },
+                    
+                    // 1월 이벤트
+                    { month: '1월', date: '1월 6일', desc: '영어배치고사(GELT) 1차 접수 시작', fullDesc: '10:00부터 1월 13일 24:00까지 접수 가능합니다.' },
+                    { month: '1월', date: '1월 7일', desc: '신입생 예비대학 영어 집중강좌 및 교환학생제도 설명회', fullDesc: '14:00~16:00에 2026년 숙명여대 신입생 및 학부모를 대상으로 진행됩니다.' },
+                    { month: '1월', date: '1월 7일', desc: '신입생 영어 집중과정(SMART) 1차 신청 시작', fullDesc: '1월 13일까지 온라인 신청이 가능합니다 (입금자 선착순 마감).' },
+                    { month: '1월', date: '1월 13일', desc: '영어배치고사(GELT) 1차 접수 마감', fullDesc: '24:00에 접수가 마감됩니다.' },
+                    { month: '1월', date: '1월 13일', desc: '신입생 영어 집중과정(SMART) 1차 신청 마감', fullDesc: '' },
+                    { month: '1월', date: '1월 19일', desc: '영어배치고사(GELT) 1차 응시 시작', fullDesc: '10:00부터 1월 23일 24:00까지 응시 가능합니다.' },
+                    { month: '1월', date: '1월 19일', desc: '매화장학금(장애학생) 신청 시작', fullDesc: '10:00부터 1월 23일 16:00까지 장애학생지원센터 이메일로 제출 가능합니다.' },
+                    { month: '1월', date: '1월 19일', desc: 'SMART 영어 집중과정 1차 강의 시작', fullDesc: '1월 30일(금)까지 총 10일간 진행됩니다.' },
+                    { month: '1월', date: '1월 21일', desc: '신입생 영어 집중과정(SMART) 2차 신청 시작', fullDesc: '1월 27일(화)까지 신청 가능합니다.' },
+                    { month: '1월', date: '1월 23일', desc: '영어배치고사(GELT) 1차 응시 마감', fullDesc: '24:00에 마감됩니다.' },
+                    { month: '1월', date: '1월 23일', desc: '매화장학금(장애학생) 신청 마감', fullDesc: '16:00에 마감됩니다.' },
+                    { month: '1월', date: '1월 26일', desc: '청파장학금 등 장학금 신청 시작', fullDesc: '10:00부터 2월 3일(화) 16:00까지 학생지원센터 이메일로 제출해야 합니다.' },
+                    { month: '1월', date: '1월 27일', desc: '신입생 영어 집중과정(SMART) 2차 신청 마감', fullDesc: '' },
+                    { month: '1월', date: '1월 30일', desc: 'SMART 영어 집중과정 1차 강의 마감', fullDesc: '' },
+                    
+                    // 2월 이벤트
+                    { month: '2월', date: '2월 2일', desc: 'SMART 영어 집중과정 2차 강의 시작', fullDesc: '2월 13일(금)까지 총 10일간 진행됩니다.' },
+                    { month: '2월', date: '2월 2일', desc: '국가장학금 I, II 유형 신청 기간 시작 (예정)', fullDesc: '2월 초부터 3월 둘째 주까지 한국장학재단 홈페이지에서 신청해야 합니다 (정확한 일정은 추후 SnoWe 공지).' },
+                    { month: '2월', date: '2월 3일', desc: '본등록금 고지서 출력 시작', fullDesc: '10시부터 입학처 홈페이지에서 출력 가능합니다.' },
+                    { month: '2월', date: '2월 3일', desc: '본등록금 납부 기간 시작', fullDesc: '10:00부터 납부가 시작됩니다.' },
+                    { month: '2월', date: '2월 3일', desc: '장학금 증명 서류 제출 마감', fullDesc: '청파, 국가유공자, 새터민 장학금 관련 증명서류 제출 기한 마감 (16:00).' },
+                    { month: '2월', date: '2월 4일', desc: '학생생활관(기숙사) 입사 신청 시작 (예정)', fullDesc: '13:00부터 2월 6일(금) 15:00까지 학생생활관 홈페이지에서 신청 가능합니다.' },
+                    { month: '2월', date: '2월 5일', desc: '본등록금 납부 마감', fullDesc: '16:00까지 신한은행 및 전국 은행을 통해 납부해야 합니다.' },
+                    { month: '2월', date: '2월 5일', desc: '1차 수강신청 시작', fullDesc: '9시부터 2월 9일(월) 17시까지 진행됩니다.' },
+                    { month: '2월', date: '2월 5일', desc: '영어배치고사(GELT) 2차 접수 시작', fullDesc: '10:00부터 2월 6일 24:00까지 접수 가능합니다.' },
+                    { month: '2월', date: '2월 6일', desc: '학생생활관(기숙사) 입사 신청 마감 (예정)', fullDesc: '15:00에 마감됩니다.' },
+                    { month: '2월', date: '2월 6일', desc: '영어배치고사(GELT) 2차 접수 마감', fullDesc: '24:00에 마감됩니다.' },
+                    { month: '2월', date: '2월 9일', desc: '1차 수강신청 마감', fullDesc: '17시에 마감됩니다.' },
+                    { month: '2월', date: '2월 9일', desc: '기숙사 입사 합격자 발표 (예정)', fullDesc: '15:00에 발표됩니다.' },
+                    { month: '2월', date: '2월 9일', desc: '기숙사비 납부 기간 시작 (예정)', fullDesc: '15:00부터 2월 11일(수) 16:00까지 납부해야 합니다.' },
+                    { month: '2월', date: '2월 10일', desc: '영어배치고사(GELT) 2차 응시', fullDesc: '10:00부터 24:00까지 응시 가능합니다.' },
+                    { month: '2월', date: '2월 10일', desc: '기숙사 서류 제출 기간 시작 (예정)', fullDesc: '2월 12일(목) 16:00까지 서류 제출이 필요합니다.' },
+                    { month: '2월', date: '2월 11일', desc: '기숙사비 납부 기간 마감 (예정)', fullDesc: '16:00까지 미납 시 자동 입사 취소됩니다.' },
+                    { month: '2월', date: '2월 12일', desc: '1차 수강신청 확정 결과 조회 (예정)', fullDesc: '16:00부터 숙명포털시스템에서 확인 가능합니다.' },
+                    { month: '2월', date: '2월 12일', desc: '기숙사 서류 제출 기간 마감 (예정)', fullDesc: '16:00에 마감됩니다.' },
+                    { month: '2월', date: '2월 13일', desc: 'SMART 영어 집중과정 2차 강의 마감', fullDesc: '' },
+                    { month: '2월', date: '2월 19일', desc: '영어배치고사(GELT) 3차 접수 시작', fullDesc: '10:00부터 24:00까지 접수 가능합니다.' },
+                    { month: '2월', date: '2월 23일', desc: '입학식 및 신입생 환영회 (예정)', fullDesc: '장소 미정으로 학사팀 공지를 확인해야 합니다.' },
+                    { month: '2월', date: '2월 24일', desc: '신체검사 시작 (예정)', fullDesc: '2월 26일(목)까지 단과대학별로 진행되며, 일정 및 장소는 추후 공지됩니다.' },
+                    { month: '2월', date: '2월 24일', desc: '영어배치고사(GELT) 3차 응시', fullDesc: '10:00부터 24:00까지 응시 가능합니다.' },
+                    { month: '2월', date: '2월 25일', desc: '신입생 오리엔테이션 시작', fullDesc: '2월 26일(목)까지 각 단과대학(독립학부)별로 진행됩니다.' },
+                    { month: '2월', date: '2월 26일', desc: '신체검사 마감 (예정)', fullDesc: '단과대학별 수검 일시를 지키지 못한 경우, 해당 기간 중 가능한 시간에 검사를 받을 수 있습니다.' },
+                    { month: '2월', date: '2월 26일', desc: '신입생 오리엔테이션 마감', fullDesc: '' },
+                    { month: '2월', date: '2월 27일', desc: '영어배치고사(GELT) 4차 접수 시작', fullDesc: '10:00부터 3월 1일(일) 24:00까지 접수 가능합니다.' },
+                    
+                    // 3월 이벤트
+                    { month: '3월', date: '3월 3일', desc: '개강일', fullDesc: '2026학년도 1학기 개강일입니다.' },
+                    { month: '3월', date: '3월 3일', desc: '영어 교양필수 이수면제 신청 기간 시작', fullDesc: '3월 31일(화)까지 입학 후 1년 이내에 신청 가능합니다.' },
+                    { month: '3월', date: '3월 3일', desc: '도서관 이용 안내', fullDesc: '모바일 학생증으로 도서관 출입이 가능하며, 대출도 이날부터 가능합니다.' },
+                    { month: '3월', date: '3월 3일', desc: '신입생 첫 대출 이벤트 시작', fullDesc: '도서 2권 이상 첫 대출하는 신입생 대상 선물 증정 이벤트가 상품 소진 시까지 시작됩니다.' },
+                    { month: '3월', date: '3월 4일', desc: '영어배치고사(GELT) 4차 응시', fullDesc: '10:00부터 16:00까지 응시 가능합니다.' },
+                    { month: '3월', date: '3월 31일', desc: '영어 교양필수 이수면제 신청 기간 마감', fullDesc: '입학 후 1년 이내 신청 기한 중 3월 신청 기간의 마지막 날입니다.' }
+                ];
+                
+                // 검색 결과 필터링
+                const filteredEvents = allEvents.filter(event =>
+                    event.desc.toLowerCase().includes(searchTerm) ||
+                    event.fullDesc.toLowerCase().includes(searchTerm) ||
+                    event.date.toLowerCase().includes(searchTerm) ||
+                    event.month.toLowerCase().includes(searchTerm)
+                );
+                
+                // 검색 결과 표시
+                searchResultsList.innerHTML = '';
+                
+                if (filteredEvents.length === 0) {
+                    searchResultsList.innerHTML = '<p>검색 결과가 없습니다.</p>';
+                } else {
+                    filteredEvents.forEach(event => {
+                        const eventDiv = document.createElement('div');
+                        eventDiv.style.cssText = 'margin-bottom: 15px; padding: 10px; border-left: 4px solid #a31f33; background-color: #f9f9f9;';
+                        eventDiv.innerHTML = `
+                            <strong>${event.date} - ${event.desc}</strong>
+                            ${event.fullDesc ? `<br><small style="color: #666;">${event.fullDesc}</small>` : ''}
+                        `;
+                        searchResultsList.appendChild(eventDiv);
+                    });
+                }
+                
+                searchResults.style.display = 'block';
+            };
+            
+            // 검색 초기화 기능
+            window.clearSearch = function() {
+                document.getElementById('searchInput').value = '';
+                document.getElementById('searchResults').style.display = 'none';
+            };
+            
+            // Enter 키로 검색 가능
+            document.getElementById('searchInput').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    searchEvents();
+                }
             });
         });
     </script>
