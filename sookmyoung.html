@@ -1,0 +1,668 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>2026학년도 신입생 주요 일정 달력</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f4f4f9;
+        }
+
+        .calendar-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .calendar {
+            background-color: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            width: calc(50% - 10px);
+            box-sizing: border-box;
+        }
+
+        .month-header {
+            font-size: 1.5em;
+            text-align: center;
+            margin-bottom: 15px;
+            color: #4a4a4a;
+            border-bottom: 2px solid #a31f33;
+            padding-bottom: 5px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            background-color: #f0f0f0;
+            color: #333;
+            padding: 10px 5px;
+            text-align: center;
+            font-size: 0.9em;
+        }
+
+        td {
+            padding: 8px 0;
+            height: 40px;
+            text-align: center;
+            vertical-align: top;
+            border: 1px solid #eee;
+            position: relative;
+        }
+
+        td.prev-month, td.next-month {
+            color: #ccc;
+            background-color: #fafafa;
+        }
+
+        .event-day {
+            background-color: #fff0f0; /* 이벤트 있는 날 배경 */
+        }
+
+        .day-number {
+            display: block;
+            font-weight: bold;
+            color: #4a4a4a;
+            font-size: 1.1em;
+            margin-bottom: 2px;
+            cursor: pointer;
+            text-decoration: none;
+        }
+        
+        /* 이벤트 표시 */
+        .event-marker {
+            display: block;
+            width: 6px;
+            height: 6px;
+            background-color: #a31f33; /* 숙명여대 상징색 */
+            border-radius: 50%;
+            margin: 0 auto;
+        }
+        
+        /* 상세 일정 팝업 스타일 */
+        .event-detail-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            z-index: 1000;
+        }
+
+        .event-detail-content {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 500px;
+            margin: 100px auto;
+            position: relative;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+        
+        .event-detail-content h3 {
+            color: #a31f33;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 10px;
+            margin-top: 0;
+        }
+        
+        .event-detail-content p {
+            margin-bottom: 15px;
+            line-height: 1.5;
+            font-size: 0.95em;
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 10px;
+            right: 20px;
+            font-size: 1.5em;
+            color: #aaa;
+            text-decoration: none;
+        }
+        
+        /* URL fragment matching for display */
+        .event-detail-overlay:target {
+            display: block;
+        }
+        
+        /* Clickable reference links (각주 제거로 비활성화) */
+
+    </style>
+</head>
+<body>
+
+    <h1>2026학년도 신입생 주요 일정</h1>
+    <p>굵게 표시된 날짜는 주요 일정이 있는 날입니다. 날짜를 클릭하면 상세 내용을 확인할 수 있습니다.</p>
+    <div style="text-align: center; margin: 20px 0;">
+        <button onclick="openPdf()" style="background-color: #a31f33; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; font-size: 16px;">합격자 안내사항 보기</button>
+    </div>
+
+    <div class="calendar-container">
+
+        <!-- 2025년 12월 달력 -->
+        <div class="calendar">
+            <div class="month-header">2025년 12월</div>
+            <table>
+                <thead>
+                    <tr><th>일</th><th>월</th><th>화</th><th>수</th><th>목</th><th>금</th><th>토</th></tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="prev-month">30</td>
+                        <td class="event-day"><a href="#event-12-1" class="day-number">15</a><span class="event-marker"></span></td>
+                        <td class="event-day"><a href="#event-12-2" class="day-number">16</a><span class="event-marker"></span></td>
+                        <td class="event-day"><a href="#event-12-3" class="day-number">17</a><span class="event-marker"></span></td>
+                        <td class="event-day"><a href="#event-12-4" class="day-number">18</a><span class="event-marker"></span></td>
+                        <td class="event-day"><a href="#event-12-5" class="day-number">19</a><span class="event-marker"></span></td>
+                        <td>20</td>
+                    </tr>
+                    <tr>
+                        <td>21</td>
+                        <td class="event-day"><a href="#event-12-6" class="day-number">22</a><span class="event-marker"></span></td>
+                        <td class="event-day"><a href="#event-12-7" class="day-number">23</a><span class="event-marker"></span></td>
+                        <td class="event-day"><a href="#event-12-8" class="day-number">24</a><span class="event-marker"></span></td>
+                        <td>25</td>
+                        <td>26</td>
+                        <td>27</td>
+                    </tr>
+                    <tr>
+                        <td>28</td>
+                        <td>29</td>
+                        <td>30</td>
+                        <td>31</td>
+                        <td class="next-month">1</td>
+                        <td class="next-month">2</td>
+                        <td class="next-month">3</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- 2026년 1월 달력 -->
+        <div class="calendar">
+            <div class="month-header">2026년 1월</div>
+            <table>
+                <thead>
+                    <tr><th>일</th><th>월</th><th>화</th><th>수</th><th>목</th><th>금</th><th>토</th></tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="prev-month"></td>
+                        <td class="prev-month"></td>
+                        <td class="prev-month"></td>
+                        <td></td>
+                        <td class="next-month">1</td>
+                        <td class="next-month">2</td>
+                        <td class="next-month">3</td>
+                    </tr>
+                    <tr>
+                        <td>4</td>
+                        <td>5</td>
+                        <td class="event-day"><a href="#event-01-1" class="day-number">6</a><span class="event-marker"></span></td>
+                        <td class="event-day"><a href="#event-01-2" class="day-number">7</a><span class="event-marker"></span></td>
+                        <td>8</td>
+                        <td>9</td>
+                        <td>10</td>
+                    </tr>
+                    <tr>
+                        <td>11</td>
+                        <td>12</td>
+                        <td class="event-day"><a href="#event-01-3" class="day-number">13</a><span class="event-marker"></span></td>
+                        <td>14</td>
+                        <td>15</td>
+                        <td>16</td>
+                        <td>17</td>
+                    </tr>
+                    <tr>
+                        <td>18</td>
+                        <td class="event-day"><a href="#event-01-4" class="day-number">19</a><span class="event-marker"></span></td>
+                        <td>20</td>
+                        <td class="event-day"><a href="#event-01-5" class="day-number">21</a><span class="event-marker"></span></td>
+                        <td>22</td>
+                        <td class="event-day"><a href="#event-01-6" class="day-number">23</a><span class="event-marker"></span></td>
+                        <td>24</td>
+                    </tr>
+                    <tr>
+                        <td>25</td>
+                        <td class="event-day"><a href="#event-01-7" class="day-number">26</a><span class="event-marker"></span></td>
+                        <td class="event-day"><a href="#event-01-8" class="day-number">27</a><span class="event-marker"></span></td>
+                        <td>28</td>
+                        <td>29</td>
+                        <td class="event-day"><a href="#event-01-9" class="day-number">30</a><span class="event-marker"></span></td>
+                        <td>31</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        
+        <!-- 2026년 2월 달력 -->
+        <div class="calendar">
+            <div class="month-header">2026년 2월</div>
+            <table>
+                <thead>
+                    <tr><th>일</th><th>월</th><th>화</th><th>수</th><th>목</th><th>금</th><th>토</th></tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>1</td>
+                        <td class="event-day"><a href="#event-02-1" class="day-number">2</a><span class="event-marker"></span></td>
+                        <td class="event-day"><a href="#event-02-2" class="day-number">3</a><span class="event-marker"></span></td>
+                        <td class="event-day"><a href="#event-02-3" class="day-number">4</a><span class="event-marker"></span></td>
+                        <td class="event-day"><a href="#event-02-4" class="day-number">5</a><span class="event-marker"></span></td>
+                        <td class="event-day"><a href="#event-02-5" class="day-number">6</a><span class="event-marker"></span></td>
+                        <td>7</td>
+                    </tr>
+                    <tr>
+                        <td>8</td>
+                        <td class="event-day"><a href="#event-02-6" class="day-number">9</a><span class="event-marker"></span></td>
+                        <td class="event-day"><a href="#event-02-7" class="day-number">10</a><span class="event-marker"></span></td>
+                        <td class="event-day"><a href="#event-02-8" class="day-number">11</a><span class="event-marker"></span></td>
+                        <td class="event-day"><a href="#event-02-9" class="day-number">12</a><span class="event-marker"></span></td>
+                        <td class="event-day"><a href="#event-02-10" class="day-number">13</a><span class="event-marker"></span></td>
+                        <td>14</td>
+                    </tr>
+                    <tr>
+                        <td>15</td>
+                        <td>16</td>
+                        <td>17</td>
+                        <td>18</td>
+                        <td class="event-day"><a href="#event-02-11" class="day-number">19</a><span class="event-marker"></span></td>
+                        <td>20</td>
+                        <td>21</td>
+                    </tr>
+                    <tr>
+                        <td>22</td>
+                        <td class="event-day"><a href="#event-02-12" class="day-number">23</a><span class="event-marker"></span></td>
+                        <td class="event-day"><a href="#event-02-13" class="day-number">24</a><span class="event-marker"></span></td>
+                        <td class="event-day"><a href="#event-02-14" class="day-number">25</a><span class="event-marker"></span></td>
+                        <td class="event-day"><a href="#event-02-15" class="day-number">26</a><span class="event-marker"></span></td>
+                        <td class="event-day"><a href="#event-02-16" class="day-number">27</a><span class="event-marker"></span></td>
+                        <td>28</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- 2026년 3월 달력 -->
+        <div class="calendar">
+            <div class="month-header">2026년 3월</div>
+            <table>
+                <thead>
+                    <tr><th>일</th><th>월</th><th>화</th><th>수</th><th>목</th><th>금</th><th>토</th></tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>1</td>
+                        <td>2</td>
+                        <td class="event-day"><a href="#event-03-1" class="day-number">3</a><span class="event-marker"></span></td>
+                        <td class="event-day"><a href="#event-03-2" class="day-number">4</a><span class="event-marker"></span></td>
+                        <td>5</td>
+                        <td>6</td>
+                        <td>7</td>
+                    </tr>
+                    <tr>
+                        <td>8</td>
+                        <td>9</td>
+                        <td>10</td>
+                        <td>11</td>
+                        <td>12</td>
+                        <td>13</td>
+                        <td>14</td>
+                    </tr>
+                    <tr>
+                        <td>15</td>
+                        <td>16</td>
+                        <td>17</td>
+                        <td>18</td>
+                        <td>19</td>
+                        <td>20</td>
+                        <td>21</td>
+                    </tr>
+                    <tr>
+                        <td>22</td>
+                        <td>23</td>
+                        <td>24</td>
+                        <td>25</td>
+                        <td>26</td>
+                        <td>27</td>
+                        <td>28</td>
+                    </tr>
+                    <tr>
+                        <td>29</td>
+                        <td>30</td>
+                        <td class="event-day"><a href="#event-03-3" class="day-number">31</a><span class="event-marker"></span></td>
+                        <td class="next-month">1</td>
+                        <td class="next-month">2</td>
+                        <td class="next-month">3</td>
+                        <td class="next-month">4</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    
+    <!-- 상세 일정 팝업 섹션 -->
+
+    <!-- 2025년 12월 이벤트 -->
+    <div id="event-12-1" class="event-detail-overlay">
+        <div class="event-detail-content">
+            <a href="#" class="close-btn">&times;</a>
+            <h3>2025년 12월 15일 (월)</h3>
+            <p><strong>수시 온라인 문서등록 시작:</strong> 10시부터 입학처 홈페이지에서 온라인 등록이 시작됩니다.</p>
+            <p><strong>수시모집 충원 세부일정:</strong> 최초합격자 등록 기간이 시작됩니다.</p>
+        </div>
+    </div>
+    <div id="event-12-2" class="event-detail-overlay">
+        <div class="event-detail-content">
+            <a href="#" class="close-btn">&times;</a>
+            <h3>2025년 12월 16일 (화)</h3>
+            <p><strong>수시 온라인 문서등록 진행 중</strong>: 등록 마감일은 12월 17일 16시입니다.</p>
+        </div>
+    </div>
+    <div id="event-12-3" class="event-detail-overlay">
+        <div class="event-detail-content">
+            <a href="#" class="close-btn">&times;</a>
+            <h3>2025년 12월 17일 (수)</h3>
+            <p><strong>수시 온라인 문서등록 마감:</strong> 16시까지 최초 합격자의 등록이 마감됩니다.</p>
+            <p><strong>등록 후 포기 신청 시작:</strong> 17시부터 12월 24일 16시까지 입학처 홈페이지에서 등록 포기 신청이 가능합니다.</p>
+            <p><strong>충원 1차 합격자 발표 및 문서등록 시작:</strong> 23시부터 진행됩니다.</p>
+        </div>
+    </div>
+    <div id="event-12-4" class="event-detail-overlay">
+        <div class="event-detail-content">
+            <a href="#" class="close-btn">&times;</a>
+            <h3>2025년 12월 18일 (목)</h3>
+            <p><strong>충원 2차 합격자 발표 및 문서등록 시작:</strong> 17시부터 진행됩니다.</p>
+        </div>
+    </div>
+    <div id="event-12-5" class="event-detail-overlay">
+        <div class="event-detail-content">
+            <a href="#" class="close-btn">&times;</a>
+            <h3>2025년 12월 19일 (금)</h3>
+            <p><strong>충원 3차 합격자 발표 및 문서등록 시작:</strong> 17시부터 진행됩니다.</p>
+        </div>
+    </div>
+    <div id="event-12-6" class="event-detail-overlay">
+        <div class="event-detail-content">
+            <a href="#" class="close-btn">&times;</a>
+            <h3>2025년 12월 22일 (월)</h3>
+            <p><strong>충원 4차 이후 합격자 발표 시작</strong>: 14시부터 개별 통보 방식이 시작됩니다.</p>
+        </div>
+    </div>
+    <div id="event-12-7" class="event-detail-overlay">
+        <div class="event-detail-content">
+            <a href="#" class="close-btn">&times;</a>
+            <h3>2025년 12월 23일 (화)</h3>
+            <p><strong>충원 4차 이후 합격자 개별 통보 마감:</strong> 18시가 충원 합격 통보 마감 시각입니다.</p>
+        </div>
+    </div>
+    <div id="event-12-8" class="event-detail-overlay">
+        <div class="event-detail-content">
+            <a href="#" class="close-btn">&times;</a>
+            <h3>2025년 12월 24일 (수)</h3>
+            <p><strong>문서등록 후 포기 신청 마감:</strong> 16시까지 우리 대학교 입학처 홈페이지에서 신청해야 합니다.</p>
+        </div>
+    </div>
+    
+    <!-- 2026년 1월 이벤트 -->
+    <div id="event-01-1" class="event-detail-overlay">
+        <div class="event-detail-content">
+            <a href="#" class="close-btn">&times;</a>
+            <h3>2026년 1월 6일 (화)</h3>
+            <p><strong>영어배치고사(GELT) 1차 접수 시작:</strong> 10:00부터 1월 13일 24:00까지 접수 가능합니다.</p>
+        </div>
+    </div>
+    <div id="event-01-2" class="event-detail-overlay">
+        <div class="event-detail-content">
+            <a href="#" class="close-btn">&times;</a>
+            <h3>2026년 1월 7일 (수)</h3>
+            <p><strong>신입생 예비대학 영어 집중강좌 및 교환학생제도 설명회:</strong> 14:00~16:00에 2026년 숙명여대 신입생 및 학부모를 대상으로 진행됩니다.</p>
+            <p><strong>신입생 영어 집중과정(SMART) 1차 신청 시작:</strong> 1월 13일까지 온라인 신청이 가능합니다 (입금자 선착순 마감).</p>
+        </div>
+    </div>
+    <div id="event-01-3" class="event-detail-overlay">
+        <div class="event-detail-content">
+            <a href="#" class="close-btn">&times;</a>
+            <h3>2026년 1월 13일 (화)</h3>
+            <p><strong>영어배치고사(GELT) 1차 접수 마감:</strong> 24:00에 접수가 마감됩니다.</p>
+            <p><strong>신입생 영어 집중과정(SMART) 1차 신청 마감</strong>.</p>
+        </div>
+    </div>
+    <div id="event-01-4" class="event-detail-overlay">
+        <div class="event-detail-content">
+            <a href="#" class="close-btn">&times;</a>
+            <h3>2026년 1월 19일 (월)</h3>
+            <p><strong>영어배치고사(GELT) 1차 응시 시작:</strong> 10:00부터 1월 23일 24:00까지 응시 가능합니다.</p>
+            <p><strong>매화장학금(장애학생) 신청 시작:</strong> 10:00부터 1월 23일 16:00까지 장애학생지원센터 이메일로 제출 가능합니다.</p>
+            <p><strong>SMART 영어 집중과정 1차 강의 시작:</strong> 1월 30일(금)까지 총 10일간 진행됩니다.</p>
+        </div>
+    </div>
+    <div id="event-01-5" class="event-detail-overlay">
+        <div class="event-detail-content">
+            <a href="#" class="close-btn">&times;</a>
+            <h3>2026년 1월 21일 (수)</h3>
+            <p><strong>신입생 영어 집중과정(SMART) 2차 신청 시작:</strong> 1월 27일(화)까지 신청 가능합니다.</p>
+        </div>
+    </div>
+    <div id="event-01-6" class="event-detail-overlay">
+        <div class="event-detail-content">
+            <a href="#" class="close-btn">&times;</a>
+            <h3>2026년 1월 23일 (금)</h3>
+            <p><strong>매화장학금(장애학생) 신청 마감:</strong> 16:00에 마감됩니다.</p>
+            <p><strong>영어배치고사(GELT) 1차 응시 마감:</strong> 24:00에 마감됩니다.</p>
+        </div>
+    </div>
+    <div id="event-01-7" class="event-detail-overlay">
+        <div class="event-detail-content">
+            <a href="#" class="close-btn">&times;</a>
+            <h3>2026년 1월 26일 (월)</h3>
+            <p><strong>청파장학금(기초생활보장수급자), 국가유공자, 새터민 관련 장학금 신청 시작:</strong> 10:00부터 2월 3일(화) 16:00까지 학생지원센터 이메일로 제출해야 합니다.</p>
+        </div>
+    </div>
+    <div id="event-01-8" class="event-detail-overlay">
+        <div class="event-detail-content">
+            <a href="#" class="close-btn">&times;</a>
+            <h3>2026년 1월 27일 (화)</h3>
+            <p><strong>신입생 영어 집중과정(SMART) 2차 신청 마감</strong>.</p>
+        </div>
+    </div>
+    <div id="event-01-9" class="event-detail-overlay">
+        <div class="event-detail-content">
+            <a href="#" class="close-btn">&times;</a>
+            <h3>2026년 1월 30일 (금)</h3>
+            <p><strong>SMART 영어 집중과정 1차 강의 마감</strong>.</p>
+        </div>
+    </div>
+    
+    <!-- 2026년 2월 이벤트 -->
+    <div id="event-02-1" class="event-detail-overlay">
+        <div class="event-detail-content">
+            <a href="#" class="close-btn">&times;</a>
+            <h3>2026년 2월 2일 (월)</h3>
+            <p><strong>SMART 영어 집중과정 2차 강의 시작:</strong> 2월 13일(금)까지 총 10일간 진행됩니다.</p>
+            <p><strong>국가장학금 I, II 유형 신청 기간 시작 (예정):</strong> 2월 초부터 3월 둘째 주까지 한국장학재단 홈페이지에서 신청해야 합니다 (정확한 일정은 추후 SnoWe 공지).</p>
+        </div>
+    </div>
+    <div id="event-02-2" class="event-detail-overlay">
+        <div class="event-detail-content">
+            <a href="#" class="close-btn">&times;</a>
+            <h3>2026년 2월 3일 (화)</h3>
+            <p><strong>본등록금 고지서 출력 시작:</strong> 10시부터 입학처 홈페이지에서 출력 가능합니다.</p>
+            <p><strong>본등록금 납부 기간 시작:</strong> 10:00부터 납부가 시작됩니다.</p>
+            <p><strong>장학금 증명 서류 제출 마감:</strong> 청파, 국가유공자, 새터민 장학금 관련 증명서류 제출 기한 마감 (16:00).</p>
+        </div>
+    </div>
+    <div id="event-02-3" class="event-detail-overlay">
+        <div class="event-detail-content">
+            <a href="#" class="close-btn">&times;</a>
+            <h3>2026년 2월 4일 (수)</h3>
+            <p><strong>학생생활관(기숙사) 입사 신청 시작 (예정):</strong> 13:00부터 2월 6일(금) 15:00까지 학생생활관 홈페이지에서 신청 가능합니다.</p>
+        </div>
+    </div>
+    <div id="event-02-4" class="event-detail-overlay">
+        <div class="event-detail-content">
+            <a href="#" class="close-btn">&times;</a>
+            <h3>2026년 2월 5일 (목)</h3>
+            <p><strong>본등록금 납부 마감:</strong> 16:00까지 신한은행 및 전국 은행을 통해 납부해야 합니다.</p>
+            <p><strong>1차 수강신청 시작:</strong> 9시부터 2월 9일(월) 17시까지 진행됩니다.</p>
+            <p><strong>영어배치고사(GELT) 2차 접수 시작:</strong> 10:00부터 2월 6일 24:00까지 접수 가능합니다.</p>
+        </div>
+    </div>
+    <div id="event-02-5" class="event-detail-overlay">
+        <div class="event-detail-content">
+            <a href="#" class="close-btn">&times;</a>
+            <h3>2026년 2월 6일 (금)</h3>
+            <p><strong>학생생활관(기숙사) 입사 신청 마감 (예정):</strong> 15:00에 마감됩니다.</p>
+            <p><strong>영어배치고사(GELT) 2차 접수 마감:</strong> 24:00에 마감됩니다.</p>
+        </div>
+    </div>
+    <div id="event-02-6" class="event-detail-overlay">
+        <div class="event-detail-content">
+            <a href="#" class="close-btn">&times;</a>
+            <h3>2026년 2월 9일 (월)</h3>
+            <p><strong>1차 수강신청 마감:</strong> 17시에 마감됩니다.</p>
+            <p><strong>기숙사 입사 합격자 발표 (예정):</strong> 15:00에 발표됩니다.</p>
+            <p><strong>기숙사비 납부 기간 시작 (예정):</strong> 15:00부터 2월 11일(수) 16:00까지 납부해야 합니다.</p>
+        </div>
+    </div>
+    <div id="event-02-7" class="event-detail-overlay">
+        <div class="event-detail-content">
+            <a href="#" class="close-btn">&times;</a>
+            <h3>2026년 2월 10일 (화)</h3>
+            <p><strong>영어배치고사(GELT) 2차 응시:</strong> 10:00부터 24:00까지 응시 가능합니다.</p>
+            <p><strong>기숙사 서류 제출 기간 시작 (예정):</strong> 2월 12일(목) 16:00까지 서류 제출이 필요합니다.</p>
+        </div>
+    </div>
+    <div id="event-02-8" class="event-detail-overlay">
+        <div class="event-detail-content">
+            <a href="#" class="close-btn">&times;</a>
+            <h3>2026년 2월 11일 (수)</h3>
+            <p><strong>기숙사비 납부 기간 마감 (예정):</strong> 16:00까지 미납 시 자동 입사 취소됩니다.</p>
+        </div>
+    </div>
+    <div id="event-02-9" class="event-detail-overlay">
+        <div class="event-detail-content">
+            <a href="#" class="close-btn">&times;</a>
+            <h3>2026년 2월 12일 (목)</h3>
+            <p><strong>1차 수강신청 확정 결과 조회 (예정):</strong> 16:00부터 숙명포털시스템에서 확인 가능합니다.</p>
+            <p><strong>기숙사 서류 제출 기간 마감 (예정):</strong> 16:00에 마감됩니다.</p>
+        </div>
+    </div>
+    <div id="event-02-10" class="event-detail-overlay">
+        <div class="event-detail-content">
+            <a href="#" class="close-btn">&times;</a>
+            <h3>2026년 2월 13일 (금)</h3>
+            <p><strong>SMART 영어 집중과정 2차 강의 마감</strong>.</p>
+        </div>
+    </div>
+    <div id="event-02-11" class="event-detail-overlay">
+        <div class="event-detail-content">
+            <a href="#" class="close-btn">&times;</a>
+            <h3>2026년 2월 19일 (목)</h3>
+            <p><strong>영어배치고사(GELT) 3차 접수 시작:</strong> 10:00부터 24:00까지 접수 가능합니다.</p>
+        </div>
+    </div>
+    <div id="event-02-12" class="event-detail-overlay">
+        <div class="event-detail-content">
+            <a href="#" class="close-btn">&times;</a>
+            <h3>2026년 2월 23일 (월)</h3>
+            <p><strong>입학식 및 신입생 환영회 (예정):</strong> 장소 미정으로 학사팀 공지를 확인해야 합니다.</p>
+        </div>
+    </div>
+    <div id="event-02-13" class="event-detail-overlay">
+        <div class="event-detail-content">
+            <a href="#" class="close-btn">&times;</a>
+            <h3>2026년 2월 24일 (화)</h3>
+            <p><strong>신체검사 시작 (예정):</strong> 2월 26일(목)까지 단과대학별로 진행되며, 일정 및 장소는 추후 공지됩니다.</p>
+            <p><strong>영어배치고사(GELT) 3차 응시:</strong> 10:00부터 24:00까지 응시 가능합니다.</p>
+        </div>
+    </div>
+    <div id="event-02-14" class="event-detail-overlay">
+        <div class="event-detail-content">
+            <a href="#" class="close-btn">&times;</a>
+            <h3>2026년 2월 25일 (수)</h3>
+            <p><strong>신입생 오리엔테이션 시작:</strong> 2월 26일(목)까지 각 단과대학(독립학부)별로 진행됩니다.</p>
+        </div>
+    </div>
+    <div id="event-02-15" class="event-detail-overlay">
+        <div class="event-detail-content">
+            <a href="#" class="close-btn">&times;</a>
+            <h3>2026년 2월 26일 (목)</h3>
+            <p><strong>신체검사 마감 (예정):</strong> 단과대학별 수검 일시를 지키지 못한 경우, 해당 기간 중 가능한 시간에 검사를 받을 수 있습니다.</p>
+            <p><strong>신입생 오리엔테이션 마감</strong>.</p>
+        </div>
+    </div>
+    <div id="event-02-16" class="event-detail-overlay">
+        <div class="event-detail-content">
+            <a href="#" class="close-btn">&times;</a>
+            <h3>2026년 2월 27일 (금)</h3>
+            <p><strong>영어배치고사(GELT) 4차 접수 시작:</strong> 10:00부터 3월 1일(일) 24:00까지 접수 가능합니다.</p>
+        </div>
+    </div>
+
+    <!-- 2026년 3월 이벤트 -->
+    <div id="event-03-1" class="event-detail-overlay">
+        <div class="event-detail-content">
+            <a href="#" class="close-btn">&times;</a>
+            <h3>2026년 3월 3일 (화)</h3>
+            <p><strong>개강일:</strong> 2026학년도 1학기 개강일입니다.</p>
+            <p><strong>영어 교양필수 이수면제 신청 기간 시작:</strong> 3월 31일(화)까지 입학 후 1년 이내에 신청 가능합니다.</p>
+            <p><strong>도서관 이용 안내:</strong> 모바일 학생증으로 도서관 출입이 가능하며, 대출도 이날부터 가능합니다.</p>
+            <p><strong>신입생 첫 대출 이벤트 시작:</strong> 도서 2권 이상 첫 대출하는 신입생 대상 선물 증정 이벤트가 상품 소진 시까지 시작됩니다.</p>
+        </div>
+    </div>
+    <div id="event-03-2" class="event-detail-overlay">
+        <div class="event-detail-content">
+            <a href="#" class="close-btn">&times;</a>
+            <h3>2026년 3월 4일 (수)</h3>
+            <p><strong>영어배치고사(GELT) 4차 응시:</strong> 10:00부터 16:00까지 응시 가능합니다.</p>
+        </div>
+    </div>
+    <div id="event-03-3" class="event-detail-overlay">
+        <div class="event-detail-content">
+            <a href="#" class="close-btn">&times;</a>
+            <h3>2026년 3월 31일 (화)</h3>
+            <p><strong>영어 교양필수 이수면제 신청 기간 마감:</strong> 입학 후 1년 이내 신청 기한 중 3월 신청 기간의 마지막 날입니다.</p>
+        </div>
+    </div>
+    
+    <!-- 중첩 일정 (기간 표시가 어려운 일정) -->
+    <div id="event-ongoing" class="event-detail-overlay">
+        <div class="event-detail-content">
+            <a href="#" class="close-btn">&times;</a>
+            <h3>기간 중 주요 진행 일정</h3>
+            <p><strong>국가장학금 I, II 유형 신청:</strong> 2026년 2월 초 ~ 3월 둘째 주 (정확한 일정은 추후 SnoWe 공지).</p>
+            <p><strong>신입생 대상 도서관 투어:</strong> 3월 첫째 주 ~ 둘째 주에 진행됩니다. (자세한 일정은 도서관 공지사항 참고).</p>
+            <p><strong>숙명가족장학금 신청:</strong> 3월 중 SNOWE 공지사항을 통해 별도 공지될 예정입니다.</p>
+            <p><strong>미수검자 서류 제출:</strong> 교내 신체검사를 받지 못한 경우(재직자 전형 합격자 포함) 3월 중으로 흉부X선 및 B형간염 검사 결과지를 보건의료센터에 제출해야 합니다.</p>
+        </div>
+    </div>
+
+    <script>
+        // PDF 열기 함수
+        function openPdf() {
+            const pdfUrl = './2026학년도신입생합격자안내사항(20251212).pdf';
+            window.open(pdfUrl, '_blank');
+        }
+
+        // 문서 로드 후 참조 링크에 이벤트 리스너 추가 (각주 제거로 비활성화)
+        document.addEventListener('DOMContentLoaded', function() {
+            // 각주를 모두 제거했으므로 참조 링크 변환 기능 비활성화
+        });
+    </script>
+
+</body>
+</html>
