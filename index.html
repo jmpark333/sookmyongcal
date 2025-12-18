@@ -208,6 +208,10 @@
         <!-- 2025년 12월 달력 -->
         <div class="calendar">
             <div class="month-header">2025년 12월</div>
+            <div class="month-events-summary">
+                <h4>12월 일정 요약</h4>
+                <ul id="december-events"></ul>
+            </div>
             <table>
                 <thead>
                     <tr><th>일</th><th>월</th><th>화</th><th>수</th><th>목</th><th>금</th><th>토</th></tr>
@@ -247,6 +251,10 @@
         <!-- 2026년 1월 달력 -->
         <div class="calendar">
             <div class="month-header">2026년 1월</div>
+            <div class="month-events-summary">
+                <h4>1월 일정 요약</h4>
+                <ul id="january-events"></ul>
+            </div>
             <table>
                 <thead>
                     <tr><th>일</th><th>월</th><th>화</th><th>수</th><th>목</th><th>금</th><th>토</th></tr>
@@ -304,6 +312,10 @@
         <!-- 2026년 2월 달력 -->
         <div class="calendar">
             <div class="month-header">2026년 2월</div>
+            <div class="month-events-summary">
+                <h4>2월 일정 요약</h4>
+                <ul id="february-events"></ul>
+            </div>
             <table>
                 <thead>
                     <tr><th>일</th><th>월</th><th>화</th><th>수</th><th>목</th><th>금</th><th>토</th></tr>
@@ -352,6 +364,10 @@
         <!-- 2026년 3월 달력 -->
         <div class="calendar">
             <div class="month-header">2026년 3월</div>
+            <div class="month-events-summary">
+                <h4>3월 일정 요약</h4>
+                <ul id="march-events"></ul>
+            </div>
             <table>
                 <thead>
                     <tr><th>일</th><th>월</th><th>화</th><th>수</th><th>목</th><th>금</th><th>토</th></tr>
@@ -735,6 +751,9 @@
                     }
                 });
             });
+            
+            // 월별 이벤트 요약 생성
+            generateEventSummaries();
             
             // 팝업 닫을 때 스크롤 위치 유지
             const closeButtons = document.querySelectorAll('.close-btn');
