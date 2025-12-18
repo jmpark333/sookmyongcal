@@ -709,6 +709,31 @@
         // 문서 로드 후 참조 링크에 이벤트 리스너 추가 (각주 제거로 비활성화)
         document.addEventListener('DOMContentLoaded', function() {
             // 각주를 모두 제거했으므로 참조 링크 변환 기능 비활성화
+            
+            // 팝업 닫을 때 스크롤 위치 유지
+            const closeButtons = document.querySelectorAll('.close-btn');
+            closeButtons.forEach(function(button) {
+                button.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const overlay = button.closest('.event-detail-overlay');
+                    overlay.style.display = 'none';
+                    
+                    // URL fragment 제거하여 페이지 맨 위로 스크롤되지 않도록 함
+                    history.pushState("", document.title, window.location.pathname);
+                });
+            });
+            
+            // 오버레이 배경 클릭 시에도 동일하게 처리
+            const overlays = document.querySelectorAll('.event-detail-overlay');
+            overlays.forEach(function(overlay) {
+                overlay.addEventListener('click', function(e) {
+                    if (e.target === overlay) {
+                        overlay.style.display = 'none';
+                        // URL fragment 제거
+                        history.pushState("", document.title, window.location.pathname);
+                    }
+                });
+            });
         });
     </script>
 
