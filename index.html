@@ -900,6 +900,9 @@
                 // 중요 일정 키워드 목록
                 const importantKeywords = ['본등록금 납부', '1차 수강신청', '입학식 및 신입생 환영회', '신입생 오리엔테이션', '개강일'];
                 
+                // 다음 일정 하이라이트 키워드 목록
+                const nextScheduleKeywords = ['본등록금 납부', '1차 수강신청', '입학식 및 신입생 환영회', '신입생 오리엔테이션', '개강일'];
+                
                 // 12월 이벤트 추가
                 if (decemberList) {
                     decemberEvents.forEach(event => {
@@ -954,21 +957,27 @@
                     februaryEvents.forEach(event => {
                         const li = document.createElement('li');
                         const isImportant = importantKeywords.some(keyword => event.desc.includes(keyword));
+                        const isNextSchedule = nextScheduleKeywords.some(keyword => event.desc.includes(keyword));
+                        
+                        if (isNextSchedule) {
+                            li.className = 'important-event';
+                            li.style.cssText = 'font-weight: bold; background-color: #ffe0e0; border-left: 4px solid #a31f33; padding: 8px 12px; margin: 5px 0; border-radius: 0 4px 4px 0;';
+                        }
                         
                         if (event.desc.includes('본등록금 납부')) {
-                            li.innerHTML = `${event.date}: <span class="clickable-link" onclick="openPdfPage(4)">${event.desc}</span>`;
+                            li.innerHTML = `${event.date}: <span style="color: #a31f33; font-weight: bold;">${event.desc}</span>`;
                         } else if (event.desc.includes('영어배치고사(GELT) 2차 응시')) {
                             li.innerHTML = `${event.date}: <span class="clickable-link" onclick="openPdfPage(11)">${event.desc}</span>`;
                         } else if (event.desc.includes('영어배치고사(GELT) 3차 접수 시작')) {
                             li.innerHTML = `${event.date}: <span class="clickable-link" onclick="openPdfPage(11)">${event.desc}</span>`;
                         } else if (event.desc.includes('입학식 및 신입생 환영회')) {
-                            li.innerHTML = `${event.date}: <span class="clickable-link" onclick="openPdfPage(2)">${event.desc}</span>`;
+                            li.innerHTML = `${event.date}: <span style="color: #a31f33; font-weight: bold;">${event.desc}</span>`;
                         } else if (event.desc.includes('신입생 오리엔테이션')) {
-                            li.innerHTML = `${event.date}: <span class="clickable-link" onclick="openPdfPage(2)">${event.desc}</span>`;
+                            li.innerHTML = `${event.date}: <span style="color: #a31f33; font-weight: bold;">${event.desc}</span>`;
                         } else if (event.desc.includes('개강일')) {
                             li.textContent = `${event.date}: ${event.desc}`;
                         } else if (event.desc.includes('1차 수강신청')) {
-                            li.innerHTML = `${event.date}: <span class="clickable-link" onclick="openPdfPage(8)">${event.desc}</span>`;
+                            li.innerHTML = `${event.date}: <span style="color: #a31f33; font-weight: bold;">${event.desc}</span>`;
                         } else {
                             li.textContent = `${event.date}: ${event.desc}`;
                         }
@@ -982,9 +991,15 @@
                     marchEvents.forEach(event => {
                         const li = document.createElement('li');
                         const isImportant = importantKeywords.some(keyword => event.desc.includes(keyword));
+                        const isNextSchedule = nextScheduleKeywords.some(keyword => event.desc.includes(keyword));
+                        
+                        if (isNextSchedule) {
+                            li.className = 'important-event';
+                            li.style.cssText = 'font-weight: bold; background-color: #ffe0e0; border-left: 4px solid #a31f33; padding: 8px 12px; margin: 5px 0; border-radius: 0 4px 4px 0;';
+                        }
                         
                         if (event.desc.includes('개강일')) {
-                            li.textContent = `${event.date}: ${event.desc}`;
+                            li.innerHTML = `${event.date}: <span style="color: #a31f33; font-weight: bold;">${event.desc}</span>`;
                         } else {
                             li.textContent = `${event.date}: ${event.desc}`;
                         }
