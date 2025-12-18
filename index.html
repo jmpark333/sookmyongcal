@@ -248,16 +248,19 @@
         
         /* 월별 일정에서 Now 표시 스타일 */
         .event-now {
-            display: inline-block;
-            background-color: #FF5722;
-            color: white;
-            padding: 2px 6px;
-            border-radius: 3px;
-            font-size: 0.8em;
-            font-weight: bold;
-            margin-left: 8px;
-            animation: blink 1.5s infinite;
-            vertical-align: middle;
+            display: inline-block !important;
+            background-color: #FF5722 !important;
+            color: white !important;
+            padding: 2px 6px !important;
+            border-radius: 3px !important;
+            font-size: 0.8em !important;
+            font-weight: bold !important;
+            margin-left: 8px !important;
+            animation: blink 1.5s infinite !important;
+            vertical-align: middle !important;
+            position: relative !important;
+            z-index: 100 !important;
+            line-height: 1 !important;
         }
 
     </style>
@@ -805,7 +808,37 @@
             window.open(pdfUrl, '_blank');
         }
 
-            // 문서 로드 후 참조 링크에 이벤트 리스너 추가 (각주 제거로 비활성화)
+        // 날짜 텍스트에서 기간 추출 함수 (전역 스코프로 이동)
+        function extractDateRange(text, month) {
+            const patterns = [
+                /(\d+)월 (\d+)일~(\d+)일/,
+                /(\d+)월 (\d+)일/,
+            ];
+            
+            for (const pattern of patterns) {
+                const match = text.match(pattern);
+                if (match) {
+                    if (match.length === 4) {
+                        // 기간 형식: "12월 15일~17일"
+                        return {
+                            start: parseInt(match[2]),
+                            end: parseInt(match[3]),
+                            month: parseInt(match[1])
+                        };
+                    } else if (match.length === 3) {
+                        // 단일 날짜 형식: "12월 19일"
+                        return {
+                            start: parseInt(match[2]),
+                            end: parseInt(match[2]),
+                            month: parseInt(match[1])
+                        };
+                    }
+                }
+            }
+            return null;
+        }
+
+        // 문서 로드 후 참조 링크에 이벤트 리스너 추가 (각주 제거로 비활성화)
         document.addEventListener('DOMContentLoaded', function() {
             // 오늘 날짜 확인 및 Now 표시 추가
             const today = new Date();
@@ -860,38 +893,11 @@
                 return false;
             }
             
-            // 날짜 텍스트에서 기간 추출 함수
-            function extractDateRange(text, month) {
-                const patterns = [
-                    /(\d+)월 (\d+)일~(\d+)일/,
-                    /(\d+)월 (\d+)일/,
-                ];
-                
-                for (const pattern of patterns) {
-                    const match = text.match(pattern);
-                    if (match) {
-                        if (match.length === 4) {
-                            // 기간 형식: "12월 15일~17일"
-                            return {
-                                start: parseInt(match[2]),
-                                end: parseInt(match[3]),
-                                month: parseInt(match[1])
-                            };
-                        } else if (match.length === 3) {
-                            // 단일 날짜 형식: "12월 19일"
-                            return {
-                                start: parseInt(match[2]),
-                                end: parseInt(match[2]),
-                                month: parseInt(match[1])
-                            };
-                        }
-                    }
-                }
-                return null;
-            }
-            
             // 월별 일정에 Now 표시 추가
             function addNowToMonthlyEvents() {
+                console.log('addNowToMonthlyEvents 호출됨');
+                console.log('오늘 날짜:', todayYear + '년 ' + todayMonth + '월 ' + todayDate + '일');
+                
                 const monthEventLists = [
                     { id: 'december-events', month: 12 },
                     { id: 'january-events', month: 1 },
@@ -901,22 +907,32 @@
                 
                 monthEventLists.forEach(monthList => {
                     const listElement = document.getElementById(monthList.id);
+                    console.log('월:', monthList.month, '목록 요소:', listElement);
+                    
                     if (listElement) {
                         // 먼저 모든 기존의 event-now 제거
                         listElement.querySelectorAll('.event-now').forEach(el => el.remove());
                         
                         const listItems = listElement.querySelectorAll('li');
-                        listItems.forEach(item => {
+                        console.log('항목 수:', listItems.length);
+                        
+                        listItems.forEach((item, index) => {
                             const text = item.textContent;
+                            console.log('항목', index, ':', text);
                             
                             // 날짜 범위 추출
                             const dateRange = extractDateRange(text, monthList.month);
+                            console.log('추출된 날짜 범위:', dateRange);
                             
                             if (dateRange) {
                                 // 오늘이 기간에 포함되는지 확인
-                                if (dateRange.month === todayMonth && 
-                                    todayDate >= dateRange.start && 
-                                    todayDate <= dateRange.end) {
+                                const isTodayInRange = dateRange.month === todayMonth &&
+                                                     todayDate >= dateRange.start &&
+                                                     todayDate <= dateRange.end;
+                                console.log('오늘 포함 여부:', isTodayInRange);
+                                
+                                if (isTodayInRange) {
+                                    console.log('Now 표시 추가 중...');
                                     
                                     // 이미 Now 표시가 있는지 확인
                                     if (!item.querySelector('.event-now')) {
@@ -924,10 +940,28 @@
                                         nowSpan.className = 'event-now';
                                         nowSpan.textContent = 'Now';
                                         item.appendChild(nowSpan);
+                                        console.log('Now 표시 추가 완료');
+                                        
+                                        // 추가 후 즉시 확인
+                                        setTimeout(() => {
+                                            const addedNow = item.querySelector('.event-now');
+                                            console.log('추가된 Now 요소:', addedNow);
+                                            console.log('Now 요소 스타일:', addedNow ? window.getComputedStyle(addedNow) : '없음');
+                                        }, 100);
                                     }
                                 }
                             }
                         });
+                        
+                        // 모든 처리 후 DOM 상태 확인
+                        setTimeout(() => {
+                            const allNowElements = listElement.querySelectorAll('.event-now');
+                            console.log('최종 Now 요소 수:', allNowElements.length);
+                            allNowElements.forEach((el, i) => {
+                                console.log('Now 요소', i, ':', el);
+                                console.log('Now 요소 스타일:', window.getComputedStyle(el));
+                            });
+                        }, 500);
                     }
                 });
             }
@@ -957,7 +991,7 @@
                 });
             });
             
-            // 월별 이벤트 요약 생성
+            // 월별 이벤트 요약 생성 (Now 표시 포함)
             generateEventSummaries();
             
             // 팝업 닫을 때 스크롤 위치 유지
@@ -1000,7 +1034,7 @@
                 });
             });
             
-            // 월별 이벤트 요약 생성 함수
+            // 월별 이벤트 요약 생성 함수 (Now 표시 포함)
             function generateEventSummaries() {
                 // 12월 이벤트 요약 (모든 이벤트 포함)
                 const decemberEvents = [
@@ -1077,6 +1111,27 @@
                 // 다음 일정 하이라이트 키워드 목록
                 const nextScheduleKeywords = ['본등록금 납부', '1차 수강신청', '입학식 및 신입생 환영회', '신입생 오리엔테이션', '개강일'];
                 
+                // 오늘 날짜와 비교하여 Now 표시 추가 함수
+                function addNowToEventItem(li, eventDate, eventDesc) {
+                    // 날짜 범위 추출
+                    const dateRange = extractDateRange(eventDate + ': ' + eventDesc, todayMonth);
+                    
+                    if (dateRange) {
+                        // 오늘이 기간에 포함되는지 확인
+                        const isTodayInRange = dateRange.month === todayMonth &&
+                                             todayDate >= dateRange.start &&
+                                             todayDate <= dateRange.end;
+                        
+                        if (isTodayInRange) {
+                            // Now 표시 추가
+                            const nowSpan = document.createElement('span');
+                            nowSpan.className = 'event-now';
+                            nowSpan.textContent = 'Now';
+                            li.appendChild(nowSpan);
+                        }
+                    }
+                }
+                
                 // 12월 이벤트 추가
                 if (decemberList) {
                     decemberEvents.forEach(event => {
@@ -1089,6 +1144,9 @@
                         } else {
                             li.textContent = `${event.date}: ${event.desc}`;
                         }
+                        
+                        // Now 표시 추가
+                        addNowToEventItem(li, event.date, event.desc);
                         
                         decemberList.appendChild(li);
                     });
@@ -1121,6 +1179,9 @@
                         } else {
                             li.textContent = `${event.date}: ${event.desc}`;
                         }
+                        
+                        // Now 표시 추가
+                        addNowToEventItem(li, event.date, event.desc);
                         
                         januaryList.appendChild(li);
                     });
@@ -1156,6 +1217,9 @@
                             li.textContent = `${event.date}: ${event.desc}`;
                         }
                         
+                        // Now 표시 추가
+                        addNowToEventItem(li, event.date, event.desc);
+                        
                         februaryList.appendChild(li);
                     });
                 }
@@ -1177,6 +1241,9 @@
                         } else {
                             li.textContent = `${event.date}: ${event.desc}`;
                         }
+                        
+                        // Now 표시 추가
+                        addNowToEventItem(li, event.date, event.desc);
                         
                         marchList.appendChild(li);
                     });
