@@ -907,9 +907,7 @@
                         
                         const listItems = listElement.querySelectorAll('li');
                         listItems.forEach(item => {
-                            // item.textContent 대신 item.innerText를 사용하여 HTML 태그 제외한 순수 텍스트만 가져오기
-                            const originalHTML = item.innerHTML;
-                            const text = item.textContent || item.innerText;
+                            const text = item.textContent;
                             
                             // 날짜 범위 추출
                             const dateRange = extractDateRange(text, monthList.month);
@@ -920,14 +918,12 @@
                                     todayDate >= dateRange.start && 
                                     todayDate <= dateRange.end) {
                                     
-                                    // 텍스트 내용에 " Now" 추가
-                                    if (!text.includes(' Now')) {
-                                        // HTML 콘텐츠를 수정하여 " Now" 텍스트 추가
-                                        item.innerHTML = originalHTML.replace(/([^:]*)$/, '$1 Now');
-                                        
-                                        // Now 텍스트에 깜박이는 효과를 위한 span 감싸기
-                                        const newHTML = item.innerHTML.replace(/ Now$/, ' <span class="event-now">Now</span>');
-                                        item.innerHTML = newHTML;
+                                    // 이미 Now 표시가 있는지 확인
+                                    if (!item.querySelector('.event-now')) {
+                                        const nowSpan = document.createElement('span');
+                                        nowSpan.className = 'event-now';
+                                        nowSpan.textContent = 'Now';
+                                        item.appendChild(nowSpan);
                                     }
                                 }
                             }
