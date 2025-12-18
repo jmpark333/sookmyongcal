@@ -710,6 +710,21 @@
         document.addEventListener('DOMContentLoaded', function() {
             // 각주를 모두 제거했으므로 참조 링크 변환 기능 비활성화
             
+            // 날짜 링크 클릭 시 팝업 표시 기능 추가
+            const dayLinks = document.querySelectorAll('.day-number');
+            dayLinks.forEach(function(link) {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const targetId = link.getAttribute('href');
+                    const targetOverlay = document.querySelector(targetId);
+                    if (targetOverlay) {
+                        targetOverlay.style.display = 'block';
+                        // URL fragment 업데이트
+                        history.pushState("", document.title, targetId);
+                    }
+                });
+            });
+            
             // 팝업 닫을 때 스크롤 위치 유지
             const closeButtons = document.querySelectorAll('.close-btn');
             closeButtons.forEach(function(button) {
