@@ -965,19 +965,19 @@
                         }
                         
                         if (event.desc.includes('본등록금 납부')) {
-                            li.innerHTML = `${event.date}: <span style="color: #a31f33; font-weight: bold;">${event.desc}</span>`;
+                            li.innerHTML = `${event.date}: <span class="clickable-link" onclick="openPdfPage(4)" style="color: #a31f33; font-weight: bold;">${event.desc}</span>`;
                         } else if (event.desc.includes('영어배치고사(GELT) 2차 응시')) {
                             li.innerHTML = `${event.date}: <span class="clickable-link" onclick="openPdfPage(11)">${event.desc}</span>`;
                         } else if (event.desc.includes('영어배치고사(GELT) 3차 접수 시작')) {
                             li.innerHTML = `${event.date}: <span class="clickable-link" onclick="openPdfPage(11)">${event.desc}</span>`;
                         } else if (event.desc.includes('입학식 및 신입생 환영회')) {
-                            li.innerHTML = `${event.date}: <span style="color: #a31f33; font-weight: bold;">${event.desc}</span>`;
+                            li.innerHTML = `${event.date}: <span class="clickable-link" onclick="openPdfPage(2)" style="color: #a31f33; font-weight: bold;">${event.desc}</span>`;
                         } else if (event.desc.includes('신입생 오리엔테이션')) {
-                            li.innerHTML = `${event.date}: <span style="color: #a31f33; font-weight: bold;">${event.desc}</span>`;
+                            li.innerHTML = `${event.date}: <span class="clickable-link" onclick="openPdfPage(2)" style="color: #a31f33; font-weight: bold;">${event.desc}</span>`;
                         } else if (event.desc.includes('개강일')) {
                             li.textContent = `${event.date}: ${event.desc}`;
                         } else if (event.desc.includes('1차 수강신청')) {
-                            li.innerHTML = `${event.date}: <span style="color: #a31f33; font-weight: bold;">${event.desc}</span>`;
+                            li.innerHTML = `${event.date}: <span class="clickable-link" onclick="openPdfPage(8)" style="color: #a31f33; font-weight: bold;">${event.desc}</span>`;
                         } else {
                             li.textContent = `${event.date}: ${event.desc}`;
                         }
