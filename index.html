@@ -150,6 +150,11 @@
             background: rgba(0, 0, 0, 0.6);
             z-index: 1000;
         }
+        
+        /* 팝업 활성화 상태 강제 적용 */
+        .event-detail-overlay.active {
+            display: block !important;
+        }
 
         .event-detail-content {
             background: white;
@@ -721,6 +726,7 @@
                     console.log('찾은 팝업:', targetOverlay); // 디버깅용 로그
                     if (targetOverlay) {
                         targetOverlay.style.display = 'block';
+                        targetOverlay.classList.add('active'); // active 클래스 추가
                         // URL fragment 업데이트
                         history.pushState("", document.title, targetId);
                         console.log('팝업 표시 성공:', targetId); // 디버깅용 로그
@@ -737,6 +743,7 @@
                     e.preventDefault();
                     const overlay = button.closest('.event-detail-overlay');
                     overlay.style.display = 'none';
+                    overlay.classList.remove('active'); // active 클래스 제거
                     
                     // URL fragment 제거하여 페이지 맨 위로 스크롤되지 않도록 함
                     history.pushState("", document.title, window.location.pathname);
@@ -749,6 +756,8 @@
                 overlay.addEventListener('click', function(e) {
                     if (e.target === overlay) {
                         overlay.style.display = 'none';
+                        overlay.classList.remove('active'); // active 클래스 제거
+                        
                         // URL fragment 제거
                         history.pushState("", document.title, window.location.pathname);
                     }
