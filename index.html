@@ -28,6 +28,57 @@
             box-sizing: border-box;
         }
 
+        /* 모바일 반응형 디자인 */
+        @media (max-width: 768px) {
+            .calendar-container {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .calendar {
+                width: 100%;
+                padding: 15px;
+            }
+            
+            .month-header {
+                font-size: 1.2em;
+            }
+            
+            th, td {
+                padding: 6px 2px;
+                font-size: 0.8em;
+            }
+            
+            .day-number {
+                font-size: 0.9em;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .calendar {
+                padding: 10px;
+            }
+            
+            .month-header {
+                font-size: 1.1em;
+            }
+            
+            th, td {
+                padding: 4px 1px;
+                font-size: 0.7em;
+                height: 30px;
+            }
+            
+            .day-number {
+                font-size: 0.8em;
+            }
+            
+            .event-marker {
+                width: 4px;
+                height: 4px;
+            }
+        }
+
         .month-header {
             font-size: 1.5em;
             text-align: center;
