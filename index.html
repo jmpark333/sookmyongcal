@@ -716,11 +716,16 @@
                 link.addEventListener('click', function(e) {
                     e.preventDefault();
                     const targetId = link.getAttribute('href');
+                    console.log('날짜 클릭:', targetId); // 디버깅용 로그
                     const targetOverlay = document.querySelector(targetId);
+                    console.log('찾은 팝업:', targetOverlay); // 디버깅용 로그
                     if (targetOverlay) {
                         targetOverlay.style.display = 'block';
                         // URL fragment 업데이트
                         history.pushState("", document.title, targetId);
+                        console.log('팝업 표시 성공:', targetId); // 디버깅용 로그
+                    } else {
+                        console.log('팝업을 찾을 수 없음:', targetId); // 디버깅용 로그
                     }
                 });
             });
