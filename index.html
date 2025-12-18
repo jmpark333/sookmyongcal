@@ -195,8 +195,8 @@
 </head>
 <body>
 
-    <h1>2026학년도 신입생 주요 일정</h1>
-    <p style="margin: 20px 0;">굵게 표시된 날짜는 주요 일정이 있는 날입니다. 날짜를 클릭하면 상세 내용을 확인할 수 있습니다. <button onclick="openPdf()" style="background-color: #a31f33; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; font-size: 16px; vertical-align: middle;">합격자 안내사항 보기</button></p>
+    <h1 style="text-align: center;">2026학년도 숙명여대 신입생 주요일정</h1>
+    <p style="margin: 20px 0; text-align: center;">굵게 표시된 날짜는 주요 일정이 있는 날입니다. 날짜를 클릭하면 상세 내용을 확인할 수 있습니다. <button onclick="openPdf()" style="background-color: #a31f33; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; font-size: 16px; vertical-align: middle;">합격자 안내사항 보기</button></p>
 
     <div class="calendar-container">
 
@@ -728,6 +728,18 @@
             overlays.forEach(function(overlay) {
                 overlay.addEventListener('click', function(e) {
                     if (e.target === overlay) {
+                        overlay.style.display = 'none';
+                        // URL fragment 제거
+                        history.pushState("", document.title, window.location.pathname);
+                    }
+                });
+            });
+            
+            // 화면 아무 곳이나 클릭해도 팝업 닫기
+            document.addEventListener('click', function(e) {
+                const openOverlays = document.querySelectorAll('.event-detail-overlay');
+                openOverlays.forEach(function(overlay) {
+                    if (overlay.style.display === 'block' && !overlay.contains(e.target)) {
                         overlay.style.display = 'none';
                         // URL fragment 제거
                         history.pushState("", document.title, window.location.pathname);
