@@ -348,11 +348,24 @@
         .tooltip::after {
             content: '';
             position: absolute;
-            bottom: 100%;
+            top: 100%;
             left: 50%;
             margin-left: -5px;
             border-width: 5px;
             border-style: solid;
+            border-color: var(--primary-color) transparent transparent transparent;
+        }
+        
+        /* 아래를 향하는 화살표 (툴팁이 날짜 위에 나타날 때) */
+        .tooltip.arrow-up::after {
+            top: 100%;
+            border-color: var(--primary-color) transparent transparent transparent;
+        }
+        
+        /* 위를 향하는 화살표 (툴팁이 날짜 아래에 나타날 때) */
+        .tooltip.arrow-down::after {
+            bottom: 100%;
+            top: auto;
             border-color: transparent transparent var(--primary-color) transparent;
         }
 
@@ -1670,8 +1683,35 @@
             tooltip.textContent = content;
             
             const rect = element.getBoundingClientRect();
-            tooltip.style.left = rect.left + (rect.width / 2) - (tooltip.offsetWidth / 2) + 'px';
-            tooltip.style.top = rect.top + window.scrollY - tooltip.offsetHeight - 10 + 'px';
+            const tooltipHeight = tooltip.offsetHeight;
+            const tooltipWidth = tooltip.offsetWidth;
+            const windowHeight = window.innerHeight;
+            const scrollY = window.scrollY;
+            
+            // 기본 위치: 날짜 아래
+            let topPosition = rect.top + scrollY + rect.height + 10;
+            let arrowDirection = 'down';
+            
+            // 화면 아래에 공간이 부족하면 위에 표시
+            if (rect.top + scrollY + rect.height + tooltipHeight + 10 > windowHeight) {
+                topPosition = rect.top + scrollY - tooltipHeight - 10;
+                arrowDirection = 'up';
+            }
+            
+            // 화면 좌우 경계 확인
+            let leftPosition = rect.left + (rect.width / 2) - (tooltipWidth / 2);
+            if (leftPosition < 10) {
+                leftPosition = 10; // 왼쪽 경계
+            } else if (leftPosition + tooltipWidth > window.innerWidth - 10) {
+                leftPosition = window.innerWidth - tooltipWidth - 10; // 오른쪽 경계
+            }
+            
+            tooltip.style.left = leftPosition + 'px';
+            tooltip.style.top = topPosition + 'px';
+            
+            // 화살표 방향에 따라 클래스 추가/제거
+            tooltip.classList.remove('arrow-up', 'arrow-down');
+            tooltip.classList.add('arrow-' + arrowDirection);
             
             tooltip.classList.add('show');
         }
