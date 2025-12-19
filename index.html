@@ -926,9 +926,8 @@
                 '신체검사'
             ];
             
-            // 최근 검색어와 기본 추천 단어 합치기 (중복 제거)
-            const allSuggestions = [...new Set([...recentSearches, ...defaultSuggestions])];
-            updateDropdown(allSuggestions);
+            // 페이지 로드 시에는 드롭다운을 표시하지 않음
+            document.getElementById('searchDropdown').style.display = 'none';
             
             // 오늘 날짜 확인 및 Now 표시 추가
             const today = new Date();
@@ -1552,7 +1551,7 @@
                     
                     // 최근 검색어와 기본 추천 단어 합치기 (중복 제거)
                     const allSuggestions = [...new Set([...recentSearches, ...defaultSuggestions])];
-                    updateDatalist(allSuggestions);
+                    updateDropdown(allSuggestions);
                     return;
                 }
                 
@@ -1600,7 +1599,13 @@
                     dropdown.appendChild(item);
                 });
                 
-                dropdown.style.display = 'block';
+                // 검색창에 포커스가 있거나 입력 중일 때만 드롭다운 표시
+                const searchInput = document.getElementById('searchInput');
+                if (document.activeElement === searchInput && searchInput.value.length >= 0) {
+                    dropdown.style.display = 'block';
+                } else {
+                    dropdown.style.display = 'none';
+                }
             }
             
             // 드롭다운 숨기기 함수
