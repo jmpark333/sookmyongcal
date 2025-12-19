@@ -323,6 +323,38 @@
             position: relative;
             display: inline-block;
         }
+        
+        /* 툴팁 스타일 */
+        .tooltip {
+            position: absolute;
+            background-color: var(--primary-color);
+            color: var(--white);
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 0.9em;
+            z-index: 1000;
+            max-width: 250px;
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
+            opacity: 0;
+            transition: opacity 0.3s;
+            pointer-events: none;
+            white-space: pre-line;
+        }
+        
+        .tooltip.show {
+            opacity: 1;
+        }
+        
+        .tooltip::after {
+            content: '';
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            margin-left: -5px;
+            border-width: 5px;
+            border-style: solid;
+            border-color: transparent transparent var(--primary-color) transparent;
+        }
 
     </style>
 </head>
@@ -1621,6 +1653,65 @@
                 if (!searchContainer.contains(e.target)) {
                     document.getElementById('searchDropdown').style.display = 'none';
                 }
+            });
+        });
+        
+        // 툴팁 기능 추가
+        function createTooltip() {
+            const tooltip = document.createElement('div');
+            tooltip.className = 'tooltip';
+            tooltip.id = 'event-tooltip';
+            document.body.appendChild(tooltip);
+            return tooltip;
+        }
+        
+        function showTooltip(element, content) {
+            const tooltip = document.getElementById('event-tooltip') || createTooltip();
+            tooltip.textContent = content;
+            
+            const rect = element.getBoundingClientRect();
+            tooltip.style.left = rect.left + (rect.width / 2) - (tooltip.offsetWidth / 2) + 'px';
+            tooltip.style.top = rect.top + window.scrollY - tooltip.offsetHeight - 10 + 'px';
+            
+            tooltip.classList.add('show');
+        }
+        
+        function hideTooltip() {
+            const tooltip = document.getElementById('event-tooltip');
+            if (tooltip) {
+                tooltip.classList.remove('show');
+            }
+        }
+        
+        // 날짜 셀에 마우스 오버 이벤트 추가
+        document.addEventListener('DOMContentLoaded', function() {
+            const eventDays = document.querySelectorAll('.event-day');
+            
+            eventDays.forEach(function(dayCell) {
+                dayCell.addEventListener('mouseenter', function(e) {
+                    const dayNumber = this.querySelector('.day-number');
+                    if (dayNumber) {
+                        const targetId = dayNumber.getAttribute('href');
+                        if (targetId) {
+                            const targetOverlay = document.querySelector(targetId);
+                            if (targetOverlay) {
+                                const eventTitle = targetOverlay.querySelector('h3').textContent;
+                                const eventParagraphs = targetOverlay.querySelectorAll('p');
+                                let eventContent = eventTitle;
+                                
+                                eventParagraphs.forEach(function(p) {
+                                    eventContent += '\n' + p.textContent;
+                                });
+                                
+                                showTooltip(this, eventContent);
+                            }
+                        }
+                    }
+                });
+                
+                dayCell.addEventListener('mouseleave', function() {
+                    hideTooltip();
+                });
             });
         });
     </script>
