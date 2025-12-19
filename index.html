@@ -290,6 +290,39 @@
             z-index: 100 !important;
             line-height: 1 !important;
         }
+        
+        /* 검색 드롭다운 스타일 */
+        .search-dropdown {
+            position: absolute;
+            background-color: white;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            max-height: 200px;
+            overflow-y: auto;
+            width: 300px;
+            z-index: 1000;
+            display: none;
+        }
+        
+        .search-dropdown-item {
+            padding: 10px;
+            cursor: pointer;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        
+        .search-dropdown-item:hover {
+            background-color: #f5f7fb;
+        }
+        
+        .search-dropdown-item:last-child {
+            border-bottom: none;
+        }
+        
+        .search-container {
+            position: relative;
+            display: inline-block;
+        }
 
     </style>
 </head>
@@ -307,7 +340,10 @@
     
     <!-- 검색창 추가 -->
     <div style="text-align: center; margin: 20px 0;">
-        <input type="text" id="searchInput" placeholder="일정 검색 (예: 수시, 영어배치고사, 등록금)" style="padding: 10px; width: 300px; border: 1px solid var(--text-secondary); border-radius: 5px; font-size: 14px;">
+        <div class="search-container">
+            <input type="text" id="searchInput" placeholder="일정 검색 (예: 수시, 영어배치고사, 등록금)" autocomplete="off" style="padding: 10px; width: 300px; border: 1px solid var(--text-secondary); border-radius: 5px; font-size: 14px;">
+            <div id="searchDropdown" class="search-dropdown"></div>
+        </div>
         <button onclick="searchEvents()" style="background-color: var(--primary-color); color: var(--white); border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; font-size: 14px; margin-left: 5px; transition: background-color 0.3s;">검색</button>
         <button onclick="clearSearch()" style="background-color: var(--secondary-color); color: var(--white); border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; font-size: 14px; margin-left: 5px; transition: background-color 0.3s;">검색 초기화</button>
     </div>
@@ -876,6 +912,24 @@
 
         // 문서 로드 후 참조 링크에 이벤트 리스너 추가 (각주 제거로 비활성화)
         document.addEventListener('DOMContentLoaded', function() {
+            // 최근 검색어와 기본 추천 단어 초기화
+            const recentSearches = getRecentSearches();
+            const defaultSuggestions = [
+                '배치고사',
+                '등록금',
+                '수강신청',
+                '입학식',
+                '신입생 환영회',
+                '신입생 오리엔테이션',
+                '영어배치고사',
+                '영어 집중과정',
+                '신체검사'
+            ];
+            
+            // 최근 검색어와 기본 추천 단어 합치기 (중복 제거)
+            const allSuggestions = [...new Set([...recentSearches, ...defaultSuggestions])];
+            updateDropdown(allSuggestions);
+            
             // 오늘 날짜 확인 및 Now 표시 추가
             const today = new Date();
             const todayDate = today.getDate();
@@ -1310,7 +1364,7 @@
             
             // 검색 기능
             window.searchEvents = function() {
-                const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+                const searchTerm = document.getElementById('searchInput').value.toLowerCase().trim();
                 const searchResults = document.getElementById('searchResults');
                 const searchResultsList = document.getElementById('searchResultsList');
                 
@@ -1318,6 +1372,9 @@
                     searchResults.style.display = 'none';
                     return;
                 }
+                
+                // 검색어를 최근 검색어에 저장
+                saveRecentSearch(searchTerm);
                 
                 // 모든 이벤트 데이터
                 const allEvents = [
@@ -1420,10 +1477,144 @@
                 document.getElementById('searchResults').style.display = 'none';
             };
             
+            // 최근 검색어 가져오기
+            function getRecentSearches() {
+                const recentSearches = localStorage.getItem('recentSearches');
+                return recentSearches ? JSON.parse(recentSearches) : [];
+            }
+            
+            // 최근 검색어 저장하기
+            function saveRecentSearch(searchTerm) {
+                let recentSearches = getRecentSearches();
+                
+                // 이미 있는 검색어는 제거하고 맨 앞에 추가
+                recentSearches = recentSearches.filter(term => term !== searchTerm);
+                recentSearches.unshift(searchTerm);
+                
+                // 최대 10개까지 저장
+                if (recentSearches.length > 10) {
+                    recentSearches = recentSearches.slice(0, 10);
+                }
+                
+                localStorage.setItem('recentSearches', JSON.stringify(recentSearches));
+            }
+            
             // Enter 키로 검색 가능
             document.getElementById('searchInput').addEventListener('keypress', function(e) {
                 if (e.key === 'Enter') {
                     searchEvents();
+                }
+            });
+            
+            // 검색창 포커스 시 최근 검색어 표시
+            document.getElementById('searchInput').addEventListener('focus', function() {
+                const inputValue = this.value.toLowerCase();
+                
+                // 입력이 없으면 최근 검색어와 기본 추천 단어 표시
+                if (!inputValue) {
+                    const recentSearches = getRecentSearches();
+                    const defaultSuggestions = [
+                        '배치고사',
+                        '등록금',
+                        '수강신청',
+                        '입학식',
+                        '신입생 환영회',
+                        '신입생 오리엔테이션',
+                        '영어배치고사',
+                        '영어 집중과정',
+                        '신체검사'
+                    ];
+                    
+                    // 최근 검색어와 기본 추천 단어 합치기 (중복 제거)
+                    const allSuggestions = [...new Set([...recentSearches, ...defaultSuggestions])];
+                    updateDropdown(allSuggestions);
+                }
+            });
+            
+            // 검색창 입력 시 자동 완성 기능
+            document.getElementById('searchInput').addEventListener('input', function(e) {
+                const inputValue = e.target.value.toLowerCase();
+                
+                // 입력이 없으면 최근 검색어와 기본 추천 단어 표시
+                if (!inputValue) {
+                    const recentSearches = getRecentSearches();
+                    const defaultSuggestions = [
+                        '배치고사',
+                        '등록금',
+                        '수강신청',
+                        '입학식',
+                        '신입생 환영회',
+                        '신입생 오리엔테이션',
+                        '영어배치고사',
+                        '영어 집중과정',
+                        '신체검사'
+                    ];
+                    
+                    // 최근 검색어와 기본 추천 단어 합치기 (중복 제거)
+                    const allSuggestions = [...new Set([...recentSearches, ...defaultSuggestions])];
+                    updateDatalist(allSuggestions);
+                    return;
+                }
+                
+                // 입력된 내용으로 시작하는 추천 단어 필터링
+                const recentSearches = getRecentSearches();
+                const defaultSuggestions = [
+                    '배치고사',
+                    '등록금',
+                    '수강신청',
+                    '입학식',
+                    '신입생 환영회',
+                    '신입생 오리엔테이션',
+                    '영어배치고사',
+                    '영어 집중과정',
+                    '신체검사'
+                ];
+                
+                const allSuggestions = [...new Set([...recentSearches, ...defaultSuggestions])];
+                const filteredSuggestions = allSuggestions.filter(suggestion =>
+                    suggestion.toLowerCase().startsWith(inputValue)
+                );
+                
+                updateDropdown(filteredSuggestions);
+            });
+            
+            // 드롭다운 업데이트 함수
+            function updateDropdown(suggestions) {
+                const dropdown = document.getElementById('searchDropdown');
+                dropdown.innerHTML = '';
+                
+                if (suggestions.length === 0) {
+                    dropdown.style.display = 'none';
+                    return;
+                }
+                
+                suggestions.forEach(suggestion => {
+                    const item = document.createElement('div');
+                    item.className = 'search-dropdown-item';
+                    item.textContent = suggestion;
+                    item.addEventListener('click', function() {
+                        document.getElementById('searchInput').value = suggestion;
+                        dropdown.style.display = 'none';
+                        searchEvents();
+                    });
+                    dropdown.appendChild(item);
+                });
+                
+                dropdown.style.display = 'block';
+            }
+            
+            // 드롭다운 숨기기 함수
+            function hideDropdown() {
+                setTimeout(() => {
+                    document.getElementById('searchDropdown').style.display = 'none';
+                }, 200); // 클릭 이벤트가 처리될 시간을 주기 위해 약간의 지연
+            }
+            
+            // 검색창 외부 클릭 시 드롭다운 숨기기
+            document.addEventListener('click', function(e) {
+                const searchContainer = document.querySelector('.search-container');
+                if (!searchContainer.contains(e.target)) {
+                    document.getElementById('searchDropdown').style.display = 'none';
                 }
             });
         });
