@@ -64,6 +64,21 @@
             .day-number {
                 font-size: 1.1em;
             }
+            
+            /* 모바일용 오늘 날짜 스타일 */
+            .today {
+                border-width: 4px !important;
+                box-shadow: 0 0 10px rgba(33, 150, 243, 0.7) !important;
+            }
+            
+            .today .day-number {
+                font-size: 1.3em !important;
+            }
+            
+            .now-indicator {
+                font-size: 0.9em;
+                padding: 4px 6px;
+            }
         }
         
         @media (max-width: 480px) {
@@ -88,6 +103,21 @@
             .event-marker {
                 width: 5px;
                 height: 5px;
+            }
+            
+            /* 작은 화면용 오늘 날짜 스타일 */
+            .today {
+                border-width: 3px !important;
+                box-shadow: 0 0 8px rgba(33, 150, 243, 0.8) !important;
+            }
+            
+            .today .day-number {
+                font-size: 1.2em !important;
+            }
+            
+            .now-indicator {
+                font-size: 0.8em;
+                padding: 3px 5px;
             }
         }
 
@@ -244,13 +274,15 @@
         /* 오늘 날짜 하이라이트 스타일 */
         .today {
             background-color: #e8f4fd !important;
-            border: 2px solid #2196F3 !important;
+            border: 3px solid #2196F3 !important;
             position: relative;
+            box-shadow: 0 0 8px rgba(33, 150, 243, 0.5) !important;
         }
         
         .today .day-number {
             color: #1976D2 !important;
             font-weight: bold !important;
+            font-size: 1.2em !important;
         }
         
         /* Now 표시 스타일 */
@@ -260,18 +292,19 @@
             top: 2px;
             background-color: #FF5722;
             color: white;
-            padding: 2px 4px;
-            border-radius: 3px;
-            font-size: 0.7em;
+            padding: 3px 6px;
+            border-radius: 4px;
+            font-size: 0.8em;
             font-weight: bold;
             animation: blink 1.5s infinite;
             z-index: 10;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
         }
         
         @keyframes blink {
-            0% { opacity: 1; }
-            50% { opacity: 0.3; }
-            100% { opacity: 1; }
+            0% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.7; transform: scale(1.05); }
+            100% { opacity: 1; transform: scale(1); }
         }
         
         /* 월별 일정에서 Now 표시 스타일 */
@@ -976,9 +1009,14 @@
             
             // 오늘 날짜 확인 및 Now 표시 추가
             const today = new Date();
+            // 테스트용: 12월 20일로 설정 (실제로는 현재 날짜 사용)
+            // const today = new Date(2025, 11, 20); // 2025년 12월 20일
             const todayDate = today.getDate();
             const todayMonth = today.getMonth() + 1;
             const todayYear = today.getFullYear();
+            
+            // 디버그용 로그
+            console.log('오늘 날짜:', todayYear + '년 ' + todayMonth + '월 ' + todayDate + '일');
             
             // 모든 날짜 셀에서 오늘 날짜 찾아서 하이라이트 및 Now 표시 추가
             function highlightTodayDate() {
@@ -989,18 +1027,36 @@
                 // 모든 날짜 셀 찾기
                 const allDayCells = document.querySelectorAll('td');
                 allDayCells.forEach(cell => {
+                    // .day-number 클래스가 있는 경우와 없는 경우 모두 처리
+                    let cellDate;
                     const dayNumber = cell.querySelector('.day-number');
+                    
                     if (dayNumber) {
-                        const cellDate = parseInt(dayNumber.textContent);
-                        
+                        // .day-number 클래스가 있는 경우
+                        cellDate = parseInt(dayNumber.textContent);
+                    } else {
+                        // .day-number 클래스가 없는 경우 (순수 텍스트)
+                        const cellText = cell.textContent.trim();
+                        // 숫자만 추출
+                        const numberMatch = cellText.match(/^\d+$/);
+                        if (numberMatch) {
+                            cellDate = parseInt(numberMatch[0]);
+                        }
+                    }
+                    
+                    if (cellDate) {
                         // 달력의 월 확인 (월 헤더에서 찾기)
                         const calendar = cell.closest('.calendar');
                         if (calendar) {
                             const monthHeader = calendar.querySelector('.month-header').textContent;
                             const calendarMonth = parseInt(monthHeader.match(/(\d+)월/)[1]);
                             
+                            // 디버그용 로그
+                            console.log('셀 날짜:', cellDate, '달력 월:', calendarMonth, '오늘 월:', todayMonth, '오늘 날짜:', todayDate);
+                            
                             // 오늘 날짜와 일치하면 하이라이트 적용
                             if (calendarMonth === todayMonth && cellDate === todayDate) {
+                                console.log('오늘 날짜 하이라이트 적용:', calendarMonth + '월 ' + cellDate + '일');
                                 cell.classList.add('today');
                                 
                                 // Now 표시 추가
