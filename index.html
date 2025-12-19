@@ -5,10 +5,22 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>2026학년도 신입생 주요 일정 달력</title>
     <style>
+        /* 숙명여대 컬러 팔레트 정의 */
+        :root {
+            --primary-color: #0E2D6C;      /* SMWU Blue - 메인 컬러 */
+            --secondary-color: #1F4FA3;    /* 보조색 */
+            --accent-color: #F2C94C;       /* 강조색 */
+            --background-color: #F5F7FB;   /* 배경색 */
+            --text-primary: #1A1A1A;       /* 본문 텍스트 */
+            --text-secondary: #4F5D73;     /* 설명, 보조 문구 */
+            --white: #FFFFFF;
+        }
+
         body {
             font-family: Arial, sans-serif;
             margin: 20px;
-            background-color: #F5F7FB;
+            background-color: var(--background-color);
+            color: var(--text-primary);
         }
 
         .calendar-container {
@@ -83,8 +95,8 @@
             font-size: 1.5em;
             text-align: center;
             margin-bottom: 15px;
-            color: #0E2D6C;
-            border-bottom: 2px solid #0E2D6C;
+            color: var(--primary-color);
+            border-bottom: 2px solid var(--primary-color);
             padding-bottom: 5px;
         }
 
@@ -94,8 +106,8 @@
         }
 
         th {
-            background-color: #f0f0f0;
-            color: #333;
+            background-color: var(--primary-color);
+            color: var(--white);
             padding: 10px 5px;
             text-align: center;
             font-size: 0.9em;
@@ -106,27 +118,39 @@
             height: 40px;
             text-align: center;
             vertical-align: top;
-            border: 1px solid #eee;
+            border: 1px solid rgba(14, 45, 108, 0.1);
             position: relative;
+        }
+        
+        td:hover {
+            background-color: rgba(14, 45, 108, 0.02);
         }
 
         td.prev-month, td.next-month {
-            color: #ccc;
-            background-color: #fafafa;
+            color: var(--text-secondary);
+            background-color: #f0f0f0;
         }
 
         .event-day {
-            background-color: #fff0f0; /* 이벤트 있는 날 배경 */
+            background-color: rgba(14, 45, 108, 0.05); /* 이벤트 있는 날 배경 */
+        }
+        
+        .event-day:hover {
+            background-color: rgba(14, 45, 108, 0.1); /* 이벤트 있는 날 hover 배경 */
         }
 
         .day-number {
             display: block;
             font-weight: bold;
-            color: #4a4a4a;
+            color: var(--text-primary);
             font-size: 1.1em;
             margin-bottom: 2px;
             cursor: pointer;
             text-decoration: none;
+        }
+        
+        .day-number:hover {
+            color: var(--secondary-color);
         }
         
         /* 이벤트 표시 */
@@ -134,7 +158,7 @@
             display: block;
             width: 6px;
             height: 6px;
-            background-color: #0E2D6C; /* 숙명여대 Primary 색상 */
+            background-color: var(--primary-color); /* 숙명여대 Primary 색상 */
             border-radius: 50%;
             margin: 0 auto;
         }
@@ -168,8 +192,8 @@
         }
         
         .event-detail-content h3 {
-            color: #0E2D6C;
-            border-bottom: 1px solid #0E2D6C;
+            color: var(--primary-color);
+            border-bottom: 1px solid var(--primary-color);
             padding-bottom: 10px;
             margin-top: 0;
         }
@@ -199,8 +223,8 @@
         /* 중요 일정 강조 스타일 */
         .important-event {
             font-weight: bold;
-            background-color: #fff0f0;
-            border-left: 4px solid #a31f33;
+            background-color: rgba(14, 45, 108, 0.05); /* 달력 날짜 배경색과 동일 */
+            border-left: 4px solid var(--primary-color);
             padding: 8px 12px;
             margin: 5px 0;
             border-radius: 0 4px 4px 0;
@@ -208,9 +232,13 @@
         
         /* 클릭 가능한 링크 스타일 */
         .clickable-link {
-            color: #a31f33;
+            color: var(--primary-color);
             cursor: pointer;
             text-decoration: underline;
+        }
+        
+        .clickable-link:hover {
+            color: var(--secondary-color);
         }
         
         /* 오늘 날짜 하이라이트 스타일 */
@@ -279,18 +307,18 @@
     
     <!-- 검색창 추가 -->
     <div style="text-align: center; margin: 20px 0;">
-        <input type="text" id="searchInput" placeholder="일정 검색 (예: 수시, 영어배치고사, 등록금)" style="padding: 10px; width: 300px; border: 1px solid #ccc; border-radius: 5px; font-size: 14px;">
-        <button onclick="searchEvents()" style="background-color: #0E2D6C; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; font-size: 14px; margin-left: 5px;">검색</button>
-        <button onclick="clearSearch()" style="background-color: #1F4FA3; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; font-size: 14px; margin-left: 5px;">검색 초기화</button>
+        <input type="text" id="searchInput" placeholder="일정 검색 (예: 수시, 영어배치고사, 등록금)" style="padding: 10px; width: 300px; border: 1px solid var(--text-secondary); border-radius: 5px; font-size: 14px;">
+        <button onclick="searchEvents()" style="background-color: var(--primary-color); color: var(--white); border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; font-size: 14px; margin-left: 5px; transition: background-color 0.3s;">검색</button>
+        <button onclick="clearSearch()" style="background-color: var(--secondary-color); color: var(--white); border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; font-size: 14px; margin-left: 5px; transition: background-color 0.3s;">검색 초기화</button>
     </div>
     
     <!-- 검색 결과 표시 영역 -->
-    <div id="searchResults" style="display: none; margin: 20px auto; max-width: 800px; background-color: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
-        <h3 style="color: #a31f33; margin-top: 0;">검색 결과</h3>
+    <div id="searchResults" style="display: none; margin: 20px auto; max-width: 800px; background-color: var(--white); padding: 20px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
+        <h3 style="color: var(--primary-color); margin-top: 0;">검색 결과</h3>
         <div id="searchResultsList"></div>
     </div>
     
-    <p style="margin: 20px 0; text-align: center;">굵게 표시된 날짜는 주요 일정이 있는 날입니다. 날짜를 클릭하면 상세 내용을 확인할 수 있습니다. <button onclick="openPdf()" style="background-color: #a31f33; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; font-size: 16px; vertical-align: middle;">합격자 안내사항 보기</button></p>
+    <p style="margin: 20px 0; text-align: center; color: var(--text-primary);">굵게 표시된 날짜는 주요 일정이 있는 날입니다. 날짜를 클릭하면 상세 내용을 확인할 수 있습니다. <button onclick="openPdf()" class="highlight-button">합격자 안내사항 보기</button></p>
 
     <div class="calendar-container">
 
@@ -1204,23 +1232,23 @@
                         
                         if (isNextSchedule) {
                             li.className = 'important-event';
-                            li.style.cssText = 'font-weight: bold; background-color: #ffe0e0; border-left: 4px solid #a31f33; padding: 8px 12px; margin: 5px 0; border-radius: 0 4px 4px 0;';
+                            li.style.cssText = 'font-weight: bold; background-color: rgba(14, 45, 108, 0.05); border-left: 4px solid var(--primary-color); padding: 8px 12px; margin: 5px 0; border-radius: 0 4px 4px 0;';
                         }
                         
                         if (event.desc.includes('본등록금 납부')) {
-                            li.innerHTML = `${event.date}: <span class="clickable-link" onclick="openPdfPage(4)" style="color: #a31f33; font-weight: bold;">${event.desc}</span>`;
+                            li.innerHTML = `${event.date}: <span class="clickable-link" onclick="openPdfPage(4)" style="color: var(--primary-color); font-weight: bold;">${event.desc}</span>`;
                         } else if (event.desc.includes('영어배치고사(GELT) 2차 응시')) {
                             li.innerHTML = `${event.date}: <span class="clickable-link" onclick="openPdfPage(11)">${event.desc}</span>`;
                         } else if (event.desc.includes('영어배치고사(GELT) 3차 접수 시작')) {
                             li.innerHTML = `${event.date}: <span class="clickable-link" onclick="openPdfPage(11)">${event.desc}</span>`;
                         } else if (event.desc.includes('입학식 및 신입생 환영회')) {
-                            li.innerHTML = `${event.date}: <span class="clickable-link" onclick="openPdfPage(2)" style="color: #a31f33; font-weight: bold;">${event.desc}</span>`;
+                            li.innerHTML = `${event.date}: <span class="clickable-link" onclick="openPdfPage(2)" style="color: var(--primary-color); font-weight: bold;">${event.desc}</span>`;
                         } else if (event.desc.includes('신입생 오리엔테이션')) {
-                            li.innerHTML = `${event.date}: <span class="clickable-link" onclick="openPdfPage(2)" style="color: #a31f33; font-weight: bold;">${event.desc}</span>`;
+                            li.innerHTML = `${event.date}: <span class="clickable-link" onclick="openPdfPage(2)" style="color: var(--primary-color); font-weight: bold;">${event.desc}</span>`;
                         } else if (event.desc.includes('개강일')) {
                             li.textContent = `${event.date}: ${event.desc}`;
                         } else if (event.desc.includes('1차 수강신청')) {
-                            li.innerHTML = `${event.date}: <span class="clickable-link" onclick="openPdfPage(8)" style="color: #a31f33; font-weight: bold;">${event.desc}</span>`;
+                            li.innerHTML = `${event.date}: <span class="clickable-link" onclick="openPdfPage(8)" style="color: var(--primary-color); font-weight: bold;">${event.desc}</span>`;
                         } else {
                             li.textContent = `${event.date}: ${event.desc}`;
                         }
@@ -1241,11 +1269,11 @@
                         
                         if (isNextSchedule) {
                             li.className = 'important-event';
-                            li.style.cssText = 'font-weight: bold; background-color: #ffe0e0; border-left: 4px solid #a31f33; padding: 8px 12px; margin: 5px 0; border-radius: 0 4px 4px 0;';
+                            li.style.cssText = 'font-weight: bold; background-color: rgba(14, 45, 108, 0.05); border-left: 4px solid var(--primary-color); padding: 8px 12px; margin: 5px 0; border-radius: 0 4px 4px 0;';
                         }
                         
                         if (event.desc.includes('개강일')) {
-                            li.innerHTML = `${event.date}: <span style="color: #a31f33; font-weight: bold;">${event.desc}</span>`;
+                            li.innerHTML = `${event.date}: <span style="color: var(--primary-color); font-weight: bold;">${event.desc}</span>`;
                         } else {
                             li.textContent = `${event.date}: ${event.desc}`;
                         }
@@ -1374,7 +1402,7 @@
                 } else {
                     filteredEvents.forEach(event => {
                         const eventDiv = document.createElement('div');
-                        eventDiv.style.cssText = 'margin-bottom: 15px; padding: 10px; border-left: 4px solid #a31f33; background-color: #f9f9f9;';
+                        eventDiv.style.cssText = 'margin-bottom: 15px; padding: 10px; border-left: 4px solid var(--primary-color); background-color: rgba(14, 45, 108, 0.05);';
                         eventDiv.innerHTML = `
                             <strong>${event.date} - ${event.desc}</strong>
                             ${event.fullDesc ? `<br><small style="color: #666;">${event.fullDesc}</small>` : ''}
