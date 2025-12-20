@@ -1,0 +1,1356 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>숙명여대 신입생 챗봇</title>
+    <style>
+        /* 챗봇 기본 스타일 */
+        .chatbot-container {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            z-index: 9999;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+        }
+
+        .chatbot-toggle {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #0E2D6C 0%, #1F4FA3 100%);
+            border: none;
+            color: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            transition: all 0.3s ease;
+            position: relative;
+            border: 2px solid #ffffff;
+        }
+
+        .chatbot-toggle:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .chatbot-toggle:active {
+            transform: scale(0.95);
+        }
+
+        .chatbot-toggle .notification {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            width: 12px;
+            height: 12px;
+            background: #ff4757;
+            border-radius: 50%;
+            border: 2px solid white;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.2); opacity: 0.7; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        .chatbot-window {
+            position: absolute;
+            bottom: 80px;
+            left: 0;
+            width: 380px;
+            height: 600px;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            display: none;
+            flex-direction: column;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .chatbot-window.active {
+            display: flex;
+        }
+
+        .chatbot-header {
+            background: linear-gradient(135deg, #0E2D6C 0%, #1F4FA3 100%);
+            color: white;
+            padding: 16px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .chatbot-header h3 {
+            margin: 0;
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .chatbot-close {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 20px;
+            cursor: pointer;
+            padding: 4px;
+            border-radius: 4px;
+            transition: background 0.2s;
+        }
+
+        .chatbot-close:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .chatbot-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            background: #f8f9fa;
+        }
+
+        .message {
+            max-width: 80%;
+            padding: 12px 16px;
+            border-radius: 18px;
+            line-height: 1.5;
+            animation: messageSlide 0.3s ease;
+        }
+
+        @keyframes messageSlide {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .message.user {
+            align-self: flex-end;
+            background: #0E2D6C;
+            color: white;
+            border-bottom-right-radius: 6px;
+        }
+
+        .message.bot {
+            align-self: flex-start;
+            background: #e3f2fd;
+            color: #1a202c;
+            border-bottom-left-radius: 6px;
+        }
+
+        .message.streaming .message-content::after {
+            content: '⬤';
+            color: #0E2D6C;
+            font-size: 12px;
+            animation: blink 1s infinite;
+            margin-left: 4px;
+            vertical-align: baseline;
+        }
+
+        @keyframes blink {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0; }
+        }
+
+        .message .timestamp {
+            font-size: 11px;
+            opacity: 0.7;
+            margin-top: 4px;
+        }
+
+        .chatbot-input-container {
+            padding: 16px;
+            border-top: 1px solid #e9ecef;
+            display: flex;
+            gap: 10px;
+            background: white;
+        }
+
+        .chatbot-input {
+            flex: 1;
+            padding: 12px 16px;
+            border: 1px solid #dee2e6;
+            border-radius: 24px;
+            outline: none;
+            font-size: 14px;
+            transition: border-color 0.2s;
+        }
+
+        .chatbot-input:focus {
+            border-color: #0E2D6C;
+        }
+
+        .chatbot-send {
+            background: #0E2D6C;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        .chatbot-send:hover {
+            background: #1F4FA3;
+            transform: scale(1.05);
+        }
+
+        .chatbot-send:disabled {
+            background: #adb5bd;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .typing-indicator {
+            display: none;
+            align-self: flex-start;
+            background: #e3f2fd;
+            padding: 12px 20px;
+            border-radius: 18px;
+            border-bottom-left-radius: 6px;
+        }
+
+        .typing-indicator.active {
+            display: block;
+        }
+
+        .typing-dots {
+            display: flex;
+            gap: 4px;
+        }
+
+        .typing-dots span {
+            width: 8px;
+            height: 8px;
+            background: #0E2D6C;
+            border-radius: 50%;
+            animation: typing 1.4s infinite;
+        }
+
+        .typing-dots span:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .typing-dots span:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+
+        @keyframes typing {
+            0%, 60%, 100% { transform: translateY(0); }
+            30% { transform: translateY(-10px); }
+        }
+
+        .error-message {
+            color: #dc3545;
+            font-size: 12px;
+            margin-top: 8px;
+        }
+
+        /* API 키 입력 모달 스타일 */
+        .api-key-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+        }
+
+        .api-key-modal.active {
+            display: flex;
+        }
+
+        .api-key-modal-content {
+            background: white;
+            border-radius: 16px;
+            padding: 24px;
+            width: 90%;
+            max-width: 400px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            animation: modalSlide 0.3s ease;
+        }
+
+        @keyframes modalSlide {
+            from {
+                opacity: 0;
+                transform: translateY(-20px) scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .api-key-modal-header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .api-key-modal-header h3 {
+            margin: 0;
+            color: #333;
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .api-key-modal-header p {
+            margin: 8px 0 0 0;
+            color: #666;
+            font-size: 14px;
+            line-height: 1.4;
+        }
+
+        .api-key-input-group {
+            margin-bottom: 16px;
+        }
+
+        .api-key-input-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 500;
+            font-size: 14px;
+        }
+
+        .api-key-input-wrapper {
+            position: relative;
+        }
+
+        .api-key-input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #dee2e6;
+            border-radius: 8px;
+            font-size: 14px;
+            font-family: monospace;
+            letter-spacing: 1px;
+            box-sizing: border-box;
+            transition: border-color 0.2s;
+        }
+
+        .api-key-input:focus {
+            outline: none;
+            border-color: #0E2D6C;
+            box-shadow: 0 0 0 3px rgba(14, 45, 108, 0.1);
+        }
+
+        .api-key-visibility-toggle {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: #666;
+            cursor: pointer;
+            padding: 4px;
+            border-radius: 4px;
+            font-size: 14px;
+            transition: color 0.2s;
+        }
+
+        .api-key-visibility-toggle:hover {
+            color: #333;
+        }
+
+        .api-key-modal-buttons {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+        }
+
+        .api-key-modal-button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            min-width: 80px;
+        }
+
+        .api-key-confirm {
+            background: #0E2D6C;
+            color: white;
+        }
+
+        .api-key-confirm:hover {
+            background: #1F4FA3;
+            transform: translateY(-1px);
+        }
+
+        .api-key-confirm:disabled {
+            background: #adb5bd;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .api-key-cancel {
+            background: #e9ecef;
+            color: #495057;
+        }
+
+        .api-key-cancel:hover {
+            background: #dee2e6;
+        }
+
+        .api-key-security-info {
+            background: #f8f9fa;
+            border-left: 4px solid #0E2D6C;
+            padding: 12px;
+            margin-top: 16px;
+            border-radius: 4px;
+        }
+
+        .api-key-security-info h4 {
+            margin: 0 0 8px 0;
+            color: #0E2D6C;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .api-key-security-info ul {
+            margin: 0;
+            padding-left: 16px;
+            color: #666;
+            font-size: 12px;
+            line-height: 1.5;
+        }
+
+        .api-key-security-info li {
+            margin-bottom: 4px;
+        }
+
+        .api-key-security-info li:last-child {
+            margin-bottom: 0;
+        }
+
+        /* 모바일 반응형 */
+        @media (max-width: 480px) {
+            .chatbot-container {
+                left: 10px;
+                bottom: 20px;
+            }
+
+            .chatbot-toggle {
+                width: 56px;
+                height: 56px;
+                font-size: 22px;
+            }
+
+            .chatbot-window {
+                width: calc(100vw - 20px);
+                height: 70vh;
+                left: 0;
+                right: 10px;
+            }
+
+            .chatbot-messages {
+                padding: 16px;
+            }
+
+            .message {
+                max-width: 85%;
+            }
+
+            .api-key-modal-content {
+                width: 95%;
+                padding: 20px;
+                margin: 20px;
+            }
+
+            .api-key-modal-buttons {
+                flex-direction: column;
+            }
+
+            .api-key-modal-button {
+                width: 100%;
+            }
+        }
+
+        /* 스크롤바 스타일 */
+        .chatbot-messages::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .chatbot-messages::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+
+        .chatbot-messages::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 3px;
+        }
+
+        .chatbot-messages::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+    </style>
+</head>
+<body>
+    <div class="chatbot-container">
+        <button class="chatbot-toggle" id="chatbotToggle" aria-label="AI 챗봇 열기">
+            <span>🎓</span>
+            <div class="notification" id="chatbotNotification" style="display: none;"></div>
+        </button>
+
+        <!-- API 키 입력 모달 -->
+        <div class="api-key-modal" id="chatbotApiKeyModal">
+            <div class="api-key-modal-content">
+                <div class="api-key-modal-header">
+                    <h3>🔐 API 키 인증</h3>
+                    <p>Z_API_KEY를 입력해주세요</p>
+                </div>
+
+                <div class="api-key-input-group">
+                    <label>API 키 발급 방법:</label>
+                    <div style="background: #e8f4fd; border: 1px solid #bee5eb; border-radius: 6px; padding: 12px; margin-bottom: 15px;">
+                        <p style="margin: 0; color: #0c5460; font-size: 12px; line-height: 1.4;">
+                            <strong>🔑 API 키 발급:</strong><br>
+                            <a href="https://z.ai/manage-apikey/apikey-list" target="_blank" style="color: #007bff; text-decoration: none; font-weight: 500;">
+                                🔗 https://z.ai/manage-apikey/apikey-list
+                            </a>
+                            <span style="color: #6c757d; font-size: 11px;"> (새 창에서 열림)</span>
+                        </p>
+                    </div>
+                    <div class="api-key-input-wrapper">
+                        <input
+                            type="password"
+                            id="chatbotApiKeyInput"
+                            placeholder="Z_API_KEY를 입력하세요..."
+                            class="api-key-input"
+                            autocomplete="off"
+                            spellcheck="false"
+                        >
+                        <button
+                            type="button"
+                            id="chatbotApiKeyToggle"
+                            class="api-key-visibility-toggle"
+                            aria-label="API 키 표시/숨김"
+                        >👁️</button>
+                    </div>
+                </div>
+
+                <div class="api-key-modal-buttons">
+                    <button type="button" id="chatbotApiKeyCancel" class="api-key-modal-button api-key-cancel">취소</button>
+                    <button type="button" id="chatbotApiKeyConfirm" class="api-key-modal-button api-key-confirm" disabled>확인</button>
+                </div>
+
+                <div class="api-key-security-info">
+                    <h4>🛡️ 보안 안내</h4>
+                    <ul>
+                        <li>API 키는 서버에 저장되지 않습니다</li>
+                        <li>현재 세션에서만 일시적으로 사용됩니다</li>
+                        <li>페이지를 새로고침하면 다시 입력해야 합니다</li>
+                        <li>안전한 처리를 위해 키가 *로 표시됩니다</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="chatbot-window" id="chatbotWindow">
+            <div class="chatbot-header">
+                <h3>🎓 숙명여대 신입생 도우미</h3>
+                <button class="chatbot-close" id="chatbotClose" aria-label="챗봇 닫기">✕</button>
+            </div>
+
+            <div class="chatbot-messages" id="chatbotMessages">
+                <div class="message bot">
+                    <div>안녕하세요! 숙명여자대학교 2026학년도 신입생 합격자 안내사항 전문 챗봇입니다. 😊</div>
+                    <div>등록금, 수강신청, 장학금, 영어배치고사, 기숙사 등 신입생 관련 궁금한 점을 물어보세요.</div>
+                    <div>이 페이지의 내용을 참고하여 정확하게 답변해드립니다.</div>
+                    <div class="timestamp" id="welcomeTime"></div>
+                </div>
+            </div>
+
+            <div class="typing-indicator" id="typingIndicator">
+                <div class="typing-dots">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+            </div>
+
+            <div class="chatbot-input-container">
+                <input
+                    type="text"
+                    class="chatbot-input"
+                    id="chatbotInput"
+                    placeholder="메시지를 입력하세요..."
+                    aria-label="메시지 입력"
+                >
+                <button class="chatbot-send" id="chatbotSend" aria-label="메시지 전송">
+                    ➤
+                </button>
+            </div>
+
+            <div class="error-message" id="errorMessage"></div>
+        </div>
+    </div>
+
+    <script>
+    // 챗봇 JavaScript 구현 (GLM-4.6 모델 버전)
+    (function() {
+        // 전역 중복 실행 방지
+        if (window.__CHATBOT_INSTALLED__) return;
+        window.__CHATBOT_INSTALLED__ = true;
+
+        // 설정 로드 상태
+        let configLoaded = false;
+        let configLoadError = false;
+
+        // API 키 상태 관리
+        let currentApiKey = null;
+        let isApiKeyVerified = false;
+
+        // API 키 관리 함수
+        const apiKeyManager = {
+            setApiKey: function(key) {
+                if (!key || typeof key !== 'string' || key.trim().length === 0) {
+                    return false;
+                }
+                currentApiKey = key.trim();
+                isApiKeyVerified = true;
+                return true;
+            },
+
+            getApiKey: function() {
+                return isApiKeyVerified ? currentApiKey : null;
+            },
+
+            clearApiKey: function() {
+                currentApiKey = null;
+                isApiKeyVerified = false;
+            },
+
+            hasApiKey: function() {
+                return isApiKeyVerified && currentApiKey !== null;
+            }
+        };
+
+        // 설정 로드 함수
+        async function loadConfig() {
+            if (configLoaded) return true;
+
+            try {
+                // GLM-4.6 모델 사용 설정
+                window.CHATBOT_SECURE_CONFIG = {
+                    getApiUrl: () => 'https://blogchatbot-proxy.netlify.app/api/chatbot',
+                    getApiKey: () => apiKeyManager.getApiKey(),
+                    MODEL: 'glm-4.6', // GLM-4.6 모델로 변경
+                    MAX_CALLS: 10,
+                    TIME_WINDOW: 3600000
+                };
+                configLoaded = true;
+                return true;
+            } catch (error) {
+                console.warn('설정 로드 중 오류:', error);
+                window.CHATBOT_SECURE_CONFIG = {
+                    getApiUrl: () => '/api/chatbot',
+                    getApiKey: () => apiKeyManager.getApiKey(),
+                    MODEL: 'glm-4.6', // GLM-4.6 모델로 변경
+                    MAX_CALLS: 10,
+                    TIME_WINDOW: 3600000
+                };
+                configLoaded = true;
+                return true;
+            }
+        }
+
+        // DOM 요소
+        const chatbotToggle = document.getElementById('chatbotToggle');
+        const chatbotWindow = document.getElementById('chatbotWindow');
+        const chatbotClose = document.getElementById('chatbotClose');
+        const chatbotMessages = document.getElementById('chatbotMessages');
+        const chatbotInput = document.getElementById('chatbotInput');
+        const chatbotSend = document.getElementById('chatbotSend');
+        const typingIndicator = document.getElementById('typingIndicator');
+        const errorMessage = document.getElementById('errorMessage');
+        const welcomeTime = document.getElementById('welcomeTime');
+        const chatbotNotification = document.getElementById('chatbotNotification');
+
+        // API 키 모달 관련 DOM 요소
+        const apiKeyModal = document.getElementById('chatbotApiKeyModal');
+        const apiKeyInput = document.getElementById('chatbotApiKeyInput');
+        const apiKeyToggle = document.getElementById('chatbotApiKeyToggle');
+        const apiKeyConfirm = document.getElementById('chatbotApiKeyConfirm');
+        const apiKeyCancel = document.getElementById('chatbotApiKeyCancel');
+
+        // 챗봇 상태
+        let isOpen = false;
+        let isProcessing = false;
+
+        // API 키 모달 관리 함수
+        function showApiKeyModal() {
+            console.log('API 키 모달 표시 시도');
+            if (apiKeyModal) {
+                apiKeyModal.classList.add('active');
+                apiKeyInput.value = '';
+                apiKeyInput.focus();
+                updateApiKeyConfirmButton();
+                console.log('API 키 모달이 표시되었습니다.');
+            } else {
+                console.error('API 키 모달 요소를 찾을 수 없습니다.');
+            }
+        }
+
+        function hideApiKeyModal() {
+            console.log('API 키 모달 숨김');
+            if (apiKeyModal) {
+                apiKeyModal.classList.remove('active');
+                apiKeyInput.value = '';
+                apiKeyInput.type = 'password';
+                apiKeyToggle.textContent = '👁️';
+                updateApiKeyConfirmButton();
+            }
+        }
+
+        function updateApiKeyConfirmButton() {
+            const hasValidKey = apiKeyInput.value.trim().length > 0;
+            apiKeyConfirm.disabled = !hasValidKey;
+        }
+
+        function toggleApiKeyVisibility() {
+            const isPassword = apiKeyInput.type === 'password';
+            apiKeyInput.type = isPassword ? 'text' : 'password';
+            apiKeyToggle.textContent = isPassword ? '🙈' : '👁️';
+        }
+
+        function confirmApiKey() {
+            const apiKey = apiKeyInput.value.trim();
+            if (apiKey.length === 0) {
+                showError('API 키를 입력해주세요.');
+                return;
+            }
+
+            if (apiKeyManager.setApiKey(apiKey)) {
+                hideApiKeyModal();
+                openChatbotWindow();
+                console.log('API 키가 설정되었습니다. (GLM-4.6 모델 사용)');
+            } else {
+                showError('유효하지 않은 API 키입니다.');
+            }
+        }
+
+        // 초기화 함수
+        async function initChatbot() {
+            try {
+                await loadConfig();
+
+                // 환영 메시지 시간 설정
+                if (welcomeTime) {
+                    welcomeTime.textContent = new Date().toLocaleTimeString('ko-KR', {
+                        hour: '2-digit',
+                        minute: '2-digit'
+                    });
+                }
+
+                console.log('AI 챗봇이 성공적으로 초기화되었습니다. (GLM-4.6 모델)');
+
+            } catch (error) {
+                console.error('챗봇 초기화 실패:', error);
+                if (chatbotToggle) {
+                    chatbotToggle.style.opacity = '0.5';
+                    chatbotToggle.style.cursor = 'not-allowed';
+                }
+                showError('챗봇 연결에 문제가 있습니다. 나중에 다시 시도해주세요.');
+            }
+        }
+
+        // 호출 제한 확인
+        function checkRateLimit() {
+            return true; // 항상 허용
+        }
+
+        // 페이지 내용 추출 함수
+        function extractPageContent() {
+            console.log('콘텐츠 추출 시작...');
+
+            let contentElement = null;
+            const possibleSelectors = [
+                '.entry-content',
+                '.post-body',
+                '.article-content',
+                '.post-content',
+                '.blog-content',
+                '.content',
+                'main',
+                '#content',
+                '#main',
+                '.main-content',
+                '#post-content',
+                '.entry-content div'
+            ];
+
+            for (const selector of possibleSelectors) {
+                const element = document.querySelector(selector);
+                if (element && element.textContent.trim().length > 50) {
+                    contentElement = element;
+                    console.log(`콘텐츠 영역 찾음: ${selector}, 텍스트 길이: ${element.textContent.length}`);
+                    break;
+                }
+            }
+
+            if (!contentElement) {
+                console.log('적절한 콘텐츠 영역을 찾지 못함, body에서 추출 시도');
+                const bodyClone = document.body.cloneNode(true);
+
+                const excludeSelectors = [
+                    'script', 'style', 'noscript', 'iframe', 'nav', '.nav', '.navigation',
+                    '.sidebar', '.menu', '.comment', '.comments', '.footer', '.header',
+                    '.advertisement', '.ad', '.ads', '.widget', '.sidebar-widget',
+                    '.social-share', '.related-posts', '.tags', '.categories'
+                ];
+
+                excludeSelectors.forEach(sel => {
+                    bodyClone.querySelectorAll(sel).forEach(el => el.remove());
+                });
+
+                contentElement = bodyClone;
+            }
+
+            if (!contentElement || !contentElement.textContent) {
+                console.log('콘텐츠를 찾을 수 없음');
+                return '';
+            }
+
+            const title = document.querySelector('h1')?.textContent ||
+                         document.querySelector('.entry-title')?.textContent ||
+                         document.querySelector('.post-title')?.textContent ||
+                         document.querySelector('h2')?.textContent ||
+                         document.title || '';
+
+            console.log(`추출된 제목: ${title}`);
+
+            let content = '';
+            let extractedElements = 0;
+
+            // 단락 추출
+            const paragraphs = contentElement.querySelectorAll('p');
+            paragraphs.forEach(p => {
+                const text = p.textContent.trim();
+                if (text && text.length > 10 && !isAdOrNavigation(text)) {
+                    content += text + '\n\n';
+                    extractedElements++;
+                }
+            });
+
+            // 표 데이터 추출
+            const tables = contentElement.querySelectorAll('table');
+            tables.forEach((table, tableIndex) => {
+                console.log(`표 ${tableIndex + 1} 발견`);
+                let tableText = `\n[표 ${tableIndex + 1}]\n`;
+                
+                const caption = table.querySelector('caption');
+                if (caption) {
+                    tableText += `표 제목: ${caption.textContent.trim()}\n`;
+                }
+                
+                const headers = table.querySelectorAll('thead th,thead td, tr:first-child th, tr:first-child td');
+                if (headers.length > 0) {
+                    tableText += '헤더: ';
+                    headers.forEach((header, index) => {
+                        tableText += header.textContent.trim();
+                        if (index < headers.length - 1) tableText += ' | ';
+                    });
+                    tableText += '\n';
+                }
+                
+                const rows = table.querySelectorAll('tbody tr, tr:not(:first-child)');
+                let rowCount = 0;
+                rows.forEach(row => {
+                    if (rowCount >= 10) return;
+                    
+                    const cells = row.querySelectorAll('td, th');
+                    if (cells.length > 0) {
+                        tableText += `${rowCount + 1}행: `;
+                        cells.forEach((cell, index) => {
+                            tableText += cell.textContent.trim();
+                            if (index < cells.length - 1) tableText += ' | ';
+                        });
+                        tableText += '\n';
+                        rowCount++;
+                    }
+                });
+                
+                if (rowCount > 0) {
+                    content += tableText + '\n';
+                    extractedElements++;
+                }
+            });
+
+            // 리스트 데이터 추출
+            const lists = contentElement.querySelectorAll('ul, ol');
+            lists.forEach((list, listIndex) => {
+                console.log(`리스트 ${listIndex + 1} 발견`);
+                let listText = `\n[리스트 ${listIndex + 1}]\n`;
+                
+                const items = list.querySelectorAll('li');
+                items.forEach((item, index) => {
+                    const text = item.textContent.trim();
+                    if (text && !isAdOrNavigation(text)) {
+                        listText += `${index + 1}. ${text}\n`;
+                    }
+                });
+                
+                if (items.length > 0) {
+                    content += listText + '\n';
+                    extractedElements++;
+                }
+            });
+
+            // 제목 추출
+            const headings = contentElement.querySelectorAll('h1, h2, h3, h4, h5, h6');
+            headings.forEach(heading => {
+                const text = heading.textContent.trim();
+                if (text && !isAdOrNavigation(text)) {
+                    content += `[${heading.tagName}] ${text}\n\n`;
+                    extractedElements++;
+                }
+            });
+
+            // 코드 블록 추출
+            const codeBlocks = contentElement.querySelectorAll('pre, code');
+            codeBlocks.forEach((block, index) => {
+                const text = block.textContent.trim();
+                if (text && text.length > 5) {
+                    content += `[코드 블록 ${index + 1}]\n${text.substring(0, 500)}${text.length > 500 ? '...' : ''}\n\n`;
+                    extractedElements++;
+                }
+            });
+
+            // 기타 중요 요소 추출
+            if (extractedElements < 5) {
+                const otherElements = contentElement.querySelectorAll('div[class*="content"], div[class*="text"], div[class*="body"]');
+                otherElements.forEach(element => {
+                    const text = element.textContent.trim();
+                    if (text && text.length > 20 && !isAdOrNavigation(text)) {
+                        content += text + '\n\n';
+                        extractedElements++;
+                    }
+                });
+            }
+
+            function isAdOrNavigation(text) {
+                const adKeywords = [
+                    '광고', 'AD', 'ad', '스폰서', 'sponsor', '추천', '관련글', '관련 상품',
+                    '구매', '판매', '가격', '할인', '쿠폰', '이벤트', '클릭', '바로가기',
+                    '더보기', '공유', '댓글', '카테고리', '태그', '작성일', '조회수'
+                ];
+
+                const navigationKeywords = [
+                    '메뉴', 'MENU', 'home', '홈', 'about', '소개', 'contact', '연락처',
+                    'login', '로그인', 'join', '가입', 'search', '검색', 'link', '링크'
+                ];
+
+                const lowerText = text.toLowerCase();
+                return adKeywords.some(keyword => lowerText.includes(keyword.toLowerCase())) ||
+                       navigationKeywords.some(keyword => lowerText.includes(keyword.toLowerCase())) ||
+                       text.length < 10;
+            }
+
+            content = content.replace(/\n{3,}/g, '\n\n').trim();
+
+            if (content.length < 200) {
+                console.log('콘텐츠가 부족하여 기존 방식으로 대체 추출');
+                const fallbackContent = contentElement.textContent;
+                const cleanText = fallbackContent.replace(/\s+/g, ' ').trim();
+                if (cleanText.length > 200) {
+                    content = cleanText.substring(0, 4000);
+                }
+            }
+
+            console.log(`추출된 요소 수: ${extractedElements}`);
+            console.log(`최종 콘텐츠 길이: ${content.length}`);
+
+            const maxLength = 8000;
+            if (content.length > maxLength) {
+                content = content.substring(0, maxLength) + '... (내용이 길어 일부만 표시됩니다)';
+            }
+
+            return `제목: ${title}\n\n본문 내용:\n${content}`;
+        }
+
+        // 메시지 추가 함수
+        function addMessage(content, isUser = false) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${isUser ? 'user' : 'bot'}`;
+
+            const messageContent = document.createElement('div');
+            if (isUser) {
+                messageContent.innerHTML = content.replace(/\n/g, '<br>');
+            } else {
+                messageContent.innerHTML = markdownToHTML(content);
+            }
+
+            const timestamp = document.createElement('div');
+            timestamp.className = 'timestamp';
+            timestamp.textContent = new Date().toLocaleTimeString('ko-KR', {
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+
+            messageDiv.appendChild(messageContent);
+            messageDiv.appendChild(timestamp);
+            chatbotMessages.appendChild(messageDiv);
+
+            chatbotMessages.scrollTop = chatbotMessages.scrollHeight;
+        }
+
+        // 타이핑 인디케이터 표시/숨김
+        function showTypingIndicator(show) {
+            if (show) {
+                typingIndicator.classList.add('active');
+                chatbotMessages.scrollTop = chatbotMessages.scrollHeight;
+            } else {
+                typingIndicator.classList.remove('active');
+            }
+        }
+
+        // 에러 메시지 표시
+        function showError(message) {
+            errorMessage.textContent = message;
+            setTimeout(() => {
+                errorMessage.textContent = '';
+            }, 5000);
+        }
+
+        // 알림 표시
+        function showNotification() {
+            chatbotNotification.style.display = 'block';
+            setTimeout(() => {
+                chatbotNotification.style.display = 'none';
+            }, 3000);
+        }
+
+        // 마크다운을 HTML로 변환하는 함수
+        function markdownToHTML(text) {
+            let html = text;
+
+            html = html.replace(/^### (.*$)/gm, '<h3 style="color: #0E2D6C; margin: 15px 0 10px 0; font-size: 1.2em;">$1</h3>');
+            html = html.replace(/^## (.*$)/gm, '<h2 style="color: #0E2D6C; margin: 20px 0 15px 0; font-size: 1.4em;">$1</h2>');
+            html = html.replace(/^# (.*$)/gm, '<h1 style="color: #0E2D6C; margin: 25px 0 20px 0; font-size: 1.6em;">$1</h1>');
+
+            html = html.replace(/\*\*(.*?)\*\*/g, '<strong style="font-weight: 600; color: #333;">$1</strong>');
+            html = html.replace(/\*(.*?)\*/g, '<em style="font-style: italic;">$1</em>');
+            html = html.replace(/`(.*?)`/g, '<code style="background: #f8f9fa; padding: 2px 6px; border-radius: 4px; font-family: monospace; font-size: 0.9em;">$1</code>');
+            html = html.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" style="color: #0E2D6C; text-decoration: none;" target="_blank">$1</a>');
+
+            html = html.replace(/^[\s]*-[\s]+(.*$)/gm, '<li style="margin: 5px 0; list-style-position: inside;">$1</li>');
+            html = html.replace(/^[\s]*\d+\.[\s]+(.*$)/gm, '<li style="margin: 5px 0; list-style-position: inside;">$1</li>');
+
+            html = html.replace(/(<li[^>]*>.*<\/li>)(\s*<li[^>]*>.*<\/li>)*/gs, (match) => {
+                const originalLines = match.match(/<li[^>]*>(.*?)<\/li>/g) || [];
+                const isOrdered = originalLines.some(line => /^\s*\d+\./.test(line.replace(/<[^>]*>/g, '')));
+
+                if (isOrdered) {
+                    return '<ol style="margin: 10px 0; padding-left: 20px;">' + match + '</ol>';
+                } else {
+                    return '<ul style="margin: 10px 0; padding-left: 20px;">' + match + '</ul>';
+                }
+            });
+
+            html = html.replace(/\n\n/g, '</p><p style="margin: 10px 0;">');
+            html = html.replace(/\n/g, '<br>');
+
+            html = html.split('<br>').map(line => {
+                line = line.trim();
+                if (!line) return '';
+                if (line.startsWith('<h') || line.startsWith('<ol>') || line.startsWith('<ul>') || line.startsWith('<li>') || line.startsWith('<p>')) {
+                    return line;
+                }
+                return '<p style="margin: 10px 0;">' + line + '</p>';
+            }).join('<br>');
+
+            return html;
+        }
+
+        // AI API 스트리밍 호출 함수 (GLM-4.6 모델)
+        async function callAIStreaming(userMessage, onChunk) {
+            if (!configLoaded || configLoadError) {
+                throw new Error('챗봇 설정이 로드되지 않았습니다.');
+            }
+
+            const config = window.CHATBOT_SECURE_CONFIG;
+            const API_URL = config.getApiUrl();
+            const MODEL = config.MODEL;
+
+            if (!checkRateLimit()) {
+                throw new Error(`시간당 ${config.MAX_CALLS}회만 사용할 수 있습니다. 잠시 후 다시 시도해주세요.`);
+            }
+
+            const pageContent = extractPageContent();
+
+            const systemPrompt = `당신은 숙명여자대학교 2026학년도 신입생 합격자 안내사항 전문 챗봇입니다. GLM-4.6 모델로 동작합니다.
+
+현재 페이지 내용을 참고하여 답변하세요:
+${pageContent}
+
+답변 원칙:
+1. 페이지 내용이 있다면 이를 우선적으로 참고하세요
+2. 사용자가 페이지 내용에 대해 물어보면 정확히 답변하세요
+3. 등록금, 수강신청, 장학금, 영어배치고사, 기숙사 등 신입생 관련 질문에 친절하게 답변하세요
+4. 페이지 내용과 관련 없는 질문이면 일반적인 정보로 답변하세요
+5. 답변은 한국어로, 친근한 어조로 작성하세요
+6. 마크다운 형식으로 깔끔하게 정리해서 답변하세요
+7. GLM-4.6 모델의 향상된 성능을 활용하여 정확하고 상세하게 답변하세요`;
+
+            try {
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept-Language': 'ko-KR'
+                    },
+                    body: JSON.stringify({
+                        model: MODEL,
+                        messages: [
+                            {
+                                role: 'system',
+                                content: systemPrompt
+                            },
+                            {
+                                role: 'user',
+                                content: userMessage
+                            }
+                        ],
+                        stream: true
+                    })
+                });
+
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    console.error('API 응답 오류:', response.status, errorText);
+                    throw new Error(`API 호출 실패: ${response.status}`);
+                }
+
+                const reader = response.body.getReader();
+                const decoder = new TextDecoder();
+                let buffer = '';
+                let fullResponse = '';
+
+                while (true) {
+                    const { done, value } = await reader.read();
+
+                    if (done) break;
+
+                    buffer += decoder.decode(value, { stream: true });
+                    const lines = buffer.split('\n');
+                    buffer = lines.pop();
+
+                    for (const line of lines) {
+                        if (line.startsWith('data: ')) {
+                            const data = line.slice(6);
+                            if (data === '[DONE]') continue;
+
+                            try {
+                                const parsed = JSON.parse(data);
+                                const content = parsed.choices[0]?.delta?.content || '';
+                                if (content) {
+                                    fullResponse += content;
+                                    onChunk(content);
+                                }
+                            } catch (e) {
+                                // JSON 파싱 오류 무시
+                            }
+                        }
+                    }
+                }
+
+                return fullResponse;
+
+            } catch (error) {
+                console.error('AI API 스트리밍 호출 오류:', error);
+                throw new Error('죄송합니다. 응답을 생성하는 중 오류가 발생했습니다.');
+            }
+        }
+
+        // 스트리밍 메시지 추가 함수
+        function addStreamingMessage() {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'message bot streaming';
+
+            const messageContent = document.createElement('div');
+            messageContent.className = 'message-content';
+
+            const timestamp = document.createElement('div');
+            timestamp.className = 'timestamp';
+            timestamp.textContent = new Date().toLocaleTimeString('ko-KR', {
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+
+            messageDiv.appendChild(messageContent);
+            messageDiv.appendChild(timestamp);
+            chatbotMessages.appendChild(messageDiv);
+
+            chatbotMessages.scrollTop = chatbotMessages.scrollHeight;
+
+            return messageContent;
+        }
+
+        // 메시지 처리 함수 (스트리밍)
+        async function processMessage() {
+            const message = chatbotInput.value.trim();
+            if (!message || isProcessing) return;
+
+            if (!apiKeyManager.hasApiKey()) {
+                showError('API 키가 필요합니다. 챗봇을 다시 열어주세요.');
+                return;
+            }
+
+            isProcessing = true;
+            chatbotSend.disabled = true;
+            chatbotInput.value = '';
+
+            addMessage(message, true);
+            showTypingIndicator(true);
+
+            try {
+                const streamingContent = addStreamingMessage();
+                let currentContent = '';
+
+                showTypingIndicator(false);
+
+                await callAIStreaming(message, (chunk) => {
+                    currentContent += chunk;
+                    streamingContent.innerHTML = markdownToHTML(currentContent);
+                    chatbotMessages.scrollTop = chatbotMessages.scrollHeight;
+                });
+
+                const messageDiv = streamingContent.closest('.message');
+                if (messageDiv) {
+                    messageDiv.classList.remove('streaming');
+                }
+
+            } catch (error) {
+                showTypingIndicator(false);
+                showError(error.message);
+                addMessage('죄송합니다. 메시지 처리 중 오류가 발생했습니다.');
+            } finally {
+                isProcessing = false;
+                chatbotSend.disabled = false;
+                chatbotInput.focus();
+            }
+        }
+
+        // 챗봇 열기/닫기
+        function toggleChatbot() {
+            if (!isOpen) {
+                if (!apiKeyManager.hasApiKey()) {
+                    showApiKeyModal();
+                    return;
+                }
+            }
+
+            isOpen = !isOpen;
+            if (isOpen) {
+                openChatbotWindow();
+            } else {
+                closeChatbotWindow();
+            }
+        }
+
+        // 챗봇 창 열기
+        function openChatbotWindow() {
+            chatbotWindow.classList.add('active');
+            chatbotToggle.setAttribute('aria-expanded', 'true');
+            chatbotInput.focus();
+            isOpen = true;
+        }
+
+        // 챗봇 창 닫기
+        function closeChatbotWindow() {
+            chatbotWindow.classList.remove('active');
+            chatbotToggle.setAttribute('aria-expanded', 'false');
+            isOpen = false;
+        }
+
+        // 이벤트 리스너
+        chatbotToggle.addEventListener('click', toggleChatbot);
+        chatbotClose.addEventListener('click', toggleChatbot);
+        chatbotSend.addEventListener('click', processMessage);
+
+        chatbotInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                processMessage();
+            }
+        });
+
+        // API 키 모달 이벤트 리스너
+        apiKeyToggle.addEventListener('click', toggleApiKeyVisibility);
+        apiKeyConfirm.addEventListener('click', confirmApiKey);
+        apiKeyCancel.addEventListener('click', hideApiKeyModal);
+
+        apiKeyInput.addEventListener('input', updateApiKeyConfirmButton);
+        apiKeyInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                if (!apiKeyConfirm.disabled) {
+                    confirmApiKey();
+                }
+            } else if (e.key === 'Escape') {
+                hideApiKeyModal();
+            }
+        });
+
+        // ESC 키로 챗봇 또는 모달 닫기
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                if (apiKeyModal.classList.contains('active')) {
+                    hideApiKeyModal();
+                } else if (isOpen) {
+                    closeChatbotWindow();
+                }
+            }
+        });
+
+        // 챗봇 외부 클릭 시 닫기
+        document.addEventListener('click', (e) => {
+            if (apiKeyModal.classList.contains('active')) {
+                if (!apiKeyModal.contains(e.target)) {
+                    hideApiKeyModal();
+                }
+            } else if (isOpen && !chatbotWindow.contains(e.target) && !chatbotToggle.contains(e.target)) {
+                closeChatbotWindow();
+            }
+        });
+
+        // 챗봇 초기화
+        initChatbot();
+
+        // 초기화 메시지 (5초 후 알림 표시)
+        setTimeout(() => {
+            if (!isOpen && configLoaded) {
+                showNotification();
+            }
+        }, 5000);
+
+        console.log('AI 챗봇이 설치되었습니다. (GLM-4.6 모델)');
+    })();
+    </script>
+</body>
+</html>
