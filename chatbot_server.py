@@ -4,7 +4,7 @@ import json
 import os
 from rag_system import get_rag_context
 import logging
-from zai._client import ZaiClient
+import requests
 
 # 로깅 설정
 logging.basicConfig(level=logging.INFO)
@@ -13,34 +13,39 @@ logger = logging.getLogger(__name__)
 app = Flask(__name__)
 CORS(app)
 
-# Z.AI 클라이언트 초기화
-client = ZaiClient(api_key="6e74659313a8456da1b4881d29dc098f.SgJrKDIG5qoTW9YO")
+# Z.AI API 설정
+ZAI_API_KEY = "6e74659313a8456da1b4881d29dc098f.SgJrKDIG5qoTW9YO"
+ZAI_API_URL = "https://api.z.ai/api/paas/v4/chat/completions"
 
 def generate_glm_response(prompt: str, context: str = "") -> str:
     """
-    Z.AI SDK를 사용하여 GLM-4.6 모델 응답 생성
+    Z.AI HTTP API를 사용하여 GLM-4.6 모델 응답 생성
     """
     try:
-        # 스트리밍 응답 생성
-        response = client.chat.completions.create(
-            model="glm-4.6",
-            messages=[
-                {"role": "system", "content": context},
-                {"role": "user", "content": prompt}
-            ],
-            max_tokens=1000,
-            temperature=0.7,
-            stream=True
-        )
-        
-        # 스트리밍 응답 수집
-        full_response = ""
-        for chunk in response:
-            if chunk.choices[0].delta.content:
-                full_response += chunk.choices[0].delta.content
-        
-        return full_response.strip()
-            
+        headers = {
+            "Authorization": f"Bearer {ZAI_API_KEY}",
+            "Content-Type": "application/json",
+            "Accept-Language": "en-US,en"
+        }
+
+        messages = []
+        if context:
+            messages.append({"role": "system", "content": context})
+        messages.append({"role": "user", "content": prompt})
+
+        data = {
+            "model": "glm-4.6",
+            "messages": messages,
+            "max_tokens": 1000,
+            "temperature": 0.7
+        }
+
+        response = requests.post(ZAI_API_URL, headers=headers, json=data, timeout=30)
+        response.raise_for_status()
+
+        result = response.json()
+        return result["choices"][0]["message"]["content"].strip()
+
     except Exception as e:
         logger.error(f"GLM 응답 생성 오류: {e}")
         return f"죄송합니다. 응답 생성 중 오류가 발생했습니다: {str(e)}"
