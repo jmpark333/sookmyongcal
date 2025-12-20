@@ -1910,9 +1910,7 @@
     <div class="chatbot-container">
         <!-- 챗봇 토글 버튼 -->
         <div class="chatbot-toggle" onclick="toggleChatbot()" title="숙명여대 신입생 도우미">
-            <svg viewBox="0 0 24 24" fill="currentColor">
-                <path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm6 14v-3H8v3h6v-2h2v2h2v-2h-2z"/>
-            </svg>
+            <img src="emblem-1_Color.png" alt="챗봇 아이콘" style="width: 48px; height: 48px; object-fit: contain; cursor: pointer; transition: transform 0.3s ease;">
         </div>
 
         <!-- 챗봇 대화창 -->
@@ -1927,7 +1925,9 @@
             <div class="chatbot-messages" id="chatMessages">
                 <!-- 환영 메시지 -->
                 <div class="message bot">
-                    <div class="message-avatar">🎓</div>
+                    <div class="message-avatar">
+                        <img src="emblem-1_Color.png" alt="챗봇" style="width: 32px; height: 32px; object-fit: contain;">
+                    </div>
                     <div class="message-bubble">
                         안녕하세요! 숙명여자대학교 2026학년도 신입생 합격자 안내사항 전문 챗봇입니다.<br><br>
                         등록금, 수강신청, 장학금, 영어배치고사, 기숙사 등 신입생 관련 궁금한 점을 물어보세요.<br><br>
@@ -1946,17 +1946,15 @@
                         placeholder="메시지를 입력하세요..."
                         onkeypress="handleKeyPress(event)"
                     >
-                    <button class="chatbot-send" id="sendButton" onclick="sendMessage()">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-                            <path d="M2.01 21L23 12 2.01 3 2 10l10 11 10-11z"/>
-                        </svg>
-                    </button>
+                    <img src="emblem-1_Color.png" alt="전송" id="sendButton" onclick="sendMessage()" style="width: 48px; height: 48px; cursor: pointer;">
                 </div>
             </div>
 
             <!-- 타이핑 인디케이터 -->
             <div class="typing-indicator" id="typingIndicator">
-                <div class="message-avatar">🎓</div>
+                <div class="message-avatar">
+                    <img src="emblem-1_Color.png" alt="챗봇" style="width: 32px; height: 32px; object-fit: contain;">
+                </div>
                 <div class="typing-dots">
                     <div class="typing-dot"></div>
                     <div class="typing-dot"></div>
@@ -2013,7 +2011,15 @@
             
             const avatar = document.createElement('div');
             avatar.className = 'message-avatar';
-            avatar.textContent = isUser ? '👤' : '🎓';
+            if (isUser) {
+                avatar.textContent = '👤';
+            } else {
+                const img = document.createElement('img');
+                img.src = 'emblem-1_Color.png';
+                img.alt = '챗봇';
+                img.style.cssText = 'width: 32px; height: 32px; object-fit: contain;';
+                avatar.appendChild(img);
+            }
             
             const bubble = document.createElement('div');
             bubble.className = 'message-bubble';
@@ -2202,22 +2208,21 @@ ${pageContent}
         }
 
         .chatbot-toggle {
-            width: 60px;
-            height: 60px;
-            background: linear-gradient(135deg, #0E2D6C, #1F4FA3);
-            border-radius: 50%;
+            width: auto;
+            height: auto;
+            background: none;
+            border: none;
+            border-radius: 0;
             display: flex;
             align-items: center;
             justify-content: center;
             cursor: pointer;
-            box-shadow: 0 4px 12px rgba(14, 45, 108, 0.3);
-            transition: all 0.3s ease;
-            border: 2px solid #ffffff;
+            box-shadow: none;
+            transition: none;
         }
 
-        .chatbot-toggle:hover {
+        .chatbot-toggle img:hover {
             transform: scale(1.1);
-            box-shadow: 0 6px 20px rgba(14, 45, 108, 0.4);
         }
 
         .chatbot-toggle svg {
@@ -2320,23 +2325,13 @@ ${pageContent}
             border-color: #0E2D6C;
         }
 
-        .chatbot-send {
-            background: #0E2D6C;
-            color: white;
-            border: none;
-            border-radius: 50%;
-            width: 44px;
-            height: 44px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+        #sendButton {
             cursor: pointer;
-            transition: all 0.2s ease;
+            transition: transform 0.2s ease;
         }
-
-        .chatbot-send:hover {
-            background: #1F4FA3;
-            transform: scale(1.05);
+        
+        #sendButton:hover {
+            transform: scale(1.1);
         }
 
         .chatbot-send:disabled {
