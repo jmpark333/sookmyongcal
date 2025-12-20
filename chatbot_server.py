@@ -100,9 +100,10 @@ if __name__ == '__main__':
     if not os.path.exists('templates'):
         os.makedirs('templates')
     
-    # 개발 환경에서 실행
-    app.run(debug=True, host='0.0.0.0', port=5000)
-# 환경 변수 설정
+    # 환경 변수에 따라 개발/프로덕션 환경 결정
+    if os.environ.get('FLASK_ENV') == 'development':
+        # 개발 환경에서 실행
+        app.run(debug=True, host='0.0.0.0', port=5000)
     else:
-    # 프로덕션 환경에서 실행
-    app.run()
+        # 프로덕션 환경에서 실행
+        app.run()
