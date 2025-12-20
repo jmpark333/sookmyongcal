@@ -79,9 +79,13 @@ def handler(event, context):
     """
     try:
         # 요청 정보 추출
-        if event.get("httpMethod") == "POST":
+        method = event.get("httpMethod", event.get("method", "GET"))
+        body = event.get("body", event.get("json", {}))
+        if isinstance(body, str):
+            body = json.loads(body)
+
+        if method == "POST":
             # POST 요청 (채팅)
-            body = json.loads(event.get("body", "{}"))
 
             if not body or "message" not in body:
                 return {
@@ -117,7 +121,7 @@ def handler(event, context):
                 },
             }
 
-        elif event.get("httpMethod") == "GET":
+        elif method == "GET":
             # GET 요청 (헬스 체크)
             return {
                 "statusCode": 200,
