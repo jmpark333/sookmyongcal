@@ -2125,7 +2125,7 @@ ${pageContent}
                                 const content = parsed.choices[0]?.delta?.content || '';
                                 if (content) {
                                     fullResponse += content;
-                                    bubble.innerHTML = content; // 간단한 HTML 변환
+                                    bubble.innerHTML = fullResponse; // 전체 응답 표시
                                     document.getElementById('chatMessages').scrollTop = document.getElementById('chatMessages').scrollHeight;
                                 }
                             } catch (e) {
