@@ -2049,31 +2049,59 @@
             showTypingIndicator();
             
             try {
-                // 임시로 하드코딩된 응답으로 테스트
-                hideTypingIndicator();
+                // 지식 베이스 내용 추출
+                const pageContent = extractKnowledgeContent();
                 
-                const lowerMessage = message.toLowerCase();
-                let responseText = '';
-                
-                if (lowerMessage.includes('등록금')) {
-                    responseText = '2026년 본등록금 납부 기간은 2026년 2월 3일(화) 10:00 ~ 2월 5일(목) 16:00까지입니다. 납부 방법은 신한은행 및 국내 모든 은행 창구, 스마트폰뱅킹, CD/ATM기 이체가 가능합니다. 고지서는 2월 3일(화) 10시부터 입학처 홈페이지(admission.sookmyung.ac.kr)에서 출력할 수 있습니다.';
-                } else if (lowerMessage.includes('수강신청')) {
-                    responseText = '수강신청 일정은 현재 안내된 정보에 포함되어 있지 않습니다. 숙명여자대학교 홈페이지나 입학처 홈페이지(admission.sookmyung.ac.kr)에서 추가 공지사항을 확인해 주시기 바랍니다.';
-                } else if (lowerMessage.includes('입학식')) {
-                    responseText = '입학식 및 신입생 환영회는 2026년 2월 23일(월) 예정입니다. 장소는 미정이며 학생지원센터에서 주관합니다.';
-                } else if (lowerMessage.includes('영어배치고사')) {
-                    responseText = '영어배치고사는 다음과 같습니다:\n• 1차: 1월 23일(금) 24:00\n• 2차: 2월 6일(금) 24:00, 2월 19일(목) 10:00~24:00\n• 3차: 2월 24일(화) 10:00~24:00\n• 4차: 3월 1일(일) 24:00, 3월 4일(수) 10:00~16:00\n접수는 본교 홈페이지 > 주요공지 또는 순헌칼리지 홈페이지에서 가능합니다.';
-                } else if (lowerMessage.includes('기숙사') || lowerMessage.includes('생활관')) {
-                    responseText = '학생생활관(명재관) 입사는 서울, 경인지역을 제외한 지방 거주 2026학번 신입학부생 대상입니다. 우선 입사 자격: 장애학생, 재외국민, 순헌장학생, 생활보호대상자, 국가유공자 등입니다. 상세 신청 일정은 추후 안내될 예정입니다.';
-                } else if (lowerMessage.includes('신체검사')) {
-                    responseText = '신체검사는 2026년 2월 24일(화) ~ 2월 26일(목) 예정이며 보건의료센터에서 실시합니다. 흉부 X선 검사, B형간염 항원항체 검사 결과지를 3월 중으로 교내 보건의료센터(순헌관 011호)로 제출해야 합니다.';
-                } else if (lowerMessage.includes('오리엔테이션')) {
-                    responseText = '신입생 오리엔테이션은 2026년 2월 25일(수) ~ 2월 26일(목)에 실시됩니다. 학생지원센터에서 주관합니다.';
-                } else {
-                    responseText = '안녕하세요! 숙명여자대학교 2026학년도 신입생 합격자 안내사항 전문 챗봇입니다. 등록금, 입학식, 영어배치고사, 기숙사, 신체검사, 오리엔테이션 등에 대해 질문해 주세요.';
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept-Language': 'ko-KR'
+                    },
+                    body: JSON.stringify({
+                        model: 'glm-4.6',
+                        messages: [
+                            {
+                                role: 'system',
+                                content: `당신은 숙명여자대학교 2026학년도 신입생 합격자 안내사항 전문 챗봇입니다. 다음 정보를 바탕으로 정확하게 답변해주세요.
+
+${pageContent}
+
+**답변 원칙:**
+1. 위 정보를 정확히 바탕으로 답변하세요
+2. 사용자가 묻는 내용이 있다면 정확한 일정과 정보를 제공하세요
+3. 한국어로, 친절하고 전문적인 어조로 답변하세요
+4. 정보가 없는 경우에는 솔직하게 모른다고 답변하세요
+5. 구체적인 날짜, 시간, 장소, 방법 등을 상세히 안내해주세요`
+                            },
+                            {
+                                role: 'user',
+                                content: message
+                            }
+                        ],
+                        stream: false  // 일반 호출로 변경
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error(`API 호출 실패: ${response.status}`);
                 }
-                
-                addMessage(responseText, false);
+
+                const result = await response.json();
+                hideTypingIndicator();
+
+                let responseText = '';
+                if (result.choices && result.choices.length > 0) {
+                    const message = result.choices[0].message;
+                    const content = message.content || message.reasoning_content || '';
+                    responseText = content.trim();
+                }
+
+                if (responseText) {
+                    addMessage(responseText, false);
+                } else {
+                    addMessage('죄송합니다. 응답을 받지 못했습니다. 잠시 후 다시 시도해주세요.', false);
+                }
                 
             } catch (error) {
                 console.error('Error:', error);
@@ -2087,49 +2115,41 @@
             }
         }
 
-        // 페이지 콘텐츠 추출 함수
-        function extractPageContent() {
-            console.log('콘텐츠 추출 시작...');
+        // 지식 베이스 스크립트 로드
+        // 지식 베이스 내용 추출 함수
+        function extractKnowledgeContent() {
+            let content = `**2026학년도 신입생 합격자 안내사항**
 
-            // 본문 콘텐츠 영역 찾기
-            let contentElement = null;
-            const possibleSelectors = [
-                '.calendar-container',
-                '.entry-content',
-                '.post-body',
-                '.article-content',
-                '.content',
-                'main',
-                '#content'
-            ];
-
-            for (const selector of possibleSelectors) {
-                const element = document.querySelector(selector);
-                if (element && element.textContent.trim().length > 50) {
-                    contentElement = element;
-                    console.log(`콘텐츠 영역 찾음: ${selector}`);
-                    break;
-                }
-            }
-
-            if (!contentElement) {
-                contentElement = document.body;
-            }
-
-            if (!contentElement || !contentElement.textContent) {
-                return '';
-            }
-
-            // 제목 추출
-            const title = document.querySelector('h1')?.textContent || document.title || '';
+`;
             
-            // 본문 내용 추출
-            const content = contentElement.textContent.trim();
-            const maxContentLength = 2000;
-            const truncatedContent = content.length > maxContentLength ? 
-                content.substring(0, maxContentLength) + '...' : content;
-
-            return `제목: ${title}\n\n내용: ${truncatedContent}`;
+            // KNOWLEDGE_BASE 배열이 있는 경우
+            if (typeof KNOWLEDGE_BASE !== 'undefined' && Array.isArray(KNOWLEDGE_BASE)) {
+                content += KNOWLEDGE_BASE.map(item => {
+                    let sectionContent = '';
+                    if (item.id === 'enrollment_period') {
+                        sectionContent = `**1. 등록금 납부 (재무회계팀)**
+${item.content}`;
+                    } else if (item.id === 'english_test') {
+                        sectionContent = `**2. 영어배치고사 (순헌칼리지 교학팀)**
+${item.content}`;
+                    } else if (item.id === 'health_check') {
+                        sectionContent = `**3. 신체검사 (보건의료센터)**
+${item.content}`;
+                    } else if (item.id === 'entrance_ceremony') {
+                        sectionContent = `**4. 입학식 및 신입생 환영회**
+${item.content}`;
+                    } else if (item.id === 'orientation') {
+                        sectionContent = `**5. 신입생 오리엔테이션**
+${item.content}`;
+                    } else if (item.id === 'dormitory') {
+                        sectionContent = `**6. 학생생활관(명재관) 입사 안내**
+${item.content}`;
+                    }
+                    return sectionContent;
+                }).join('\n\n');
+            }
+            
+            return content;
         }
 
         // 페이지 로드 시 초기화

@@ -23,6 +23,7 @@ def main():
         "img-logo01.png",
         "screenshot_today.png",
         "screenshot.png",
+        "knowledge_base.js",
     ]
     for static_file in static_files:
         if os.path.exists(static_file):
