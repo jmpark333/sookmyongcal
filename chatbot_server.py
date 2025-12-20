@@ -4,7 +4,10 @@ import json
 import os
 from rag_system import get_rag_context
 import logging
-from zai._client import ZaiClient
+try:
+    from zai import ZaiClient
+except ImportError:
+    from zai._client import ZaiClient
 
 # 로깅 설정
 logging.basicConfig(level=logging.INFO)
