@@ -3,35 +3,40 @@ import os
 import shutil
 import sys
 
+
 def main():
     print("Building Netlify site...")
 
     # Create output directory
     os.makedirs("output", exist_ok=True)
 
-    # Copy templates to output
-    if os.path.exists("templates"):
-        shutil.copytree("templates", "output/templates", dirs_exist_ok=True)
-        print("Copied templates to output")
+    # Copy main HTML files
+    html_files = ["index.html", "chatbot.html"]
+    for html_file in html_files:
+        if os.path.exists(html_file):
+            shutil.copy(html_file, f"output/{html_file}")
+            print(f"Copied {html_file} to output")
 
-    # Copy index.html to output root
-    if os.path.exists("templates/index.html"):
-        shutil.copy("templates/index.html", "output/index.html")
-        print("Copied index.html to output")
+    # Copy static assets
+    static_files = [
+        "sookmyoung.svg",
+        "img-logo01.png",
+        "screenshot_today.png",
+        "screenshot.png",
+    ]
+    for static_file in static_files:
+        if os.path.exists(static_file):
+            shutil.copy(static_file, f"output/{static_file}")
+            print(f"Copied {static_file} to output")
 
-    # Copy rag_system.py to netlify/functions
-    os.makedirs("netlify/functions", exist_ok=True)
-    if os.path.exists("rag_system.py"):
-        shutil.copy("rag_system.py", "netlify/functions/rag_system.py")
-        print("Copied rag_system.py to netlify/functions")
-
-    # Copy data directory if it exists
-    if os.path.exists("data"):
-        shutil.copytree("data", "netlify/functions/data", dirs_exist_ok=True)
-        print("Copied data directory to netlify/functions")
+    # Copy functions directory
+    if os.path.exists("functions"):
+        shutil.copytree("functions", "output/functions", dirs_exist_ok=True)
+        print("Copied functions directory to output")
 
     print("Build completed successfully!")
     return 0
+
 
 if __name__ == "__main__":
     sys.exit(main())
