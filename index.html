@@ -408,28 +408,7 @@
             border-color: transparent transparent var(--primary-color) transparent;
         }
         
-        /* 하이라이트 버튼 스타일 */
-        .highlight-button {
-            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-            color: var(--white);
-            border: none;
-            padding: 12px 25px;
-            border-radius: 25px;
-            cursor: pointer;
-            font-size: 14px;
-            font-weight: bold;
-            box-shadow: 0 4px 15px rgba(14, 45, 108, 0.3);
-            transition: all 0.3s ease;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            margin: 0 10px;
-        }
-        
-        .highlight-button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(14, 45, 108, 0.4);
-            background: linear-gradient(135deg, var(--secondary-color), var(--primary-color));
-        }
+
 
     </style>
 </head>
@@ -465,9 +444,13 @@
     
     <!-- 합격자 안내사항 보기 버튼 -->
     <div style="text-align: center; margin: 30px 0;">
-        <button onclick="openPdf()" class="highlight-button" style="background: linear-gradient(135deg, var(--primary-color), var(--secondary-color)); color: var(--white); border: none; padding: 15px 40px; border-radius: 50px; cursor: pointer; font-size: 18px; font-weight: bold; box-shadow: 0 6px 20px rgba(14, 45, 108, 0.4); transition: all 0.3s ease; text-transform: uppercase; letter-spacing: 1px; position: relative; overflow: hidden;">
-            <span style="position: relative; z-index: 2;">📋 합격자 안내사항 전체보기</span>
-            <div style="position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: linear-gradient(45deg, transparent, rgba(255,255,255,0.1), transparent); transform: rotate(45deg); animation: shine 3s infinite;"></div>
+        <button onclick="openPdf()" style="background: var(--primary-color); color: var(--white); border: none; padding: 12px 25px; border-radius: 8px; cursor: pointer; font-size: 15px; font-weight: 600; box-shadow: 0 3px 10px rgba(14, 45, 108, 0.2); transition: all 0.2s ease; display: inline-flex; align-items: center; gap: 8px;">
+            📄 합격자 안내사항 보기
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: inline-block;">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                <polyline points="7,10 12,15 17,10"/>
+                <line x1="12" y1="15" x2="12" y2="3"/>
+            </svg>
         </button>
     </div>
 
@@ -991,9 +974,15 @@
     <script>
         // PDF 열기 함수
         function openPdf() {
-            // 로컬 PDF 파일 사용
+            // PDF 다운로드 방식으로 열기
             const pdfUrl = './2026학년도신입생합격자안내사항(20251212).pdf';
-            window.open(pdfUrl, '_blank');
+            const link = document.createElement('a');
+            link.href = pdfUrl;
+            link.download = '2026학년도신입생합격자안내사항(20251212).pdf';
+            link.target = '_blank';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
         }
 
         // 날짜 텍스트에서 기간 추출 함수 (전역 스코프로 이동)

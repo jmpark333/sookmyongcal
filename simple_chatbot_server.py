@@ -51,9 +51,32 @@ def find_relevant_knowledge(query):
 def generate_simple_response(query, knowledge):
     """간단한 응답 생성"""
     if not knowledge:
-        return "안녕하세요! 숙명여자대학교 2026학년도 신입생 합격자 안내사항 전문 챗봇입니다. 등록금, 입학식, 영어배치고사, 기숙사, 신체검사, 오리엔테이션, 장학금, 수강신청 등에 대해 질문해 주세요."
+        return "안녕하세요! 숙명여자대학교 2026학년도 신입생 합격자 안내사항 전문 챗봇입니다. 등록금, 입학식, 영어배치고사, 기숙사, 신체검사, 오리엔테이션, 장학금, 수강신청, 영어 교양필수 이수면제 등에 대해 질문해 주세요."
 
-    # 간단한 응답 형식
+    query_lower = query.lower()
+
+    # 영어 교양필수 이수면제 관련 질문은 더 상세한 답변
+    if knowledge["id"] == "영어교양필수이수면제" and any(
+        keyword in query_lower
+        for keyword in [
+            "기준",
+            "성적",
+            "점수",
+            "어떻게",
+            "어떻게",
+            "toeic",
+            "toefl",
+            "ielts",
+            "인정",
+        ]
+    ):
+        return f"""{knowledge["content"]}
+
+💡 추가 안내:
+• 구체적인 성적 기준은 학년도별로 다를 수 있습니다.
+• 신청 방법과 제출 서류는 순헌칼리지 교학팀으로 문의해주세요.
+• 기타 이수면제 관련 공지사항은 숙명여자대학교 공지사항을 참고해주세요."""
+
     return f"{knowledge['content']}"
 
 

@@ -10,3 +10,11 @@ Press CTRL+C to quit
  * Debugger PIN: 394-799-753
 127.0.0.1 - - [20/Dec/2025 14:54:15] "POST /chat HTTP/1.1" 200 -
 127.0.0.1 - - [20/Dec/2025 14:54:27] "POST /chat HTTP/1.1" 200 -
+ * Detected change in '/home/rg3270/sookmyongcal/pdf_extractor_fixed.py', reloading
+ * Restarting with stat
+ * Debugger is active!
+ * Debugger PIN: 394-799-753
+ * Detected change in '/home/rg3270/sookmyongcal/simple_chatbot_server.py', reloading
+ * Restarting with stat
+ * Debugger is active!
+ * Debugger PIN: 394-799-753
