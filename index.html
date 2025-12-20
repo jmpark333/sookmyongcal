@@ -1968,7 +1968,7 @@
 
     <script>
         let isOpen = false;
-        const API_URL = 'http://localhost:5000/chat'; // 개발 환경에서는 localhost 사용
+        const API_URL = 'https://blogchatbot-proxy.netlify.app/api/chatbot'; // 프록시 사용
 
         function toggleChatbot() {
             const chatbotWindow = document.getElementById('chatbotWindow');
@@ -2049,25 +2049,94 @@
             showTypingIndicator();
             
             try {
+                const pageContent = extractPageContent();
+                
                 const response = await fetch(API_URL, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
+                        'Accept-Language': 'ko-KR'
                     },
                     body: JSON.stringify({
-                        message: message
+                        model: 'glm-4.6',
+                        messages: [
+                            {
+                                role: 'system',
+                                content: `당신은 숙명여자대학교 2026학년도 신입생 합격자 안내사항 전문 챗봇입니다. GLM-4.6 모델로 동작합니다.
+
+현재 페이지 내용을 참고하여 답변하세요:
+${pageContent}
+
+답변 원칙:
+1. 페이지 내용이 있다면 이를 우선적으로 참고하세요
+2. 사용자가 페이지 내용에 대해 물어보면 정확히 답변하세요
+3. 등록금, 수강신청, 장학금, 영어배치고사, 기숙사 등 신입생 관련 질문에 친절하게 답변하세요
+4. 페이지 내용과 관련 없는 질문이면 일반적인 정보로 답변하세요
+5. 답변은 한국어로, 친근한 어조로 작성하세요
+6. 마크다운 형식으로 깔끔하게 정리해서 답변하세요
+7. GLM-4.6 모델의 향상된 성능을 활용하여 정확하고 상세하게 답변하세요`
+                            },
+                            {
+                                role: 'user',
+                                content: message
+                            }
+                        ],
+                        stream: true
                     })
                 });
-                
-                const data = await response.json();
-                
+
+                if (!response.ok) {
+                    throw new Error(`API 호출 실패: ${response.status}`);
+                }
+
+                const reader = response.body.getReader();
+                const decoder = new TextDecoder();
+                let buffer = '';
+                let fullResponse = '';
+
                 // 타이핑 인디케이터 숨기기
                 hideTypingIndicator();
-                
-                if (data.response) {
-                    addMessage(data.response);
-                } else {
-                    addMessage('죄송합니다. 응답을 받지 못했습니다. 잠시 후 다시 시도해주세요.');
+
+                // 빈 메시지 추가
+                const messageDiv = document.createElement('div');
+                messageDiv.className = 'message bot';
+                messageDiv.innerHTML = `
+                    <div class="message-avatar">🎓</div>
+                    <div class="message-bubble"></div>
+                `;
+                const bubble = messageDiv.querySelector('.message-bubble');
+                document.getElementById('chatMessages').appendChild(messageDiv);
+
+                while (true) {
+                    const { done, value } = await reader.read();
+                    if (done) break;
+
+                    buffer += decoder.decode(value, { stream: true });
+                    const lines = buffer.split('\n');
+                    buffer = lines.pop();
+
+                    for (const line of lines) {
+                        if (line.startsWith('data: ')) {
+                            const data = line.slice(6);
+                            if (data === '[DONE]') continue;
+
+                            try {
+                                const parsed = JSON.parse(data);
+                                const content = parsed.choices[0]?.delta?.content || '';
+                                if (content) {
+                                    fullResponse += content;
+                                    bubble.innerHTML = content; // 간단한 HTML 변환
+                                    document.getElementById('chatMessages').scrollTop = document.getElementById('chatMessages').scrollHeight;
+                                }
+                            } catch (e) {
+                                console.warn('JSON 파싱 오류:', e);
+                            }
+                        }
+                    }
+                }
+
+                if (!fullResponse) {
+                    bubble.innerHTML = '죄송합니다. 응답을 받지 못했습니다. 잠시 후 다시 시도해주세요.';
                 }
                 
             } catch (error) {
@@ -2080,6 +2149,51 @@
                 // 입력창에 포커스
                 input.focus();
             }
+        }
+
+        // 페이지 콘텐츠 추출 함수
+        function extractPageContent() {
+            console.log('콘텐츠 추출 시작...');
+
+            // 본문 콘텐츠 영역 찾기
+            let contentElement = null;
+            const possibleSelectors = [
+                '.calendar-container',
+                '.entry-content',
+                '.post-body',
+                '.article-content',
+                '.content',
+                'main',
+                '#content'
+            ];
+
+            for (const selector of possibleSelectors) {
+                const element = document.querySelector(selector);
+                if (element && element.textContent.trim().length > 50) {
+                    contentElement = element;
+                    console.log(`콘텐츠 영역 찾음: ${selector}`);
+                    break;
+                }
+            }
+
+            if (!contentElement) {
+                contentElement = document.body;
+            }
+
+            if (!contentElement || !contentElement.textContent) {
+                return '';
+            }
+
+            // 제목 추출
+            const title = document.querySelector('h1')?.textContent || document.title || '';
+            
+            // 본문 내용 추출
+            const content = contentElement.textContent.trim();
+            const maxContentLength = 2000;
+            const truncatedContent = content.length > maxContentLength ? 
+                content.substring(0, maxContentLength) + '...' : content;
+
+            return `제목: ${title}\n\n내용: ${truncatedContent}`;
         }
 
         // 페이지 로드 시 초기화

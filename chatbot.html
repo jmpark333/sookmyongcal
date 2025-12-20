@@ -646,7 +646,8 @@
             },
 
             hasApiKey: function() {
-                return isApiKeyVerified && currentApiKey !== null;
+                // 프록시를 사용하므로 항상 true 반환
+                return true;
             }
         };
 
