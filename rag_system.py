@@ -98,28 +98,21 @@ class SimpleRAGSystem:
         """
         쿼리에 대한 컨텍스트 생성
         """
-        relevant_docs = self.search(query, top_k=3)
+        relevant_docs = self.search(query, top_k=2)
 
         if not relevant_docs:
             return "관련 정보를 찾을 수 없습니다."
 
-        context_parts = []
-        current_length = 0
+        # 가장 관련성 높은 문서만 사용
+        best_doc = relevant_docs[0]
+        content = best_doc["content"]
+        title = best_doc.get("title", "")
 
-        for doc in relevant_docs:
-            content = doc["content"]
-            title = doc.get("title", "")
+        # 불필요한 공백과 특수문자 정리
+        content = re.sub(r"\s+", " ", content)
+        content = content.strip()
 
-            # 문서 포맷팅
-            formatted_doc = f"[{title}] {content}"
-
-            if current_length + len(formatted_doc) <= max_context_length:
-                context_parts.append(formatted_doc)
-                current_length += len(formatted_doc)
-            else:
-                break
-
-        return "\n\n".join(context_parts)
+        return f"[{title}] {content}"
 
 
 # 전역 RAG 시스템 인스턴스

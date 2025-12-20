@@ -26,19 +26,36 @@ def generate_glm_response(prompt: str, context: str = "") -> str:
         headers = {
             "Authorization": f"Bearer {ZAI_API_KEY}",
             "Content-Type": "application/json",
-            "Accept-Language": "en-US,en",
+            "Accept-Language": "ko-KR,ko",
         }
 
+        system_prompt = """당신은 숙명여자대학교 2026학년도 신입생 합격자 안내사항 전문 챗봇입니다.
+제공된 문맥 정보를 바탕으로 사용자의 질문에 정확하고 간결하게 답변해주세요.
+
+답변 규칙:
+1. 문맥 정보를 최대한 활용하여 답변하세요.
+2. 질문에 대한 핵심 정보를 먼저 제공하세요.
+3. 불필요한 분석이나 사고 과정은 제외하고 바로 답변하세요.
+4. 1-3문장 이내로 간결하게 답변하세요.
+5. 문맥에 정보가 없으면 "해당 정보는 문서에 없습니다. 담당 부서에 문의해주세요."라고 답변하세요."""
+
         messages = []
-        if context:
-            messages.append({"role": "system", "content": context})
+        if context and context != "관련 정보를 찾을 수 없습니다.":
+            messages.append(
+                {
+                    "role": "system",
+                    "content": f"{system_prompt}\n\n문서 정보:\n{context}",
+                }
+            )
+        else:
+            messages.append({"role": "system", "content": system_prompt})
         messages.append({"role": "user", "content": prompt})
 
         data = {
             "model": "glm-4.6",
             "messages": messages,
-            "max_tokens": 500,
-            "temperature": 0.3,
+            "max_tokens": 200,
+            "temperature": 0.1,
         }
 
         response = requests.post(ZAI_API_URL, headers=headers, json=data, timeout=30)

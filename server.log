@@ -1,0 +1,9 @@
+임베딩 생성 완료: (29, 1000)
+임베딩 생성 완료: (29, 1000)
+ * Serving Flask app 'chatbot_server'
+ * Debug mode: off
+INFO:werkzeug:[31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5000
+INFO:werkzeug:[33mPress CTRL+C to quit[0m
+INFO:__main__:API 응답 상태: 200
+INFO:werkzeug:127.0.0.1 - - [20/Dec/2025 14:53:20] "POST /chat HTTP/1.1" 200 -

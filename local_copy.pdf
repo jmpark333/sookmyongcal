@@ -307,12 +307,6 @@
             100% { opacity: 1; transform: scale(1); }
         }
         
-        @keyframes shine {
-            0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
-            50% { transform: translateX(100%) translateY(100%) rotate(45deg); }
-            100% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
-        }
-        
         /* 월별 일정에서 Now 표시 스타일 */
         .event-now {
             display: inline-block !important;
@@ -407,29 +401,6 @@
             top: auto;
             border-color: transparent transparent var(--primary-color) transparent;
         }
-        
-        /* 하이라이트 버튼 스타일 */
-        .highlight-button {
-            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-            color: var(--white);
-            border: none;
-            padding: 12px 25px;
-            border-radius: 25px;
-            cursor: pointer;
-            font-size: 14px;
-            font-weight: bold;
-            box-shadow: 0 4px 15px rgba(14, 45, 108, 0.3);
-            transition: all 0.3s ease;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            margin: 0 10px;
-        }
-        
-        .highlight-button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(14, 45, 108, 0.4);
-            background: linear-gradient(135deg, var(--secondary-color), var(--primary-color));
-        }
 
     </style>
 </head>
@@ -461,15 +432,7 @@
         <div id="searchResultsList"></div>
     </div>
     
-    <p style="margin: 20px 0; text-align: center; color: var(--text-primary);">굵게 표시된 날짜는 주요 일정이 있는 날입니다. 날짜를 클릭하면 상세 내용을 확인할 수 있습니다.</p>
-    
-    <!-- 합격자 안내사항 보기 버튼 -->
-    <div style="text-align: center; margin: 30px 0;">
-        <button onclick="openPdf()" class="highlight-button" style="background: linear-gradient(135deg, var(--primary-color), var(--secondary-color)); color: var(--white); border: none; padding: 15px 40px; border-radius: 50px; cursor: pointer; font-size: 18px; font-weight: bold; box-shadow: 0 6px 20px rgba(14, 45, 108, 0.4); transition: all 0.3s ease; text-transform: uppercase; letter-spacing: 1px; position: relative; overflow: hidden;">
-            <span style="position: relative; z-index: 2;">📋 합격자 안내사항 전체보기</span>
-            <div style="position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: linear-gradient(45deg, transparent, rgba(255,255,255,0.1), transparent); transform: rotate(45deg); animation: shine 3s infinite;"></div>
-        </button>
-    </div>
+    <p style="margin: 20px 0; text-align: center; color: var(--text-primary);">굵게 표시된 날짜는 주요 일정이 있는 날입니다. 날짜를 클릭하면 상세 내용을 확인할 수 있습니다. <button onclick="openPdf()" class="highlight-button">합격자 안내사항 보기</button></p>
 
     <div class="calendar-container">
 
@@ -991,8 +954,7 @@
     <script>
         // PDF 열기 함수
         function openPdf() {
-            // 로컬 PDF 파일 사용
-            const pdfUrl = './2026학년도신입생합격자안내사항(20251212).pdf';
+            const pdfUrl = 'https://sookmyongcal.netlify.app/2026학년도신입생합격자안내사항(20251212).pdf';
             window.open(pdfUrl, '_blank');
         }
 
