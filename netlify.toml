@@ -5,14 +5,12 @@ command = "pip install -r requirements.txt && python build.py"
 [build.environment]
 PYTHON_VERSION = "3.8"
 
+[functions]
+directory = "functions"
+
 [[redirects]]
 from = "/api/*"
 to = "/.netlify/functions/:splat"
-status = 200
-
-[[redirects]]
-from = "/chat"
-to = "/.netlify/functions/chat"
 status = 200
 
 [[redirects]]
