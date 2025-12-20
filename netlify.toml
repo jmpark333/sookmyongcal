@@ -1,0 +1,7 @@
+[build]
+  publish = "output"
+  command = "python chatbot_server.py"
+
+[build.environment]
+  PYTHON_VERSION = "3.8"
+</build>
