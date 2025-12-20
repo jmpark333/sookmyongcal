@@ -1,0 +1,2370 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>2026학년도 신입생 주요 일정 달력</title>
+    <style>
+        /* 숙명여대 컬러 팔레트 정의 */
+        :root {
+            --primary-color: #0E2D6C;      /* SMWU Blue - 메인 컬러 */
+            --secondary-color: #1F4FA3;    /* 보조색 */
+            --accent-color: #F2C94C;       /* 강조색 */
+            --background-color: #F5F7FB;   /* 배경색 */
+            --text-primary: #1A1A1A;       /* 본문 텍스트 */
+            --text-secondary: #4F5D73;     /* 설명, 보조 문구 */
+            --white: #FFFFFF;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: var(--background-color);
+            color: var(--text-primary);
+        }
+
+        .calendar-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .calendar {
+            background-color: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            width: calc(50% - 10px);
+            box-sizing: border-box;
+        }
+
+        /* 모바일 반응형 디자인 */
+        @media (max-width: 768px) {
+            .calendar-container {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .calendar {
+                width: 100%;
+                padding: 15px;
+            }
+            
+            .month-header {
+                font-size: 1.2em;
+            }
+            
+            th, td {
+                padding: 8px 4px;
+                font-size: 0.95em;
+            }
+            
+            .day-number {
+                font-size: 1.1em;
+            }
+            
+            /* 모바일용 오늘 날짜 스타일 */
+            .today {
+                border-width: 4px !important;
+                box-shadow: 0 0 10px rgba(33, 150, 243, 0.7) !important;
+            }
+            
+            .today .day-number {
+                font-size: 1.3em !important;
+            }
+            
+            .now-indicator {
+                font-size: 0.9em;
+                padding: 4px 6px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .calendar {
+                padding: 10px;
+            }
+            
+            .month-header {
+                font-size: 1.1em;
+            }
+            
+            th, td {
+                padding: 6px 2px;
+                font-size: 0.9em;
+                height: 35px;
+            }
+            
+            .day-number {
+                font-size: 1.0em;
+            }
+            
+            .event-marker {
+                width: 5px;
+                height: 5px;
+            }
+            
+            /* 작은 화면용 오늘 날짜 스타일 */
+            .today {
+                border-width: 3px !important;
+                box-shadow: 0 0 8px rgba(33, 150, 243, 0.8) !important;
+            }
+            
+            .today .day-number {
+                font-size: 1.2em !important;
+            }
+            
+            .now-indicator {
+                font-size: 0.8em;
+                padding: 3px 5px;
+            }
+        }
+
+        .month-header {
+            font-size: 1.5em;
+            text-align: center;
+            margin-bottom: 15px;
+            color: var(--primary-color);
+            border-bottom: 2px solid var(--primary-color);
+            padding-bottom: 5px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            background-color: var(--primary-color);
+            color: var(--white);
+            padding: 10px 5px;
+            text-align: center;
+            font-size: 0.9em;
+        }
+
+        td {
+            padding: 8px 0;
+            height: 40px;
+            text-align: center;
+            vertical-align: top;
+            border: 1px solid rgba(14, 45, 108, 0.1);
+            position: relative;
+        }
+        
+        td:hover {
+            background-color: rgba(14, 45, 108, 0.02);
+        }
+
+        td.prev-month, td.next-month {
+            color: var(--text-secondary);
+            background-color: #f0f0f0;
+        }
+
+        .event-day {
+            background-color: rgba(14, 45, 108, 0.05); /* 이벤트 있는 날 배경 */
+        }
+        
+        .event-day:hover {
+            background-color: rgba(14, 45, 108, 0.1); /* 이벤트 있는 날 hover 배경 */
+        }
+
+        .day-number {
+            display: block;
+            font-weight: bold;
+            color: var(--text-primary);
+            font-size: 1.1em;
+            margin-bottom: 2px;
+            cursor: pointer;
+            text-decoration: none;
+        }
+        
+        .day-number:hover {
+            color: var(--secondary-color);
+        }
+        
+        /* 이벤트 표시 */
+        .event-marker {
+            display: block;
+            width: 6px;
+            height: 6px;
+            background-color: var(--primary-color); /* 숙명여대 Primary 색상 */
+            border-radius: 50%;
+            margin: 0 auto;
+        }
+        
+        /* 상세 일정 팝업 스타일 */
+        .event-detail-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            z-index: 1000;
+        }
+        
+        /* 팝업 활성화 상태 강제 적용 */
+        .event-detail-overlay.active {
+            display: block !important;
+        }
+
+        .event-detail-content {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 500px;
+            margin: 100px auto;
+            position: relative;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+        
+        .event-detail-content h3 {
+            color: var(--primary-color);
+            border-bottom: 1px solid var(--primary-color);
+            padding-bottom: 10px;
+            margin-top: 0;
+        }
+        
+        .event-detail-content p {
+            margin-bottom: 15px;
+            line-height: 1.5;
+            font-size: 0.95em;
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 10px;
+            right: 20px;
+            font-size: 1.5em;
+            color: #aaa;
+            text-decoration: none;
+        }
+        
+        /* URL fragment matching for display */
+        .event-detail-overlay:target {
+            display: block;
+        }
+        
+        /* Clickable reference links (각주 제거로 비활성화) */
+        
+        /* 중요 일정 강조 스타일 */
+        .important-event {
+            font-weight: bold;
+            background-color: rgba(14, 45, 108, 0.05); /* 달력 날짜 배경색과 동일 */
+            border-left: 4px solid var(--primary-color);
+            padding: 8px 12px;
+            margin: 5px 0;
+            border-radius: 0 4px 4px 0;
+        }
+        
+        /* 클릭 가능한 링크 스타일 */
+        .clickable-link {
+            color: var(--primary-color);
+            cursor: pointer;
+            text-decoration: underline;
+        }
+        
+        .clickable-link:hover {
+            color: var(--secondary-color);
+        }
+        
+        /* 오늘 날짜 하이라이트 스타일 */
+        .today {
+            background-color: #e8f4fd !important;
+            border: 3px solid #2196F3 !important;
+            position: relative;
+            box-shadow: 0 0 8px rgba(33, 150, 243, 0.5) !important;
+        }
+        
+        .today .day-number {
+            color: #1976D2 !important;
+            font-weight: bold !important;
+            font-size: 1.2em !important;
+        }
+        
+        /* Now 표시 스타일 */
+        .now-indicator {
+            position: absolute;
+            right: 2px;
+            top: 2px;
+            background-color: #FF5722;
+            color: white;
+            padding: 3px 6px;
+            border-radius: 4px;
+            font-size: 0.8em;
+            font-weight: bold;
+            animation: blink 1.5s infinite;
+            z-index: 10;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+        
+        @keyframes blink {
+            0% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.7; transform: scale(1.05); }
+            100% { opacity: 1; transform: scale(1); }
+        }
+        
+        /* 월별 일정에서 Now 표시 스타일 */
+        .event-now {
+            display: inline-block !important;
+            background-color: #FF5722 !important;
+            color: white !important;
+            padding: 2px 6px !important;
+            border-radius: 3px !important;
+            font-size: 0.8em !important;
+            font-weight: bold !important;
+            margin-left: 8px !important;
+            animation: blink 1.5s infinite !important;
+            vertical-align: middle !important;
+            position: relative !important;
+            z-index: 100 !important;
+            line-height: 1 !important;
+        }
+        
+        /* 검색 드롭다운 스타일 */
+        .search-dropdown {
+            position: absolute;
+            background-color: white;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            max-height: 200px;
+            overflow-y: auto;
+            width: 300px;
+            z-index: 1000;
+            display: none;
+        }
+        
+        .search-dropdown-item {
+            padding: 10px;
+            cursor: pointer;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        
+        .search-dropdown-item:hover {
+            background-color: #f5f7fb;
+        }
+        
+        .search-dropdown-item:last-child {
+            border-bottom: none;
+        }
+        
+        .search-container {
+            position: relative;
+            display: inline-block;
+        }
+        
+        /* 툴팁 스타일 */
+        .tooltip {
+            position: absolute;
+            background-color: var(--primary-color);
+            color: var(--white);
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 0.9em;
+            z-index: 1000;
+            max-width: 250px;
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
+            opacity: 0;
+            transition: opacity 0.3s;
+            pointer-events: none;
+            white-space: pre-line;
+        }
+        
+        .tooltip.show {
+            opacity: 1;
+        }
+        
+        .tooltip::after {
+            content: '';
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            margin-left: -5px;
+            border-width: 5px;
+            border-style: solid;
+            border-color: var(--primary-color) transparent transparent transparent;
+        }
+        
+        /* 아래를 향하는 화살표 (툴팁이 날짜 위에 나타날 때) */
+        .tooltip.arrow-up::after {
+            top: 100%;
+            border-color: var(--primary-color) transparent transparent transparent;
+        }
+        
+        /* 위를 향하는 화살표 (툴팁이 날짜 아래에 나타날 때) */
+        .tooltip.arrow-down::after {
+            bottom: 100%;
+            top: auto;
+            border-color: transparent transparent var(--primary-color) transparent;
+        }
+
+    </style>
+</head>
+<body>
+
+            <!-- 로고 컨테이너 -->
+        <div style="text-align: center; margin-bottom: 20px;">
+            <img src="img-logo01.png" alt="숙명여자대학교 로고" style="max-width: 280px; height: auto; margin-bottom: 10px;">
+        </div>
+
+        <!-- 제목 컨테이너 -->
+        <div style="text-align: center; margin-bottom: 20px;">
+            <h1 style="margin: 0;">2026학년도 신입생 주요일정</h1>
+        </div>
+    
+    <!-- 검색창 추가 -->
+    <div style="text-align: center; margin: 20px 0;">
+        <div class="search-container">
+            <input type="text" id="searchInput" placeholder="일정 검색 (예: 입학식, 영어배치고사, 등록금)" autocomplete="off" style="padding: 10px; width: 300px; border: 1px solid var(--text-secondary); border-radius: 5px; font-size: 14px;">
+            <div id="searchDropdown" class="search-dropdown"></div>
+        </div>
+        <button onclick="searchEvents()" style="background-color: var(--primary-color); color: var(--white); border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; font-size: 14px; margin-left: 5px; transition: background-color 0.3s;">검색</button>
+        <button onclick="clearSearch()" style="background-color: var(--secondary-color); color: var(--white); border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; font-size: 14px; margin-left: 5px; transition: background-color 0.3s;">검색 초기화</button>
+    </div>
+    
+    <!-- 검색 결과 표시 영역 -->
+    <div id="searchResults" style="display: none; margin: 20px auto; max-width: 800px; background-color: var(--white); padding: 20px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
+        <h3 style="color: var(--primary-color); margin-top: 0;">검색 결과</h3>
+        <div id="searchResultsList"></div>
+    </div>
+    
+    <p style="margin: 20px 0; text-align: center; color: var(--text-primary);">굵게 표시된 날짜는 주요 일정이 있는 날입니다. 날짜를 클릭하면 상세 내용을 확인할 수 있습니다. <button onclick="openPdf()" class="highlight-button">합격자 안내사항 보기</button></p>
+
+    <div class="calendar-container">
+
+        <!-- 2025년 12월 달력 -->
+        <div class="calendar">
+            <div class="month-header">2025년 12월</div>
+            <table>
+                <thead>
+                    <tr><th>일</th><th>월</th><th>화</th><th>수</th><th>목</th><th>금</th><th>토</th></tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="prev-month">30</td>
+                        <td class="event-day"><a href="#event-12-1" class="day-number">15</a><span class="event-marker"></span></td>
+                        <td class="event-day"><a href="#event-12-2" class="day-number">16</a><span class="event-marker"></span></td>
+                        <td class="event-day"><a href="#event-12-3" class="day-number">17</a><span class="event-marker"></span></td>
+                        <td class="event-day"><a href="#event-12-4" class="day-number">18</a><span class="event-marker"></span></td>
+                        <td class="event-day"><a href="#event-12-5" class="day-number">19</a><span class="event-marker"></span></td>
+                        <td>20</td>
+                    </tr>
+                    <tr>
+                        <td>21</td>
+                        <td class="event-day"><a href="#event-12-6" class="day-number">22</a><span class="event-marker"></span></td>
+                        <td class="event-day"><a href="#event-12-7" class="day-number">23</a><span class="event-marker"></span></td>
+                        <td class="event-day"><a href="#event-12-8" class="day-number">24</a><span class="event-marker"></span></td>
+                        <td>25</td>
+                        <td>26</td>
+                        <td>27</td>
+                    </tr>
+                    <tr>
+                        <td>28</td>
+                        <td>29</td>
+                        <td>30</td>
+                        <td>31</td>
+                        <td class="next-month">1</td>
+                        <td class="next-month">2</td>
+                        <td class="next-month">3</td>
+                    </tr>
+                </tbody>
+            </table>
+            <div class="month-events-summary">
+                <h4>12월 일정</h4>
+                <ul id="december-events"></ul>
+            </div>
+        </div>
+
+        <!-- 2026년 1월 달력 -->
+        <div class="calendar">
+            <div class="month-header">2026년 1월</div>
+            <table>
+                <thead>
+                    <tr><th>일</th><th>월</th><th>화</th><th>수</th><th>목</th><th>금</th><th>토</th></tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="prev-month"></td>
+                        <td class="prev-month"></td>
+                        <td class="prev-month"></td>
+                        <td></td>
+                        <td class="next-month">1</td>
+                        <td class="next-month">2</td>
+                        <td class="next-month">3</td>
+                    </tr>
+                    <tr>
+                        <td>4</td>
+                        <td>5</td>
+                        <td class="event-day"><a href="#event-01-1" class="day-number">6</a><span class="event-marker"></span></td>
+                        <td class="event-day"><a href="#event-01-2" class="day-number">7</a><span class="event-marker"></span></td>
+                        <td>8</td>
+                        <td>9</td>
+                        <td>10</td>
+                    </tr>
+                    <tr>
+                        <td>11</td>
+                        <td>12</td>
+                        <td class="event-day"><a href="#event-01-3" class="day-number">13</a><span class="event-marker"></span></td>
+                        <td>14</td>
+                        <td>15</td>
+                        <td>16</td>
+                        <td>17</td>
+                    </tr>
+                    <tr>
+                        <td>18</td>
+                        <td class="event-day"><a href="#event-01-4" class="day-number">19</a><span class="event-marker"></span></td>
+                        <td>20</td>
+                        <td class="event-day"><a href="#event-01-5" class="day-number">21</a><span class="event-marker"></span></td>
+                        <td>22</td>
+                        <td class="event-day"><a href="#event-01-6" class="day-number">23</a><span class="event-marker"></span></td>
+                        <td>24</td>
+                    </tr>
+                    <tr>
+                        <td>25</td>
+                        <td class="event-day"><a href="#event-01-7" class="day-number">26</a><span class="event-marker"></span></td>
+                        <td class="event-day"><a href="#event-01-8" class="day-number">27</a><span class="event-marker"></span></td>
+                        <td>28</td>
+                        <td>29</td>
+                        <td class="event-day"><a href="#event-01-9" class="day-number">30</a><span class="event-marker"></span></td>
+                        <td>31</td>
+                    </tr>
+                </tbody>
+            </table>
+            <div class="month-events-summary">
+                <h4>1월 일정</h4>
+                <ul id="january-events"></ul>
+            </div>
+        </div>
+        
+        <!-- 2026년 2월 달력 -->
+        <div class="calendar">
+            <div class="month-header">2026년 2월</div>
+            <table>
+                <thead>
+                    <tr><th>일</th><th>월</th><th>화</th><th>수</th><th>목</th><th>금</th><th>토</th></tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>1</td>
+                        <td class="event-day"><a href="#event-02-1" class="day-number">2</a><span class="event-marker"></span></td>
+                        <td class="event-day"><a href="#event-02-2" class="day-number">3</a><span class="event-marker"></span></td>
+                        <td class="event-day"><a href="#event-02-3" class="day-number">4</a><span class="event-marker"></span></td>
+                        <td class="event-day"><a href="#event-02-4" class="day-number">5</a><span class="event-marker"></span></td>
+                        <td class="event-day"><a href="#event-02-5" class="day-number">6</a><span class="event-marker"></span></td>
+                        <td>7</td>
+                    </tr>
+                    <tr>
+                        <td>8</td>
+                        <td class="event-day"><a href="#event-02-6" class="day-number">9</a><span class="event-marker"></span></td>
+                        <td class="event-day"><a href="#event-02-7" class="day-number">10</a><span class="event-marker"></span></td>
+                        <td class="event-day"><a href="#event-02-8" class="day-number">11</a><span class="event-marker"></span></td>
+                        <td class="event-day"><a href="#event-02-9" class="day-number">12</a><span class="event-marker"></span></td>
+                        <td class="event-day"><a href="#event-02-10" class="day-number">13</a><span class="event-marker"></span></td>
+                        <td>14</td>
+                    </tr>
+                    <tr>
+                        <td>15</td>
+                        <td>16</td>
+                        <td>17</td>
+                        <td>18</td>
+                        <td class="event-day"><a href="#event-02-11" class="day-number">19</a><span class="event-marker"></span></td>
+                        <td>20</td>
+                        <td>21</td>
+                    </tr>
+                    <tr>
+                        <td>22</td>
+                        <td class="event-day"><a href="#event-02-12" class="day-number">23</a><span class="event-marker"></span></td>
+                        <td class="event-day"><a href="#event-02-13" class="day-number">24</a><span class="event-marker"></span></td>
+                        <td class="event-day"><a href="#event-02-14" class="day-number">25</a><span class="event-marker"></span></td>
+                        <td class="event-day"><a href="#event-02-15" class="day-number">26</a><span class="event-marker"></span></td>
+                        <td class="event-day"><a href="#event-02-16" class="day-number">27</a><span class="event-marker"></span></td>
+                        <td>28</td>
+                    </tr>
+                </tbody>
+            </table>
+            <div class="month-events-summary">
+                <h4>2월 일정</h4>
+                <ul id="february-events"></ul>
+            </div>
+        </div>
+
+        <!-- 2026년 3월 달력 -->
+        <div class="calendar">
+            <div class="month-header">2026년 3월</div>
+            <table>
+                <thead>
+                    <tr><th>일</th><th>월</th><th>화</th><th>수</th><th>목</th><th>금</th><th>토</th></tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>1</td>
+                        <td>2</td>
+                        <td class="event-day"><a href="#event-03-1" class="day-number">3</a><span class="event-marker"></span></td>
+                        <td class="event-day"><a href="#event-03-2" class="day-number">4</a><span class="event-marker"></span></td>
+                        <td>5</td>
+                        <td>6</td>
+                        <td>7</td>
+                    </tr>
+                    <tr>
+                        <td>8</td>
+                        <td>9</td>
+                        <td>10</td>
+                        <td>11</td>
+                        <td>12</td>
+                        <td>13</td>
+                        <td>14</td>
+                    </tr>
+                    <tr>
+                        <td>15</td>
+                        <td>16</td>
+                        <td>17</td>
+                        <td>18</td>
+                        <td>19</td>
+                        <td>20</td>
+                        <td>21</td>
+                    </tr>
+                    <tr>
+                        <td>22</td>
+                        <td>23</td>
+                        <td>24</td>
+                        <td>25</td>
+                        <td>26</td>
+                        <td>27</td>
+                        <td>28</td>
+                    </tr>
+                    <tr>
+                        <td>29</td>
+                        <td>30</td>
+                        <td class="event-day"><a href="#event-03-3" class="day-number">31</a><span class="event-marker"></span></td>
+                        <td class="next-month">1</td>
+                        <td class="next-month">2</td>
+                        <td class="next-month">3</td>
+                        <td class="next-month">4</td>
+                    </tr>
+                </tbody>
+            </table>
+            <div class="month-events-summary">
+                <h4>3월 일정</h4>
+                <ul id="march-events"></ul>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 상세 일정 팝업 섹션 -->
+
+    <!-- 2025년 12월 이벤트 -->
+    <div id="event-12-1" class="event-detail-overlay">
+        <div class="event-detail-content">
+            <a href="#" class="close-btn">&times;</a>
+            <h3>2025년 12월 15일 (월)</h3>
+            <p><strong>수시 온라인 문서등록 시작:</strong> 10시부터 입학처 홈페이지에서 온라인 등록이 시작됩니다.</p>
+            <p><strong>수시모집 충원 세부일정:</strong> 최초합격자 등록 기간이 시작됩니다.</p>
+        </div>
+    </div>
+    <div id="event-12-2" class="event-detail-overlay">
+        <div class="event-detail-content">
+            <a href="#" class="close-btn">&times;</a>
+            <h3>2025년 12월 16일 (화)</h3>
+            <p><strong>수시 온라인 문서등록 진행 중</strong>: 등록 마감일은 12월 17일 16시입니다.</p>
+        </div>
+    </div>
+    <div id="event-12-3" class="event-detail-overlay">
+        <div class="event-detail-content">
+            <a href="#" class="close-btn">&times;</a>
+            <h3>2025년 12월 17일 (수)</h3>
+            <p><strong>수시 온라인 문서등록 마감:</strong> 16시까지 최초 합격자의 등록이 마감됩니다.</p>
+            <p><strong>등록 후 포기 신청 시작:</strong> 17시부터 12월 24일 16시까지 입학처 홈페이지에서 등록 포기 신청이 가능합니다.</p>
+            <p><strong>충원 1차 합격자 발표 및 문서등록 시작:</strong> 23시부터 진행됩니다.</p>
+        </div>
+    </div>
+    <div id="event-12-4" class="event-detail-overlay">
+        <div class="event-detail-content">
+            <a href="#" class="close-btn">&times;</a>
+            <h3>2025년 12월 18일 (목)</h3>
+            <p><strong>충원 2차 합격자 발표 및 문서등록 시작:</strong> 17시부터 진행됩니다.</p>
+        </div>
+    </div>
+    <div id="event-12-5" class="event-detail-overlay">
+        <div class="event-detail-content">
+            <a href="#" class="close-btn">&times;</a>
+            <h3>2025년 12월 19일 (금)</h3>
+            <p><strong>충원 3차 합격자 발표 및 문서등록 시작:</strong> 17시부터 진행됩니다.</p>
+        </div>
+    </div>
+    <div id="event-12-6" class="event-detail-overlay">
+        <div class="event-detail-content">
+            <a href="#" class="close-btn">&times;</a>
+            <h3>2025년 12월 22일 (월)</h3>
+            <p><strong>충원 4차 이후 합격자 발표 시작</strong>: 14시부터 개별 통보 방식이 시작됩니다.</p>
+        </div>
+    </div>
+    <div id="event-12-7" class="event-detail-overlay">
+        <div class="event-detail-content">
+            <a href="#" class="close-btn">&times;</a>
+            <h3>2025년 12월 23일 (화)</h3>
+            <p><strong>충원 4차 이후 합격자 개별 통보 마감:</strong> 18시가 충원 합격 통보 마감 시각입니다.</p>
+        </div>
+    </div>
+    <div id="event-12-8" class="event-detail-overlay">
+        <div class="event-detail-content">
+            <a href="#" class="close-btn">&times;</a>
+            <h3>2025년 12월 24일 (수)</h3>
+            <p><strong>문서등록 후 포기 신청 마감:</strong> 16시까지 우리 대학교 입학처 홈페이지에서 신청해야 합니다.</p>
+        </div>
+    </div>
+    
+    <!-- 2026년 1월 이벤트 -->
+    <div id="event-01-1" class="event-detail-overlay">
+        <div class="event-detail-content">
+            <a href="#" class="close-btn">&times;</a>
+            <h3>2026년 1월 6일 (화)</h3>
+            <p><strong>영어배치고사(GELT) 1차 접수 시작:</strong> 10:00부터 1월 13일 24:00까지 접수 가능합니다.</p>
+        </div>
+    </div>
+    <div id="event-01-2" class="event-detail-overlay">
+        <div class="event-detail-content">
+            <a href="#" class="close-btn">&times;</a>
+            <h3>2026년 1월 7일 (수)</h3>
+            <p><strong>신입생 예비대학 영어 집중강좌 및 교환학생제도 설명회:</strong> 14:00~16:00에 2026년 숙명여대 신입생 및 학부모를 대상으로 진행됩니다.</p>
+            <p><strong>신입생 영어 집중과정(SMART) 1차 신청 시작:</strong> 1월 13일까지 온라인 신청이 가능합니다 (입금자 선착순 마감).</p>
+        </div>
+    </div>
+    <div id="event-01-3" class="event-detail-overlay">
+        <div class="event-detail-content">
+            <a href="#" class="close-btn">&times;</a>
+            <h3>2026년 1월 13일 (화)</h3>
+            <p><strong>영어배치고사(GELT) 1차 접수 마감:</strong> 24:00에 접수가 마감됩니다.</p>
+            <p><strong>신입생 영어 집중과정(SMART) 1차 신청 마감</strong>.</p>
+        </div>
+    </div>
+    <div id="event-01-4" class="event-detail-overlay">
+        <div class="event-detail-content">
+            <a href="#" class="close-btn">&times;</a>
+            <h3>2026년 1월 19일 (월)</h3>
+            <p><strong>영어배치고사(GELT) 1차 응시 시작:</strong> 10:00부터 1월 23일 24:00까지 응시 가능합니다.</p>
+            <p><strong>매화장학금(장애학생) 신청 시작:</strong> 10:00부터 1월 23일 16:00까지 장애학생지원센터 이메일로 제출 가능합니다.</p>
+            <p><strong>SMART 영어 집중과정 1차 강의 시작:</strong> 1월 30일(금)까지 총 10일간 진행됩니다.</p>
+        </div>
+    </div>
+    <div id="event-01-5" class="event-detail-overlay">
+        <div class="event-detail-content">
+            <a href="#" class="close-btn">&times;</a>
+            <h3>2026년 1월 21일 (수)</h3>
+            <p><strong>신입생 영어 집중과정(SMART) 2차 신청 시작:</strong> 1월 27일(화)까지 신청 가능합니다.</p>
+        </div>
+    </div>
+    <div id="event-01-6" class="event-detail-overlay">
+        <div class="event-detail-content">
+            <a href="#" class="close-btn">&times;</a>
+            <h3>2026년 1월 23일 (금)</h3>
+            <p><strong>매화장학금(장애학생) 신청 마감:</strong> 16:00에 마감됩니다.</p>
+            <p><strong>영어배치고사(GELT) 1차 응시 마감:</strong> 24:00에 마감됩니다.</p>
+        </div>
+    </div>
+    <div id="event-01-7" class="event-detail-overlay">
+        <div class="event-detail-content">
+            <a href="#" class="close-btn">&times;</a>
+            <h3>2026년 1월 26일 (월)</h3>
+            <p><strong>청파장학금(기초생활보장수급자), 국가유공자, 새터민 관련 장학금 신청 시작:</strong> 10:00부터 2월 3일(화) 16:00까지 학생지원센터 이메일로 제출해야 합니다.</p>
+        </div>
+    </div>
+    <div id="event-01-8" class="event-detail-overlay">
+        <div class="event-detail-content">
+            <a href="#" class="close-btn">&times;</a>
+            <h3>2026년 1월 27일 (화)</h3>
+            <p><strong>신입생 영어 집중과정(SMART) 2차 신청 마감</strong>.</p>
+        </div>
+    </div>
+    <div id="event-01-9" class="event-detail-overlay">
+        <div class="event-detail-content">
+            <a href="#" class="close-btn">&times;</a>
+            <h3>2026년 1월 30일 (금)</h3>
+            <p><strong>SMART 영어 집중과정 1차 강의 마감</strong>.</p>
+        </div>
+    </div>
+    
+    <!-- 2026년 2월 이벤트 -->
+    <div id="event-02-1" class="event-detail-overlay">
+        <div class="event-detail-content">
+            <a href="#" class="close-btn">&times;</a>
+            <h3>2026년 2월 2일 (월)</h3>
+            <p><strong>SMART 영어 집중과정 2차 강의 시작:</strong> 2월 13일(금)까지 총 10일간 진행됩니다.</p>
+            <p><strong>국가장학금 I, II 유형 신청 기간 시작 (예정):</strong> 2월 초부터 3월 둘째 주까지 한국장학재단 홈페이지에서 신청해야 합니다 (정확한 일정은 추후 SnoWe 공지).</p>
+        </div>
+    </div>
+    <div id="event-02-2" class="event-detail-overlay">
+        <div class="event-detail-content">
+            <a href="#" class="close-btn">&times;</a>
+            <h3>2026년 2월 3일 (화)</h3>
+            <p><strong>본등록금 고지서 출력 시작:</strong> 10시부터 입학처 홈페이지에서 출력 가능합니다.</p>
+            <p><strong>본등록금 납부 기간 시작:</strong> 10:00부터 납부가 시작됩니다.</p>
+            <p><strong>장학금 증명 서류 제출 마감:</strong> 청파, 국가유공자, 새터민 장학금 관련 증명서류 제출 기한 마감 (16:00).</p>
+        </div>
+    </div>
+    <div id="event-02-3" class="event-detail-overlay">
+        <div class="event-detail-content">
+            <a href="#" class="close-btn">&times;</a>
+            <h3>2026년 2월 4일 (수)</h3>
+            <p><strong>학생생활관(기숙사) 입사 신청 시작 (예정):</strong> 13:00부터 2월 6일(금) 15:00까지 학생생활관 홈페이지에서 신청 가능합니다.</p>
+        </div>
+    </div>
+    <div id="event-02-4" class="event-detail-overlay">
+        <div class="event-detail-content">
+            <a href="#" class="close-btn">&times;</a>
+            <h3>2026년 2월 5일 (목)</h3>
+            <p><strong>본등록금 납부 마감:</strong> 16:00까지 신한은행 및 전국 은행을 통해 납부해야 합니다.</p>
+            <p><strong>1차 수강신청 시작:</strong> 9시부터 2월 9일(월) 17시까지 진행됩니다.</p>
+            <p><strong>영어배치고사(GELT) 2차 접수 시작:</strong> 10:00부터 2월 6일 24:00까지 접수 가능합니다.</p>
+        </div>
+    </div>
+    <div id="event-02-5" class="event-detail-overlay">
+        <div class="event-detail-content">
+            <a href="#" class="close-btn">&times;</a>
+            <h3>2026년 2월 6일 (금)</h3>
+            <p><strong>학생생활관(기숙사) 입사 신청 마감 (예정):</strong> 15:00에 마감됩니다.</p>
+            <p><strong>영어배치고사(GELT) 2차 접수 마감:</strong> 24:00에 마감됩니다.</p>
+        </div>
+    </div>
+    <div id="event-02-6" class="event-detail-overlay">
+        <div class="event-detail-content">
+            <a href="#" class="close-btn">&times;</a>
+            <h3>2026년 2월 9일 (월)</h3>
+            <p><strong>1차 수강신청 마감:</strong> 17시에 마감됩니다.</p>
+            <p><strong>기숙사 입사 합격자 발표 (예정):</strong> 15:00에 발표됩니다.</p>
+            <p><strong>기숙사비 납부 기간 시작 (예정):</strong> 15:00부터 2월 11일(수) 16:00까지 납부해야 합니다.</p>
+        </div>
+    </div>
+    <div id="event-02-7" class="event-detail-overlay">
+        <div class="event-detail-content">
+            <a href="#" class="close-btn">&times;</a>
+            <h3>2026년 2월 10일 (화)</h3>
+            <p><strong>영어배치고사(GELT) 2차 응시:</strong> 10:00부터 24:00까지 응시 가능합니다.</p>
+            <p><strong>기숙사 서류 제출 기간 시작 (예정):</strong> 2월 12일(목) 16:00까지 서류 제출이 필요합니다.</p>
+        </div>
+    </div>
+    <div id="event-02-8" class="event-detail-overlay">
+        <div class="event-detail-content">
+            <a href="#" class="close-btn">&times;</a>
+            <h3>2026년 2월 11일 (수)</h3>
+            <p><strong>기숙사비 납부 기간 마감 (예정):</strong> 16:00까지 미납 시 자동 입사 취소됩니다.</p>
+        </div>
+    </div>
+    <div id="event-02-9" class="event-detail-overlay">
+        <div class="event-detail-content">
+            <a href="#" class="close-btn">&times;</a>
+            <h3>2026년 2월 12일 (목)</h3>
+            <p><strong>1차 수강신청 확정 결과 조회 (예정):</strong> 16:00부터 숙명포털시스템에서 확인 가능합니다.</p>
+            <p><strong>기숙사 서류 제출 기간 마감 (예정):</strong> 16:00에 마감됩니다.</p>
+        </div>
+    </div>
+    <div id="event-02-10" class="event-detail-overlay">
+        <div class="event-detail-content">
+            <a href="#" class="close-btn">&times;</a>
+            <h3>2026년 2월 13일 (금)</h3>
+            <p><strong>SMART 영어 집중과정 2차 강의 마감</strong>.</p>
+        </div>
+    </div>
+    <div id="event-02-11" class="event-detail-overlay">
+        <div class="event-detail-content">
+            <a href="#" class="close-btn">&times;</a>
+            <h3>2026년 2월 19일 (목)</h3>
+            <p><strong>영어배치고사(GELT) 3차 접수 시작:</strong> 10:00부터 24:00까지 접수 가능합니다.</p>
+        </div>
+    </div>
+    <div id="event-02-12" class="event-detail-overlay">
+        <div class="event-detail-content">
+            <a href="#" class="close-btn">&times;</a>
+            <h3>2026년 2월 23일 (월)</h3>
+            <p><strong>입학식 및 신입생 환영회 (예정):</strong> 장소 미정으로 학사팀 공지를 확인해야 합니다.</p>
+        </div>
+    </div>
+    <div id="event-02-13" class="event-detail-overlay">
+        <div class="event-detail-content">
+            <a href="#" class="close-btn">&times;</a>
+            <h3>2026년 2월 24일 (화)</h3>
+            <p><strong>신체검사 시작 (예정):</strong> 2월 26일(목)까지 단과대학별로 진행되며, 일정 및 장소는 추후 공지됩니다.</p>
+            <p><strong>영어배치고사(GELT) 3차 응시:</strong> 10:00부터 24:00까지 응시 가능합니다.</p>
+        </div>
+    </div>
+    <div id="event-02-14" class="event-detail-overlay">
+        <div class="event-detail-content">
+            <a href="#" class="close-btn">&times;</a>
+            <h3>2026년 2월 25일 (수)</h3>
+            <p><strong>신입생 오리엔테이션 시작:</strong> 2월 26일(목)까지 각 단과대학(독립학부)별로 진행됩니다.</p>
+        </div>
+    </div>
+    <div id="event-02-15" class="event-detail-overlay">
+        <div class="event-detail-content">
+            <a href="#" class="close-btn">&times;</a>
+            <h3>2026년 2월 26일 (목)</h3>
+            <p><strong>신체검사 마감 (예정):</strong> 단과대학별 수검 일시를 지키지 못한 경우, 해당 기간 중 가능한 시간에 검사를 받을 수 있습니다.</p>
+            <p><strong>신입생 오리엔테이션 마감</strong>.</p>
+        </div>
+    </div>
+    <div id="event-02-16" class="event-detail-overlay">
+        <div class="event-detail-content">
+            <a href="#" class="close-btn">&times;</a>
+            <h3>2026년 2월 27일 (금)</h3>
+            <p><strong>영어배치고사(GELT) 4차 접수 시작:</strong> 10:00부터 3월 1일(일) 24:00까지 접수 가능합니다.</p>
+        </div>
+    </div>
+
+    <!-- 2026년 3월 이벤트 -->
+    <div id="event-03-1" class="event-detail-overlay">
+        <div class="event-detail-content">
+            <a href="#" class="close-btn">&times;</a>
+            <h3>2026년 3월 3일 (화)</h3>
+            <p><strong>개강일:</strong> 2026학년도 1학기 개강일입니다.</p>
+            <p><strong>영어 교양필수 이수면제 신청 기간 시작:</strong> 3월 31일(화)까지 입학 후 1년 이내에 신청 가능합니다.</p>
+            <p><strong>도서관 이용 안내:</strong> 모바일 학생증으로 도서관 출입이 가능하며, 대출도 이날부터 가능합니다.</p>
+            <p><strong>신입생 첫 대출 이벤트 시작:</strong> 도서 2권 이상 첫 대출하는 신입생 대상 선물 증정 이벤트가 상품 소진 시까지 시작됩니다.</p>
+        </div>
+    </div>
+    <div id="event-03-2" class="event-detail-overlay">
+        <div class="event-detail-content">
+            <a href="#" class="close-btn">&times;</a>
+            <h3>2026년 3월 4일 (수)</h3>
+            <p><strong>영어배치고사(GELT) 4차 응시:</strong> 10:00부터 16:00까지 응시 가능합니다.</p>
+        </div>
+    </div>
+    <div id="event-03-3" class="event-detail-overlay">
+        <div class="event-detail-content">
+            <a href="#" class="close-btn">&times;</a>
+            <h3>2026년 3월 31일 (화)</h3>
+            <p><strong>영어 교양필수 이수면제 신청 기간 마감:</strong> 입학 후 1년 이내 신청 기한 중 3월 신청 기간의 마지막 날입니다.</p>
+        </div>
+    </div>
+    
+    <!-- 중첩 일정 (기간 표시가 어려운 일정) -->
+    <div id="event-ongoing" class="event-detail-overlay">
+        <div class="event-detail-content">
+            <a href="#" class="close-btn">&times;</a>
+            <h3>기간 중 주요 진행 일정</h3>
+            <p><strong>국가장학금 I, II 유형 신청:</strong> 2026년 2월 초 ~ 3월 둘째 주 (정확한 일정은 추후 SnoWe 공지).</p>
+            <p><strong>신입생 대상 도서관 투어:</strong> 3월 첫째 주 ~ 둘째 주에 진행됩니다. (자세한 일정은 도서관 공지사항 참고).</p>
+            <p><strong>숙명가족장학금 신청:</strong> 3월 중 SNOWE 공지사항을 통해 별도 공지될 예정입니다.</p>
+            <p><strong>미수검자 서류 제출:</strong> 교내 신체검사를 받지 못한 경우(재직자 전형 합격자 포함) 3월 중으로 흉부X선 및 B형간염 검사 결과지를 보건의료센터에 제출해야 합니다.</p>
+        </div>
+    </div>
+
+    <script>
+        // PDF 열기 함수
+        function openPdf() {
+            const pdfUrl = 'https://sookmyongcal.netlify.app/2026학년도신입생합격자안내사항(20251212).pdf';
+            window.open(pdfUrl, '_blank');
+        }
+
+        // 날짜 텍스트에서 기간 추출 함수 (전역 스코프로 이동)
+        function extractDateRange(text, month) {
+            const patterns = [
+                /(\d+)월 (\d+)일~(\d+)일/,
+                /(\d+)월 (\d+)일/,
+            ];
+            
+            for (const pattern of patterns) {
+                const match = text.match(pattern);
+                if (match) {
+                    if (match.length === 4) {
+                        // 기간 형식: "12월 15일~17일"
+                        return {
+                            start: parseInt(match[2]),
+                            end: parseInt(match[3]),
+                            month: parseInt(match[1])
+                        };
+                    } else if (match.length === 3) {
+                        // 단일 날짜 형식: "12월 19일"
+                        return {
+                            start: parseInt(match[2]),
+                            end: parseInt(match[2]),
+                            month: parseInt(match[1])
+                        };
+                    }
+                }
+            }
+            return null;
+        }
+
+        // 문서 로드 후 참조 링크에 이벤트 리스너 추가 (각주 제거로 비활성화)
+        document.addEventListener('DOMContentLoaded', function() {
+            // 최근 검색어와 기본 추천 단어 초기화
+            const recentSearches = getRecentSearches();
+            const defaultSuggestions = [
+                '배치고사',
+                '등록금',
+                '수강신청',
+                '입학식',
+                '신입생 환영회',
+                '신입생 오리엔테이션',
+                '영어배치고사',
+                '영어 집중과정',
+                '신체검사'
+            ];
+            
+            // 페이지 로드 시에는 드롭다운을 표시하지 않음
+            document.getElementById('searchDropdown').style.display = 'none';
+            
+            // 오늘 날짜 확인 및 Now 표시 추가
+            const today = new Date();
+            // 테스트용: 12월 20일로 설정 (실제로는 현재 날짜 사용)
+            // const today = new Date(2025, 11, 20); // 2025년 12월 20일
+            const todayDate = today.getDate();
+            const todayMonth = today.getMonth() + 1;
+            const todayYear = today.getFullYear();
+            
+            // 디버그용 로그
+            console.log('오늘 날짜:', todayYear + '년 ' + todayMonth + '월 ' + todayDate + '일');
+            
+            // 모든 날짜 셀에서 오늘 날짜 찾아서 하이라이트 및 Now 표시 추가
+            function highlightTodayDate() {
+                // 먼저 모든 기존의 today 클래스와 now-indicator 제거
+                document.querySelectorAll('.today').forEach(el => el.classList.remove('today'));
+                document.querySelectorAll('.now-indicator').forEach(el => el.remove());
+                
+                // 모든 날짜 셀 찾기
+                const allDayCells = document.querySelectorAll('td');
+                allDayCells.forEach(cell => {
+                    // .day-number 클래스가 있는 경우와 없는 경우 모두 처리
+                    let cellDate;
+                    const dayNumber = cell.querySelector('.day-number');
+                    
+                    if (dayNumber) {
+                        // .day-number 클래스가 있는 경우
+                        cellDate = parseInt(dayNumber.textContent);
+                    } else {
+                        // .day-number 클래스가 없는 경우 (순수 텍스트)
+                        const cellText = cell.textContent.trim();
+                        // 숫자만 추출
+                        const numberMatch = cellText.match(/^\d+$/);
+                        if (numberMatch) {
+                            cellDate = parseInt(numberMatch[0]);
+                        }
+                    }
+                    
+                    if (cellDate) {
+                        // 달력의 월 확인 (월 헤더에서 찾기)
+                        const calendar = cell.closest('.calendar');
+                        if (calendar) {
+                            const monthHeader = calendar.querySelector('.month-header').textContent;
+                            const calendarMonth = parseInt(monthHeader.match(/(\d+)월/)[1]);
+                            
+                            // 디버그용 로그
+                            console.log('셀 날짜:', cellDate, '달력 월:', calendarMonth, '오늘 월:', todayMonth, '오늘 날짜:', todayDate);
+                            
+                            // 오늘 날짜와 일치하면 하이라이트 적용
+                            if (calendarMonth === todayMonth && cellDate === todayDate) {
+                                console.log('오늘 날짜 하이라이트 적용:', calendarMonth + '월 ' + cellDate + '일');
+                                cell.classList.add('today');
+                                
+                                // Now 표시 추가
+                                const nowSpan = document.createElement('span');
+                                nowSpan.className = 'now-indicator';
+                                nowSpan.textContent = 'Now';
+                                cell.appendChild(nowSpan);
+                            }
+                        }
+                    }
+                });
+            }
+            
+            // 날짜 범위 확인 함수
+            function isDateInRange(dateText, startDay, endDay, month) {
+                if (month !== todayMonth) return false;
+                
+                // 오늘이 기간에 포함되는지 확인
+                for (let day = startDay; day <= endDay; day++) {
+                    if (day === todayDate) {
+                        return true;
+                    }
+                }
+                return false;
+            }
+            
+            // 월별 일정에 Now 표시 추가
+            function addNowToMonthlyEvents() {
+                console.log('addNowToMonthlyEvents 호출됨');
+                console.log('오늘 날짜:', todayYear + '년 ' + todayMonth + '월 ' + todayDate + '일');
+                
+                const monthEventLists = [
+                    { id: 'december-events', month: 12 },
+                    { id: 'january-events', month: 1 },
+                    { id: 'february-events', month: 2 },
+                    { id: 'march-events', month: 3 }
+                ];
+                
+                monthEventLists.forEach(monthList => {
+                    const listElement = document.getElementById(monthList.id);
+                    console.log('월:', monthList.month, '목록 요소:', listElement);
+                    
+                    if (listElement) {
+                        // 먼저 모든 기존의 event-now 제거
+                        listElement.querySelectorAll('.event-now').forEach(el => el.remove());
+                        
+                        const listItems = listElement.querySelectorAll('li');
+                        console.log('항목 수:', listItems.length);
+                        
+                        listItems.forEach((item, index) => {
+                            const text = item.textContent;
+                            console.log('항목', index, ':', text);
+                            
+                            // 날짜 범위 추출
+                            const dateRange = extractDateRange(text, monthList.month);
+                            console.log('추출된 날짜 범위:', dateRange);
+                            
+                            if (dateRange) {
+                                // 오늘이 기간에 포함되는지 확인
+                                const isTodayInRange = dateRange.month === todayMonth &&
+                                                     todayDate >= dateRange.start &&
+                                                     todayDate <= dateRange.end;
+                                console.log('오늘 포함 여부:', isTodayInRange);
+                                
+                                if (isTodayInRange) {
+                                    console.log('Now 표시 추가 중...');
+                                    
+                                    // 이미 Now 표시가 있는지 확인
+                                    if (!item.querySelector('.event-now')) {
+                                        const nowSpan = document.createElement('span');
+                                        nowSpan.className = 'event-now';
+                                        nowSpan.textContent = 'Now';
+                                        item.appendChild(nowSpan);
+                                        console.log('Now 표시 추가 완료');
+                                        
+                                        // 추가 후 즉시 확인
+                                        setTimeout(() => {
+                                            const addedNow = item.querySelector('.event-now');
+                                            console.log('추가된 Now 요소:', addedNow);
+                                            console.log('Now 요소 스타일:', addedNow ? window.getComputedStyle(addedNow) : '없음');
+                                        }, 100);
+                                    }
+                                }
+                            }
+                        });
+                        
+                        // 모든 처리 후 DOM 상태 확인
+                        setTimeout(() => {
+                            const allNowElements = listElement.querySelectorAll('.event-now');
+                            console.log('최종 Now 요소 수:', allNowElements.length);
+                            allNowElements.forEach((el, i) => {
+                                console.log('Now 요소', i, ':', el);
+                                console.log('Now 요소 스타일:', window.getComputedStyle(el));
+                            });
+                        }, 500);
+                    }
+                });
+            }
+            
+            highlightTodayDate();
+            addNowToMonthlyEvents();
+             // 각주를 모두 제거했으므로 참조 링크 변환 기능 비활성화
+            
+            // 날짜 링크 클릭 시 팝업 표시 기능 추가
+            const dayLinks = document.querySelectorAll('.day-number');
+            dayLinks.forEach(function(link) {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const targetId = link.getAttribute('href');
+                    console.log('날짜 클릭:', targetId); // 디버깅용 로그
+                    const targetOverlay = document.querySelector(targetId);
+                    console.log('찾은 팝업:', targetOverlay); // 디버깅용 로그
+                    if (targetOverlay) {
+                        targetOverlay.style.display = 'block';
+                        targetOverlay.classList.add('active'); // active 클래스 추가
+                        // URL fragment 업데이트
+                        history.pushState("", document.title, targetId);
+                        console.log('팝업 표시 성공:', targetId); // 디버깅용 로그
+                    } else {
+                        console.log('팝업을 찾을 수 없음:', targetId); // 디버깅용 로그
+                    }
+                });
+            });
+            
+            // 월별 이벤트 요약 생성 (Now 표시 포함)
+            generateEventSummaries();
+            
+            // 팝업 닫을 때 스크롤 위치 유지
+            const closeButtons = document.querySelectorAll('.close-btn');
+            closeButtons.forEach(function(button) {
+                button.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const overlay = button.closest('.event-detail-overlay');
+                    overlay.style.display = 'none';
+                    overlay.classList.remove('active'); // active 클래스 제거
+                    
+                    // URL fragment 제거하여 페이지 맨 위로 스크롤되지 않도록 함
+                    history.pushState("", document.title, window.location.pathname);
+                });
+            });
+            
+            // 오버레이 배경 클릭 시에도 동일하게 처리
+            const overlays = document.querySelectorAll('.event-detail-overlay');
+            overlays.forEach(function(overlay) {
+                overlay.addEventListener('click', function(e) {
+                    if (e.target === overlay) {
+                        overlay.style.display = 'none';
+                        overlay.classList.remove('active'); // active 클래스 제거
+                        
+                        // URL fragment 제거
+                        history.pushState("", document.title, window.location.pathname);
+                    }
+                });
+            });
+            
+            // 화면 아무 곳이나 클릭해도 팝업 닫기
+            document.addEventListener('click', function(e) {
+                const openOverlays = document.querySelectorAll('.event-detail-overlay');
+                openOverlays.forEach(function(overlay) {
+                    if (overlay.style.display === 'block' && !overlay.contains(e.target)) {
+                        overlay.style.display = 'none';
+                        // URL fragment 제거
+                        history.pushState("", document.title, window.location.pathname);
+                    }
+                });
+            });
+            
+            // 월별 이벤트 요약 생성 함수 (Now 표시 포함)
+            function generateEventSummaries() {
+                // 12월 이벤트 요약 (모든 이벤트 포함)
+                const decemberEvents = [
+                    { date: '12월 15일~17일', desc: '수시 온라인 문서등록' },
+                    { date: '12월 17일~24일', desc: '등록 후 포기 신청' },
+                    { date: '12월 18일', desc: '충원 2차 합격자 발표 및 문서등록 시작' },
+                    { date: '12월 19일', desc: '충원 3차 합격자 발표 및 문서등록 시작' },
+                    { date: '12월 22일~23일', desc: '충원 4차 이후 합격자 발표' }
+                ];
+                
+                // 1월 이벤트 요약 (모든 이벤트 포함)
+                const januaryEvents = [
+                    { date: '1월 6일~13일', desc: '영어배치고사(GELT) 1차 접수' },
+                    { date: '1월 7일', desc: '신입생 예비대학 영어 집중강좌 및 교환학생제도 설명회' },
+                    { date: '1월 7일~13일', desc: '신입생 영어 집중과정(SMART) 1차 신청' },
+                    { date: '1월 19일~23일', desc: '영어배치고사(GELT) 1차 응시' },
+                    { date: '1월 19일~23일', desc: '매화장학금(장애학생) 신청' },
+                    { date: '1월 19일~30일', desc: 'SMART 영어 집중과정 1차 강의' },
+                    { date: '1월 21일~27일', desc: '신입생 영어 집중과정(SMART) 2차 신청' },
+                    { date: '1월 26일~2월 3일', desc: '청파장학금 등 장학금 신청' },
+                    { date: '1월 30일', desc: 'SMART 영어 집중과정 1차 강의 마감' }
+                ];
+                
+                // 2월 이벤트 요약 (모든 이벤트 포함)
+                const februaryEvents = [
+                    { date: '2월 2일~13일', desc: 'SMART 영어 집중과정 2차 강의' },
+                    { date: '2월 3일', desc: '본등록금 고지서 출력 시작' },
+                    { date: '2월 3일~5일', desc: '본등록금 납부' },
+                    { date: '2월 3일', desc: '장학금 증명 서류 제출 마감' },
+                    { date: '2월 4일~6일', desc: '학생생활관(기숙사) 입사 신청' },
+                    { date: '2월 5일', desc: '본등록금 납부 마감 및 1차 수강신청 시작' },
+                    { date: '2월 5일~9일', desc: '1차 수강신청' },
+                    { date: '2월 6일', desc: '영어배치고사(GELT) 2차 접수 마감' },
+                    { date: '2월 9일', desc: '1차 수강신청 마감' },
+                    { date: '2월 9일', desc: '기숙사 입사 합격자 발표' },
+                    { date: '2월 9일~11일', desc: '기숙사비 납부' },
+                    { date: '2월 10일', desc: '영어배치고사(GELT) 2차 응시' },
+                    { date: '2월 10일~12일', desc: '기숙사 서류 제출' },
+                    { date: '2월 11일', desc: '기숙사비 납부 기간 마감' },
+                    { date: '2월 12일', desc: '1차 수강신청 확정 결과 조회' },
+                    { date: '2월 13일', desc: 'SMART 영어 집중과정 2차 강의 마감' },
+                    { date: '2월 19일', desc: '영어배치고사(GELT) 3차 접수 시작' },
+                    { date: '2월 23일', desc: '입학식 및 신입생 환영회' },
+                    { date: '2월 24일~26일', desc: '신체검사' },
+                    { date: '2월 25일~26일', desc: '신입생 오리엔테이션' },
+                    { date: '2월 27일', desc: '영어배치고사(GELT) 4차 접수 시작' }
+                ];
+                
+                // 3월 이벤트 요약 (모든 이벤트 포함)
+                const marchEvents = [
+                    { date: '3월 3일', desc: '개강일' },
+                    { date: '3월 3일', desc: '도서관 이용 안내' },
+                    { date: '3월 3일', desc: '신입생 첫 대출 이벤트 시작' },
+                    { date: '3월 3일~31일', desc: '영어 교양필수 이수면제 신청' },
+                    { date: '3월 4일', desc: '영어배치고사(GELT) 4차 응시' },
+                    { date: '3월 31일', desc: '영어 교양필수 이수면제 신청 마감' }
+                ];
+                
+                // 각 월별 이벤트 목록을 DOM에 추가
+                const decemberList = document.getElementById('december-events');
+                const januaryList = document.getElementById('january-events');
+                const februaryList = document.getElementById('february-events');
+                const marchList = document.getElementById('march-events');
+                
+                // 기존 내용 삭제 (중복 방지)
+                if (decemberList) decemberList.innerHTML = '';
+                if (januaryList) januaryList.innerHTML = '';
+                if (februaryList) februaryList.innerHTML = '';
+                if (marchList) marchList.innerHTML = '';
+                
+                // 중요 일정 키워드 목록
+                const importantKeywords = ['본등록금 납부', '1차 수강신청', '입학식 및 신입생 환영회', '신입생 오리엔테이션', '개강일'];
+                
+                // 다음 일정 하이라이트 키워드 목록
+                const nextScheduleKeywords = ['본등록금 납부', '1차 수강신청', '입학식 및 신입생 환영회', '신입생 오리엔테이션', '개강일'];
+                
+                // 오늘 날짜와 비교하여 Now 표시 추가 함수
+                function addNowToEventItem(li, eventDate, eventDesc) {
+                    // 날짜 범위 추출
+                    const dateRange = extractDateRange(eventDate + ': ' + eventDesc, todayMonth);
+                    
+                    if (dateRange) {
+                        // 오늘이 기간에 포함되는지 확인
+                        const isTodayInRange = dateRange.month === todayMonth &&
+                                             todayDate >= dateRange.start &&
+                                             todayDate <= dateRange.end;
+                        
+                        if (isTodayInRange) {
+                            // Now 표시 추가
+                            const nowSpan = document.createElement('span');
+                            nowSpan.className = 'event-now';
+                            nowSpan.textContent = 'Now';
+                            li.appendChild(nowSpan);
+                        }
+                    }
+                }
+                
+                // 12월 이벤트 추가
+                if (decemberList) {
+                    decemberEvents.forEach(event => {
+                        const li = document.createElement('li');
+                        const isImportant = importantKeywords.some(keyword => event.desc.includes(keyword));
+                        
+                        if (isImportant) {
+                            li.className = 'important-event';
+                            li.innerHTML = `${event.date}: <span style="color: #a31f33;">${event.desc}</span>`;
+                        } else {
+                            li.textContent = `${event.date}: ${event.desc}`;
+                        }
+                        
+                        // Now 표시 추가
+                        addNowToEventItem(li, event.date, event.desc);
+                        
+                        decemberList.appendChild(li);
+                    });
+                }
+                
+                // 1월 이벤트 추가
+                if (januaryList) {
+                    januaryEvents.forEach(event => {
+                        const li = document.createElement('li');
+                        const isImportant = importantKeywords.some(keyword => event.desc.includes(keyword));
+                        
+                        if (event.desc.includes('영어배치고사(GELT) 1차 접수')) {
+                            li.innerHTML = `${event.date}: <span class="clickable-link" onclick="openPdfPage(11)">${event.desc}</span>`;
+                        } else if (event.desc.includes('신입생 예비대학 영어 집중강좌 및 교환학생제도 설명회')) {
+                            li.innerHTML = `${event.date}: <span class="clickable-link" onclick="openPdfPage(13)">${event.desc}</span>`;
+                        } else if (event.desc.includes('본등록금 납부')) {
+                            li.innerHTML = `${event.date}: <span class="clickable-link" onclick="openPdfPage(4)">${event.desc}</span>`;
+                        } else if (event.desc.includes('영어배치고사(GELT) 1차 응시')) {
+                            li.innerHTML = `${event.date}: <span class="clickable-link" onclick="openPdfPage(11)">${event.desc}</span>`;
+                        } else if (event.desc.includes('영어배치고사(GELT) 3차 접수 시작')) {
+                            li.innerHTML = `${event.date}: <span class="clickable-link" onclick="openPdfPage(11)">${event.desc}</span>`;
+                        } else if (event.desc.includes('입학식 및 신입생 환영회')) {
+                            li.innerHTML = `${event.date}: <span class="clickable-link" onclick="openPdfPage(2)">${event.desc}</span>`;
+                        } else if (event.desc.includes('신입생 오리엔테이션')) {
+                            li.innerHTML = `${event.date}: <span class="clickable-link" onclick="openPdfPage(2)">${event.desc}</span>`;
+                        } else if (event.desc.includes('개강일')) {
+                            li.textContent = `${event.date}: ${event.desc}`;
+                        } else if (event.desc.includes('1차 수강신청')) {
+                            li.innerHTML = `${event.date}: <span class="clickable-link" onclick="openPdfPage(8)">${event.desc}</span>`;
+                        } else {
+                            li.textContent = `${event.date}: ${event.desc}`;
+                        }
+                        
+                        // Now 표시 추가
+                        addNowToEventItem(li, event.date, event.desc);
+                        
+                        januaryList.appendChild(li);
+                    });
+                }
+                
+                // 2월 이벤트 추가
+                if (februaryList) {
+                    februaryEvents.forEach(event => {
+                        const li = document.createElement('li');
+                        const isImportant = importantKeywords.some(keyword => event.desc.includes(keyword));
+                        const isNextSchedule = nextScheduleKeywords.some(keyword => event.desc.includes(keyword));
+                        
+                        if (isNextSchedule) {
+                            li.className = 'important-event';
+                            li.style.cssText = 'font-weight: bold; background-color: rgba(14, 45, 108, 0.05); border-left: 4px solid var(--primary-color); padding: 8px 12px; margin: 5px 0; border-radius: 0 4px 4px 0;';
+                        }
+                        
+                        if (event.desc.includes('본등록금 납부')) {
+                            li.innerHTML = `${event.date}: <span class="clickable-link" onclick="openPdfPage(4)" style="color: var(--primary-color); font-weight: bold;">${event.desc}</span>`;
+                        } else if (event.desc.includes('영어배치고사(GELT) 2차 응시')) {
+                            li.innerHTML = `${event.date}: <span class="clickable-link" onclick="openPdfPage(11)">${event.desc}</span>`;
+                        } else if (event.desc.includes('영어배치고사(GELT) 3차 접수 시작')) {
+                            li.innerHTML = `${event.date}: <span class="clickable-link" onclick="openPdfPage(11)">${event.desc}</span>`;
+                        } else if (event.desc.includes('입학식 및 신입생 환영회')) {
+                            li.innerHTML = `${event.date}: <span class="clickable-link" onclick="openPdfPage(2)" style="color: var(--primary-color); font-weight: bold;">${event.desc}</span>`;
+                        } else if (event.desc.includes('신입생 오리엔테이션')) {
+                            li.innerHTML = `${event.date}: <span class="clickable-link" onclick="openPdfPage(2)" style="color: var(--primary-color); font-weight: bold;">${event.desc}</span>`;
+                        } else if (event.desc.includes('개강일')) {
+                            li.textContent = `${event.date}: ${event.desc}`;
+                        } else if (event.desc.includes('1차 수강신청')) {
+                            li.innerHTML = `${event.date}: <span class="clickable-link" onclick="openPdfPage(8)" style="color: var(--primary-color); font-weight: bold;">${event.desc}</span>`;
+                        } else {
+                            li.textContent = `${event.date}: ${event.desc}`;
+                        }
+                        
+                        // Now 표시 추가
+                        addNowToEventItem(li, event.date, event.desc);
+                        
+                        februaryList.appendChild(li);
+                    });
+                }
+                
+                // 3월 이벤트 추가
+                if (marchList) {
+                    marchEvents.forEach(event => {
+                        const li = document.createElement('li');
+                        const isImportant = importantKeywords.some(keyword => event.desc.includes(keyword));
+                        const isNextSchedule = nextScheduleKeywords.some(keyword => event.desc.includes(keyword));
+                        
+                        if (isNextSchedule) {
+                            li.className = 'important-event';
+                            li.style.cssText = 'font-weight: bold; background-color: rgba(14, 45, 108, 0.05); border-left: 4px solid var(--primary-color); padding: 8px 12px; margin: 5px 0; border-radius: 0 4px 4px 0;';
+                        }
+                        
+                        if (event.desc.includes('개강일')) {
+                            li.innerHTML = `${event.date}: <span style="color: var(--primary-color); font-weight: bold;">${event.desc}</span>`;
+                        } else {
+                            li.textContent = `${event.date}: ${event.desc}`;
+                        }
+                        
+                        // Now 표시 추가
+                        addNowToEventItem(li, event.date, event.desc);
+                        
+                        marchList.appendChild(li);
+                    });
+                }
+            }
+            
+            // 함수 호출
+            generateEventSummaries();
+            
+            // PDF 특정 페이지 열기 함수
+            window.openPdfPage = function(pageNumber) {
+                // 기존 방식으로 되돌아가되, 모바일에서는 안내 메시지 표시
+                const pdfUrl = `https://sookmyongcal.netlify.app/2026학년도신입생합격자안내사항(20251212).pdf#page=${pageNumber}`;
+                
+                // 모바일 환경 감지
+                const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+                
+                if (isMobile) {
+                    // 모바일에서는 페이지 이동이 안된다는 안내와 함께 PDF 열기
+                    if (confirm(`PDF를 열겠습니다.\n모바일에서는 자동 페이지 이동이 지원되지 않을 수 있습니다.\n수동으로 ${pageNumber}페이지로 이동해주세요.\n\n열기를 누르면 PDF가 열립니다.`)) {
+                        window.open('https://sookmyongcal.netlify.app/2026학년도신입생합격자안내사항(20251212).pdf', '_blank');
+                    }
+                } else {
+                    // PC에서는 기존 방식대로
+                    window.open(pdfUrl, '_blank');
+                }
+            };
+            
+            // 검색 기능
+            window.searchEvents = function() {
+                const searchTerm = document.getElementById('searchInput').value.toLowerCase().trim();
+                const searchResults = document.getElementById('searchResults');
+                const searchResultsList = document.getElementById('searchResultsList');
+                
+                if (!searchTerm) {
+                    searchResults.style.display = 'none';
+                    return;
+                }
+                
+                // 검색어를 최근 검색어에 저장
+                saveRecentSearch(searchTerm);
+                
+                // 모든 이벤트 데이터
+                const allEvents = [
+                    // 12월 이벤트
+                    { month: '12월', date: '12월 15일', desc: '수시 온라인 문서등록 시작', fullDesc: '10시부터 입학처 홈페이지에서 온라인 등록이 시작됩니다. 수시모집 충원 세부일정: 최초합격자 등록 기간이 시작됩니다.' },
+                    { month: '12월', date: '12월 16일', desc: '수시 온라인 문서등록 진행 중', fullDesc: '등록 마감일은 12월 17일 16시입니다.' },
+                    { month: '12월', date: '12월 17일', desc: '수시 온라인 문서등록 마감 및 충원 1차 합격자 발표', fullDesc: '16시까지 최초 합격자의 등록이 마감됩니다. 등록 후 포기 신청 시작: 17시부터 12월 24일 16시까지 입학처 홈페이지에서 등록 포기 신청이 가능합니다. 충원 1차 합격자 발표 및 문서등록 시작: 23시부터 진행됩니다.' },
+                    { month: '12월', date: '12월 18일', desc: '충원 2차 합격자 발표 및 문서등록 시작', fullDesc: '17시부터 진행됩니다.' },
+                    { month: '12월', date: '12월 19일', desc: '충원 3차 합격자 발표 및 문서등록 시작', fullDesc: '17시부터 진행됩니다.' },
+                    { month: '12월', date: '12월 22일', desc: '충원 4차 이후 합격자 발표 시작', fullDesc: '14시부터 개별 통보 방식이 시작됩니다.' },
+                    { month: '12월', date: '12월 23일', desc: '충원 4차 이후 합격자 개별 통보 마감', fullDesc: '18시가 충원 합격 통보 마감 시각입니다.' },
+                    { month: '12월', date: '12월 24일', desc: '문서등록 후 포기 신청 마감', fullDesc: '16시까지 우리 대학교 입학처 홈페이지에서 신청해야 합니다.' },
+                    
+                    // 1월 이벤트
+                    { month: '1월', date: '1월 6일', desc: '영어배치고사(GELT) 1차 접수 시작', fullDesc: '10:00부터 1월 13일 24:00까지 접수 가능합니다.' },
+                    { month: '1월', date: '1월 7일', desc: '신입생 예비대학 영어 집중강좌 및 교환학생제도 설명회', fullDesc: '14:00~16:00에 2026년 숙명여대 신입생 및 학부모를 대상으로 진행됩니다.' },
+                    { month: '1월', date: '1월 7일', desc: '신입생 영어 집중과정(SMART) 1차 신청 시작', fullDesc: '1월 13일까지 온라인 신청이 가능합니다 (입금자 선착순 마감).' },
+                    { month: '1월', date: '1월 13일', desc: '영어배치고사(GELT) 1차 접수 마감', fullDesc: '24:00에 접수가 마감됩니다.' },
+                    { month: '1월', date: '1월 13일', desc: '신입생 영어 집중과정(SMART) 1차 신청 마감', fullDesc: '' },
+                    { month: '1월', date: '1월 19일', desc: '영어배치고사(GELT) 1차 응시 시작', fullDesc: '10:00부터 1월 23일 24:00까지 응시 가능합니다.' },
+                    { month: '1월', date: '1월 19일', desc: '매화장학금(장애학생) 신청 시작', fullDesc: '10:00부터 1월 23일 16:00까지 장애학생지원센터 이메일로 제출 가능합니다.' },
+                    { month: '1월', date: '1월 19일', desc: 'SMART 영어 집중과정 1차 강의 시작', fullDesc: '1월 30일(금)까지 총 10일간 진행됩니다.' },
+                    { month: '1월', date: '1월 21일', desc: '신입생 영어 집중과정(SMART) 2차 신청 시작', fullDesc: '1월 27일(화)까지 신청 가능합니다.' },
+                    { month: '1월', date: '1월 23일', desc: '영어배치고사(GELT) 1차 응시 마감', fullDesc: '24:00에 마감됩니다.' },
+                    { month: '1월', date: '1월 23일', desc: '매화장학금(장애학생) 신청 마감', fullDesc: '16:00에 마감됩니다.' },
+                    { month: '1월', date: '1월 26일', desc: '청파장학금 등 장학금 신청 시작', fullDesc: '10:00부터 2월 3일(화) 16:00까지 학생지원센터 이메일로 제출해야 합니다.' },
+                    { month: '1월', date: '1월 27일', desc: '신입생 영어 집중과정(SMART) 2차 신청 마감', fullDesc: '' },
+                    { month: '1월', date: '1월 30일', desc: 'SMART 영어 집중과정 1차 강의 마감', fullDesc: '' },
+                    
+                    // 2월 이벤트
+                    { month: '2월', date: '2월 2일', desc: 'SMART 영어 집중과정 2차 강의 시작', fullDesc: '2월 13일(금)까지 총 10일간 진행됩니다.' },
+                    { month: '2월', date: '2월 2일', desc: '국가장학금 I, II 유형 신청 기간 시작 (예정)', fullDesc: '2월 초부터 3월 둘째 주까지 한국장학재단 홈페이지에서 신청해야 합니다 (정확한 일정은 추후 SnoWe 공지).' },
+                    { month: '2월', date: '2월 3일', desc: '본등록금 고지서 출력 시작', fullDesc: '10시부터 입학처 홈페이지에서 출력 가능합니다.' },
+                    { month: '2월', date: '2월 3일', desc: '본등록금 납부 기간 시작', fullDesc: '10:00부터 납부가 시작됩니다.' },
+                    { month: '2월', date: '2월 3일', desc: '장학금 증명 서류 제출 마감', fullDesc: '청파, 국가유공자, 새터민 장학금 관련 증명서류 제출 기한 마감 (16:00).' },
+                    { month: '2월', date: '2월 4일', desc: '학생생활관(기숙사) 입사 신청 시작 (예정)', fullDesc: '13:00부터 2월 6일(금) 15:00까지 학생생활관 홈페이지에서 신청 가능합니다.' },
+                    { month: '2월', date: '2월 5일', desc: '본등록금 납부 마감', fullDesc: '16:00까지 신한은행 및 전국 은행을 통해 납부해야 합니다.' },
+                    { month: '2월', date: '2월 5일', desc: '1차 수강신청 시작', fullDesc: '9시부터 2월 9일(월) 17시까지 진행됩니다.' },
+                    { month: '2월', date: '2월 5일', desc: '영어배치고사(GELT) 2차 접수 시작', fullDesc: '10:00부터 2월 6일 24:00까지 접수 가능합니다.' },
+                    { month: '2월', date: '2월 6일', desc: '학생생활관(기숙사) 입사 신청 마감 (예정)', fullDesc: '15:00에 마감됩니다.' },
+                    { month: '2월', date: '2월 6일', desc: '영어배치고사(GELT) 2차 접수 마감', fullDesc: '24:00에 마감됩니다.' },
+                    { month: '2월', date: '2월 9일', desc: '1차 수강신청 마감', fullDesc: '17시에 마감됩니다.' },
+                    { month: '2월', date: '2월 9일', desc: '기숙사 입사 합격자 발표 (예정)', fullDesc: '15:00에 발표됩니다.' },
+                    { month: '2월', date: '2월 9일', desc: '기숙사비 납부 기간 시작 (예정)', fullDesc: '15:00부터 2월 11일(수) 16:00까지 납부해야 합니다.' },
+                    { month: '2월', date: '2월 10일', desc: '영어배치고사(GELT) 2차 응시', fullDesc: '10:00부터 24:00까지 응시 가능합니다.' },
+                    { month: '2월', date: '2월 10일', desc: '기숙사 서류 제출 기간 시작 (예정)', fullDesc: '2월 12일(목) 16:00까지 서류 제출이 필요합니다.' },
+                    { month: '2월', date: '2월 11일', desc: '기숙사비 납부 기간 마감 (예정)', fullDesc: '16:00까지 미납 시 자동 입사 취소됩니다.' },
+                    { month: '2월', date: '2월 12일', desc: '1차 수강신청 확정 결과 조회 (예정)', fullDesc: '16:00부터 숙명포털시스템에서 확인 가능합니다.' },
+                    { month: '2월', date: '2월 12일', desc: '기숙사 서류 제출 기간 마감 (예정)', fullDesc: '16:00에 마감됩니다.' },
+                    { month: '2월', date: '2월 13일', desc: 'SMART 영어 집중과정 2차 강의 마감', fullDesc: '' },
+                    { month: '2월', date: '2월 19일', desc: '영어배치고사(GELT) 3차 접수 시작', fullDesc: '10:00부터 24:00까지 접수 가능합니다.' },
+                    { month: '2월', date: '2월 23일', desc: '입학식 및 신입생 환영회 (예정)', fullDesc: '장소 미정으로 학사팀 공지를 확인해야 합니다.' },
+                    { month: '2월', date: '2월 24일', desc: '신체검사 시작 (예정)', fullDesc: '2월 26일(목)까지 단과대학별로 진행되며, 일정 및 장소는 추후 공지됩니다.' },
+                    { month: '2월', date: '2월 24일', desc: '영어배치고사(GELT) 3차 응시', fullDesc: '10:00부터 24:00까지 응시 가능합니다.' },
+                    { month: '2월', date: '2월 25일', desc: '신입생 오리엔테이션 시작', fullDesc: '2월 26일(목)까지 각 단과대학(독립학부)별로 진행됩니다.' },
+                    { month: '2월', date: '2월 26일', desc: '신체검사 마감 (예정)', fullDesc: '단과대학별 수검 일시를 지키지 못한 경우, 해당 기간 중 가능한 시간에 검사를 받을 수 있습니다.' },
+                    { month: '2월', date: '2월 26일', desc: '신입생 오리엔테이션 마감', fullDesc: '' },
+                    { month: '2월', date: '2월 27일', desc: '영어배치고사(GELT) 4차 접수 시작', fullDesc: '10:00부터 3월 1일(일) 24:00까지 접수 가능합니다.' },
+                    
+                    // 3월 이벤트
+                    { month: '3월', date: '3월 3일', desc: '개강일', fullDesc: '2026학년도 1학기 개강일입니다.' },
+                    { month: '3월', date: '3월 3일', desc: '영어 교양필수 이수면제 신청 기간 시작', fullDesc: '3월 31일(화)까지 입학 후 1년 이내에 신청 가능합니다.' },
+                    { month: '3월', date: '3월 3일', desc: '도서관 이용 안내', fullDesc: '모바일 학생증으로 도서관 출입이 가능하며, 대출도 이날부터 가능합니다.' },
+                    { month: '3월', date: '3월 3일', desc: '신입생 첫 대출 이벤트 시작', fullDesc: '도서 2권 이상 첫 대출하는 신입생 대상 선물 증정 이벤트가 상품 소진 시까지 시작됩니다.' },
+                    { month: '3월', date: '3월 4일', desc: '영어배치고사(GELT) 4차 응시', fullDesc: '10:00부터 16:00까지 응시 가능합니다.' },
+                    { month: '3월', date: '3월 31일', desc: '영어 교양필수 이수면제 신청 기간 마감', fullDesc: '입학 후 1년 이내 신청 기한 중 3월 신청 기간의 마지막 날입니다.' }
+                ];
+                
+                // 검색 결과 필터링
+                const filteredEvents = allEvents.filter(event =>
+                    event.desc.toLowerCase().includes(searchTerm) ||
+                    event.fullDesc.toLowerCase().includes(searchTerm) ||
+                    event.date.toLowerCase().includes(searchTerm) ||
+                    event.month.toLowerCase().includes(searchTerm)
+                );
+                
+                // 검색 결과 표시
+                searchResultsList.innerHTML = '';
+                
+                if (filteredEvents.length === 0) {
+                    searchResultsList.innerHTML = '<p>검색 결과가 없습니다.</p>';
+                } else {
+                    filteredEvents.forEach(event => {
+                        const eventDiv = document.createElement('div');
+                        eventDiv.style.cssText = 'margin-bottom: 15px; padding: 10px; border-left: 4px solid var(--primary-color); background-color: rgba(14, 45, 108, 0.05);';
+                        eventDiv.innerHTML = `
+                            <strong>${event.date} - ${event.desc}</strong>
+                            ${event.fullDesc ? `<br><small style="color: #666;">${event.fullDesc}</small>` : ''}
+                        `;
+                        searchResultsList.appendChild(eventDiv);
+                    });
+                }
+                
+                searchResults.style.display = 'block';
+            };
+            
+            // 검색 초기화 기능
+            window.clearSearch = function() {
+                document.getElementById('searchInput').value = '';
+                document.getElementById('searchResults').style.display = 'none';
+            };
+            
+            // 최근 검색어 가져오기
+            function getRecentSearches() {
+                const recentSearches = localStorage.getItem('recentSearches');
+                return recentSearches ? JSON.parse(recentSearches) : [];
+            }
+            
+            // 최근 검색어 저장하기
+            function saveRecentSearch(searchTerm) {
+                let recentSearches = getRecentSearches();
+                
+                // 이미 있는 검색어는 제거하고 맨 앞에 추가
+                recentSearches = recentSearches.filter(term => term !== searchTerm);
+                recentSearches.unshift(searchTerm);
+                
+                // 최대 10개까지 저장
+                if (recentSearches.length > 10) {
+                    recentSearches = recentSearches.slice(0, 10);
+                }
+                
+                localStorage.setItem('recentSearches', JSON.stringify(recentSearches));
+            }
+            
+            // Enter 키로 검색 가능
+            document.getElementById('searchInput').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    searchEvents();
+                }
+            });
+            
+            // 검색창 포커스 시 최근 검색어 표시
+            document.getElementById('searchInput').addEventListener('focus', function() {
+                const inputValue = this.value.toLowerCase();
+                
+                // 입력이 없으면 최근 검색어와 기본 추천 단어 표시
+                if (!inputValue) {
+                    const recentSearches = getRecentSearches();
+                    const defaultSuggestions = [
+                        '배치고사',
+                        '등록금',
+                        '수강신청',
+                        '입학식',
+                        '신입생 환영회',
+                        '신입생 오리엔테이션',
+                        '영어배치고사',
+                        '영어 집중과정',
+                        '신체검사'
+                    ];
+                    
+                    // 최근 검색어와 기본 추천 단어 합치기 (중복 제거)
+                    const allSuggestions = [...new Set([...recentSearches, ...defaultSuggestions])];
+                    updateDropdown(allSuggestions);
+                }
+            });
+            
+            // 검색창 입력 시 자동 완성 기능
+            document.getElementById('searchInput').addEventListener('input', function(e) {
+                const inputValue = e.target.value.toLowerCase();
+                
+                // 입력이 없으면 최근 검색어와 기본 추천 단어 표시
+                if (!inputValue) {
+                    const recentSearches = getRecentSearches();
+                    const defaultSuggestions = [
+                        '배치고사',
+                        '등록금',
+                        '수강신청',
+                        '입학식',
+                        '신입생 환영회',
+                        '신입생 오리엔테이션',
+                        '영어배치고사',
+                        '영어 집중과정',
+                        '신체검사'
+                    ];
+                    
+                    // 최근 검색어와 기본 추천 단어 합치기 (중복 제거)
+                    const allSuggestions = [...new Set([...recentSearches, ...defaultSuggestions])];
+                    updateDropdown(allSuggestions);
+                    return;
+                }
+                
+                // 입력된 내용으로 시작하는 추천 단어 필터링
+                const recentSearches = getRecentSearches();
+                const defaultSuggestions = [
+                    '배치고사',
+                    '등록금',
+                    '수강신청',
+                    '입학식',
+                    '신입생 환영회',
+                    '신입생 오리엔테이션',
+                    '영어배치고사',
+                    '영어 집중과정',
+                    '신체검사'
+                ];
+                
+                const allSuggestions = [...new Set([...recentSearches, ...defaultSuggestions])];
+                const filteredSuggestions = allSuggestions.filter(suggestion =>
+                    suggestion.toLowerCase().startsWith(inputValue)
+                );
+                
+                updateDropdown(filteredSuggestions);
+            });
+            
+            // 드롭다운 업데이트 함수
+            function updateDropdown(suggestions) {
+                const dropdown = document.getElementById('searchDropdown');
+                dropdown.innerHTML = '';
+                
+                if (suggestions.length === 0) {
+                    dropdown.style.display = 'none';
+                    return;
+                }
+                
+                suggestions.forEach(suggestion => {
+                    const item = document.createElement('div');
+                    item.className = 'search-dropdown-item';
+                    item.textContent = suggestion;
+                    item.addEventListener('click', function() {
+                        document.getElementById('searchInput').value = suggestion;
+                        dropdown.style.display = 'none';
+                        searchEvents();
+                    });
+                    dropdown.appendChild(item);
+                });
+                
+                // 검색창에 포커스가 있거나 입력 중일 때만 드롭다운 표시
+                const searchInput = document.getElementById('searchInput');
+                if (document.activeElement === searchInput && searchInput.value.length >= 0) {
+                    dropdown.style.display = 'block';
+                } else {
+                    dropdown.style.display = 'none';
+                }
+            }
+            
+            // 드롭다운 숨기기 함수
+            function hideDropdown() {
+                setTimeout(() => {
+                    document.getElementById('searchDropdown').style.display = 'none';
+                }, 200); // 클릭 이벤트가 처리될 시간을 주기 위해 약간의 지연
+            }
+            
+            // 검색창 외부 클릭 시 드롭다운 숨기기
+            document.addEventListener('click', function(e) {
+                const searchContainer = document.querySelector('.search-container');
+                if (!searchContainer.contains(e.target)) {
+                    document.getElementById('searchDropdown').style.display = 'none';
+                }
+            });
+        });
+        
+        // 툴팁 기능 추가
+        function createTooltip() {
+            const tooltip = document.createElement('div');
+            tooltip.className = 'tooltip';
+            tooltip.id = 'event-tooltip';
+            document.body.appendChild(tooltip);
+            return tooltip;
+        }
+        
+        function showTooltip(element, content) {
+            const tooltip = document.getElementById('event-tooltip') || createTooltip();
+            tooltip.textContent = content;
+            
+            const rect = element.getBoundingClientRect();
+            const tooltipHeight = tooltip.offsetHeight;
+            const tooltipWidth = tooltip.offsetWidth;
+            const windowHeight = window.innerHeight;
+            const scrollY = window.scrollY;
+            
+            // 기본 위치: 날짜 아래
+            let topPosition = rect.top + scrollY + rect.height + 10;
+            let arrowDirection = 'down';
+            
+            // 화면 아래에 공간이 부족하면 위에 표시
+            if (rect.top + scrollY + rect.height + tooltipHeight + 10 > windowHeight) {
+                topPosition = rect.top + scrollY - tooltipHeight - 10;
+                arrowDirection = 'up';
+            }
+            
+            // 화면 좌우 경계 확인
+            let leftPosition = rect.left + (rect.width / 2) - (tooltipWidth / 2);
+            if (leftPosition < 10) {
+                leftPosition = 10; // 왼쪽 경계
+            } else if (leftPosition + tooltipWidth > window.innerWidth - 10) {
+                leftPosition = window.innerWidth - tooltipWidth - 10; // 오른쪽 경계
+            }
+            
+            tooltip.style.left = leftPosition + 'px';
+            tooltip.style.top = topPosition + 'px';
+            
+            // 화살표 방향에 따라 클래스 추가/제거
+            tooltip.classList.remove('arrow-up', 'arrow-down');
+            tooltip.classList.add('arrow-' + arrowDirection);
+            
+            tooltip.classList.add('show');
+        }
+        
+        function hideTooltip() {
+            const tooltip = document.getElementById('event-tooltip');
+            if (tooltip) {
+                tooltip.classList.remove('show');
+            }
+        }
+        
+        // 날짜 셀에 마우스 오버 이벤트 추가 (데스크톱에서만 동작)
+        document.addEventListener('DOMContentLoaded', function() {
+            // 모바일 환경 감지
+            const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+            
+            // 모바일에서는 툴팁 기능을 추가하지 않음
+            if (isMobile) {
+                return;
+            }
+            
+            const eventDays = document.querySelectorAll('.event-day');
+            
+            eventDays.forEach(function(dayCell) {
+                dayCell.addEventListener('mouseenter', function(e) {
+                    const dayNumber = this.querySelector('.day-number');
+                    if (dayNumber) {
+                        const targetId = dayNumber.getAttribute('href');
+                        if (targetId) {
+                            const targetOverlay = document.querySelector(targetId);
+                            if (targetOverlay) {
+                                const eventTitle = targetOverlay.querySelector('h3').textContent;
+                                const eventParagraphs = targetOverlay.querySelectorAll('p');
+                                let eventContent = eventTitle;
+                                
+                                eventParagraphs.forEach(function(p) {
+                                    eventContent += '\n' + p.textContent;
+                                });
+                                
+                                showTooltip(this, eventContent);
+                            }
+                        }
+                    }
+                });
+                
+                dayCell.addEventListener('mouseleave', function() {
+                    hideTooltip();
+                });
+            });
+        });
+    </script>
+
+    <!-- 대학본부 연락처 섹션 -->
+    <div style="max-width: 1200px; margin: 40px auto; padding: 20px; background-color: var(--white); border-radius: 8px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
+        <h2 style="text-align: center; color: var(--primary-color); margin-bottom: 25px; border-bottom: 2px solid var(--primary-color); padding-bottom: 10px;">대학본부 연락처</h2>
+        
+        <p style="text-align: center; font-weight: bold; font-size: 1.1em; color: var(--primary-color); margin-bottom: 20px;">인공지능공학부: 710-9379</p>
+        
+        <div style="overflow-x: auto;">
+            <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
+                <thead>
+                    <tr style="background-color: var(--primary-color);">
+                        <th style="color: var(--white); padding: 14px 10px; text-align: center; border: 1px solid var(--primary-color);">부서명</th>
+                        <th style="color: var(--white); padding: 14px 10px; text-align: center; border: 1px solid var(--primary-color);">신입생 주요 문의내용</th>
+                        <th style="color: var(--white); padding: 14px 10px; text-align: center; border: 1px solid var(--primary-color);">문의전화</th>
+                        <th style="color: var(--white); padding: 14px 10px; text-align: center; border: 1px solid var(--primary-color);">위치</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td style="padding: 12px 10px; text-align: left; border: 1px solid rgba(14, 45, 108, 0.2); font-weight: bold; color: var(--primary-color);">입학처</td>
+                        <td style="padding: 12px 10px; text-align: center; border: 1px solid rgba(14, 45, 108, 0.2);">입학문의</td>
+                        <td style="padding: 12px 10px; text-align: center; border: 1px solid rgba(14, 45, 108, 0.2);">710-9920</td>
+                        <td style="padding: 12px 10px; text-align: center; border: 1px solid rgba(14, 45, 108, 0.2);">행정관 1층 입학정보센터</td>
+                    </tr>
+                    <tr style="background-color: rgba(14, 45, 108, 0.05);">
+                        <td style="padding: 12px 10px; text-align: left; border: 1px solid rgba(14, 45, 108, 0.2); font-weight: bold; color: var(--primary-color);">재무회계팀</td>
+                        <td style="padding: 12px 10px; text-align: center; border: 1px solid rgba(14, 45, 108, 0.2);">등록 및 등록금 안내</td>
+                        <td style="padding: 12px 10px; text-align: center; border: 1px solid rgba(14, 45, 108, 0.2);">710-9049</td>
+                        <td style="padding: 12px 10px; text-align: center; border: 1px solid rgba(14, 45, 108, 0.2);">행정관 304호</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 12px 10px; text-align: left; border: 1px solid rgba(14, 45, 108, 0.2); font-weight: bold; color: var(--primary-color);">학생지원센터</td>
+                        <td style="padding: 12px 10px; text-align: center; border: 1px solid rgba(14, 45, 108, 0.2);">신입생 오리엔테이션</td>
+                        <td style="padding: 12px 10px; text-align: center; border: 1px solid rgba(14, 45, 108, 0.2);">710-9268</td>
+                        <td style="padding: 12px 10px; text-align: center; border: 1px solid rgba(14, 45, 108, 0.2);">학생회관 305호</td>
+                    </tr>
+                    <tr style="background-color: rgba(14, 45, 108, 0.05);">
+                        <td style="padding: 12px 10px; text-align: left; border: 1px solid rgba(14, 45, 108, 0.2); font-weight: bold; color: var(--primary-color);">학생지원센터</td>
+                        <td style="padding: 12px 10px; text-align: center; border: 1px solid rgba(14, 45, 108, 0.2);">장학금 안내</td>
+                        <td style="padding: 12px 10px; text-align: center; border: 1px solid rgba(14, 45, 108, 0.2);">710-9907, 9033</td>
+                        <td style="padding: 12px 10px; text-align: center; border: 1px solid rgba(14, 45, 108, 0.2);">학생회관 306호</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 12px 10px; text-align: left; border: 1px solid rgba(14, 45, 108, 0.2); font-weight: bold; color: var(--primary-color);">학사팀</td>
+                        <td style="padding: 12px 10px; text-align: center; border: 1px solid rgba(14, 45, 108, 0.2);">입학식, 수강신청</td>
+                        <td style="padding: 12px 10px; text-align: center; border: 1px solid rgba(14, 45, 108, 0.2);">710-9015</td>
+                        <td style="padding: 12px 10px; text-align: center; border: 1px solid rgba(14, 45, 108, 0.2);">행정관 201호</td>
+                    </tr>
+                    <tr style="background-color: rgba(14, 45, 108, 0.05);">
+                        <td style="padding: 12px 10px; text-align: left; border: 1px solid rgba(14, 45, 108, 0.2); font-weight: bold; color: var(--primary-color);">순헌칼리지 교학팀</td>
+                        <td style="padding: 12px 10px; text-align: center; border: 1px solid rgba(14, 45, 108, 0.2);">영어배치고사 / 이수면제제도</td>
+                        <td style="padding: 12px 10px; text-align: center; border: 1px solid rgba(14, 45, 108, 0.2);">2077-7511</td>
+                        <td style="padding: 12px 10px; text-align: center; border: 1px solid rgba(14, 45, 108, 0.2);">행정관 201호</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 12px 10px; text-align: left; border: 1px solid rgba(14, 45, 108, 0.2); font-weight: bold; color: var(--primary-color);">보건의료센터</td>
+                        <td style="padding: 12px 10px; text-align: center; border: 1px solid rgba(14, 45, 108, 0.2);">신체검사</td>
+                        <td style="padding: 12px 10px; text-align: center; border: 1px solid rgba(14, 45, 108, 0.2);">710-9146</td>
+                        <td style="padding: 12px 10px; text-align: center; border: 1px solid rgba(14, 45, 108, 0.2);">순헌관 지하 011호</td>
+                    </tr>
+                    <tr style="background-color: rgba(14, 45, 108, 0.05);">
+                        <td style="padding: 12px 10px; text-align: left; border: 1px solid rgba(14, 45, 108, 0.2); font-weight: bold; color: var(--primary-color);">학생생활관</td>
+                        <td style="padding: 12px 10px; text-align: center; border: 1px solid rgba(14, 45, 108, 0.2);">기숙사 입사 신청</td>
+                        <td style="padding: 12px 10px; text-align: center; border: 1px solid rgba(14, 45, 108, 0.2);">2077-7424</td>
+                        <td style="padding: 12px 10px; text-align: center; border: 1px solid rgba(14, 45, 108, 0.2);">기숙사 명재관 1층</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 12px 10px; text-align: left; border: 1px solid rgba(14, 45, 108, 0.2); font-weight: bold; color: var(--primary-color);">TESOL SMART</td>
+                        <td style="padding: 12px 10px; text-align: center; border: 1px solid rgba(14, 45, 108, 0.2);">신입생 예비대학 영어 집중강좌</td>
+                        <td style="padding: 12px 10px; text-align: center; border: 1px solid rgba(14, 45, 108, 0.2);">2077-7700</td>
+                        <td style="padding: 12px 10px; text-align: center; border: 1px solid rgba(14, 45, 108, 0.2);">인재관 1층</td>
+                    </tr>
+                    <tr style="background-color: rgba(14, 45, 108, 0.05);">
+                        <td style="padding: 12px 10px; text-align: left; border: 1px solid rgba(14, 45, 108, 0.2); font-weight: bold; color: var(--primary-color);">도서관</td>
+                        <td style="padding: 12px 10px; text-align: center; border: 1px solid rgba(14, 45, 108, 0.2);">도서관 이용 안내</td>
+                        <td style="padding: 12px 10px; text-align: center; border: 1px solid rgba(14, 45, 108, 0.2);">710-9001</td>
+                        <td style="padding: 12px 10px; text-align: center; border: 1px solid rgba(14, 45, 108, 0.2);">중앙도서관</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        
+        <p style="text-align: center; color: var(--text-secondary); margin-top: 15px;">
+            ※ 전화번호 앞자리 02는 서울 지역번호이며, 내선번호는 해당 부서로 직접 연결됩니다.
+        </p>
+    </div>
+
+    <!-- 플로팅 챗봇 -->
+    <div class="chatbot-container">
+        <!-- 챗봇 토글 버튼 -->
+        <div class="chatbot-toggle" onclick="toggleChatbot()" title="숙명여대 신입생 도우미">
+            <svg viewBox="0 0 24 24" fill="currentColor">
+                <path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm6 14v-3H8v3h6v-2h2v2h2v-2h-2z"/>
+            </svg>
+        </div>
+
+        <!-- 챗봇 대화창 -->
+        <div class="chatbot-window" id="chatbotWindow">
+            <!-- 헤더 -->
+            <div class="chatbot-header">
+                <span>숙명여대 신입생 도우미 🎓</span>
+                <button class="chatbot-close" onclick="toggleChatbot()">×</button>
+            </div>
+
+            <!-- 메시지 영역 -->
+            <div class="chatbot-messages" id="chatMessages">
+                <!-- 환영 메시지 -->
+                <div class="message bot">
+                    <div class="message-avatar">🎓</div>
+                    <div class="message-bubble">
+                        안녕하세요! 숙명여자대학교 2026학년도 신입생 합격자 안내사항 전문 챗봇입니다.<br><br>
+                        등록금, 수강신청, 장학금, 영어배치고사, 기숙사 등 신입생 관련 궁금한 점을 물어보세요.<br><br>
+                        무엇을 도와드릴까요? 😊
+                    </div>
+                </div>
+            </div>
+
+            <!-- 입력 영역 -->
+            <div class="chatbot-input-container">
+                <div class="chatbot-input-wrapper">
+                    <input
+                        type="text"
+                        class="chatbot-input"
+                        id="chatInput"
+                        placeholder="메시지를 입력하세요..."
+                        onkeypress="handleKeyPress(event)"
+                    >
+                    <button class="chatbot-send" id="sendButton" onclick="sendMessage()">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M2.01 21L23 12 2.01 3 2 10l10 11 10-11z"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+
+            <!-- 타이핑 인디케이터 -->
+            <div class="typing-indicator" id="typingIndicator">
+                <div class="message-avatar">🎓</div>
+                <div class="typing-dots">
+                    <div class="typing-dot"></div>
+                    <div class="typing-dot"></div>
+                    <div class="typing-dot"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let isOpen = false;
+        const API_URL = 'http://localhost:5000/chat'; // 개발 환경에서는 localhost 사용
+
+        function toggleChatbot() {
+            const chatbotWindow = document.getElementById('chatbotWindow');
+            const chatbotToggle = document.querySelector('.chatbot-toggle');
+            
+            isOpen = !isOpen;
+            
+            if (isOpen) {
+                chatbotWindow.style.display = 'flex';
+                chatbotToggle.style.display = 'none';
+                // 입력창에 포커스
+                setTimeout(() => {
+                    document.getElementById('chatInput').focus();
+                }, 300);
+            } else {
+                chatbotWindow.style.display = 'none';
+                chatbotToggle.style.display = 'flex';
+            }
+        }
+
+        function handleKeyPress(event) {
+            if (event.key === 'Enter' && !event.shiftKey) {
+                event.preventDefault();
+                sendMessage();
+            }
+        }
+
+        function showTypingIndicator() {
+            const typingIndicator = document.getElementById('typingIndicator');
+            typingIndicator.classList.add('show');
+        }
+
+        function hideTypingIndicator() {
+            const typingIndicator = document.getElementById('typingIndicator');
+            typingIndicator.classList.remove('show');
+        }
+
+        function addMessage(content, isUser = false) {
+            const messagesContainer = document.getElementById('chatMessages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${isUser ? 'user' : 'bot'}`;
+            
+            const avatar = document.createElement('div');
+            avatar.className = 'message-avatar';
+            avatar.textContent = isUser ? '👤' : '🎓';
+            
+            const bubble = document.createElement('div');
+            bubble.className = 'message-bubble';
+            bubble.innerHTML = content;
+            
+            if (isUser) {
+                messageDiv.appendChild(bubble);
+                messageDiv.appendChild(avatar);
+            } else {
+                messageDiv.appendChild(avatar);
+                messageDiv.appendChild(bubble);
+            }
+            
+            messagesContainer.appendChild(messageDiv);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+
+        async function sendMessage() {
+            const input = document.getElementById('chatInput');
+            const sendButton = document.getElementById('sendButton');
+            const message = input.value.trim();
+            
+            if (!message) return;
+            
+            // 사용자 메시지 추가
+            addMessage(message, true);
+            
+            // 입력창 초기화 및 비활성화
+            input.value = '';
+            sendButton.disabled = true;
+            
+            // 타이핑 인디케이터 표시
+            showTypingIndicator();
+            
+            try {
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        message: message
+                    })
+                });
+                
+                const data = await response.json();
+                
+                // 타이핑 인디케이터 숨기기
+                hideTypingIndicator();
+                
+                if (data.response) {
+                    addMessage(data.response);
+                } else {
+                    addMessage('죄송합니다. 응답을 받지 못했습니다. 잠시 후 다시 시도해주세요.');
+                }
+                
+            } catch (error) {
+                console.error('Error:', error);
+                hideTypingIndicator();
+                addMessage('서버 연결에 문제가 있습니다. 잠시 후 다시 시도해주세요.');
+            } finally {
+                // 전송 버튼 재활성화
+                sendButton.disabled = false;
+                // 입력창에 포커스
+                input.focus();
+            }
+        }
+
+        // 페이지 로드 시 초기화
+        document.addEventListener('DOMContentLoaded', function() {
+            // ESC 키로 챗봇 닫기
+            document.addEventListener('keydown', function(event) {
+                if (event.key === 'Escape' && isOpen) {
+                    toggleChatbot();
+                }
+            });
+        });
+    </script>
+
+    <style>
+        /* 챗봇 스타일 */
+        .chatbot-container {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 9999;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .chatbot-toggle {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #0E2D6C, #1F4FA3);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(14, 45, 108, 0.3);
+            transition: all 0.3s ease;
+            border: 2px solid #ffffff;
+        }
+
+        .chatbot-toggle:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 20px rgba(14, 45, 108, 0.4);
+        }
+
+        .chatbot-toggle svg {
+            width: 30px;
+            height: 30px;
+            fill: white;
+        }
+
+        .chatbot-window {
+            position: absolute;
+            bottom: 80px;
+            right: 0;
+            width: 380px;
+            height: 600px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+            display: none;
+            flex-direction: column;
+            overflow: hidden;
+            border: 1px solid #e1e5e9;
+        }
+
+        .chatbot-header {
+            background: linear-gradient(135deg, #0E2D6C, #1F4FA3);
+            color: white;
+            padding: 16px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 600;
+            font-size: 16px;
+        }
+
+        .chatbot-close {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            padding: 0;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: background 0.2s ease;
+        }
+
+        .chatbot-close:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .chatbot-messages {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            background: #f8f9fa;
+        }
+
+        .chatbot-input-container {
+            padding: 16px 20px;
+            background: white;
+            border-top: 1px solid #e1e5e9;
+        }
+
+        .chatbot-input-wrapper {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .chatbot-input {
+            flex: 1;
+            padding: 12px 16px;
+            border: 1px solid #d1d5db;
+            border-radius: 24px;
+            font-size: 14px;
+            outline: none;
+            transition: border-color 0.2s ease;
+        }
+
+        .chatbot-input:focus {
+            border-color: #0E2D6C;
+        }
+
+        .chatbot-send {
+            background: #0E2D6C;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 44px;
+            height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .chatbot-send:hover {
+            background: #1F4FA3;
+            transform: scale(1.05);
+        }
+
+        .chatbot-send:disabled {
+            background: #9ca3af;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .message {
+            margin-bottom: 16px;
+            display: flex;
+            align-items: flex-start;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .message.user {
+            justify-content: flex-end;
+        }
+
+        .message-bubble {
+            max-width: 80%;
+            padding: 12px 16px;
+            border-radius: 18px;
+            word-wrap: break-word;
+            font-size: 14px;
+            line-height: 1.4;
+        }
+
+        .message.bot .message-bubble {
+            background: #e3f2fd;
+            color: #1a202c;
+            border-bottom-left-radius: 4px;
+        }
+
+        .message.user .message-bubble {
+            background: #0E2D6C;
+            color: white;
+            border-bottom-right-radius: 4px;
+        }
+
+        .message-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            margin: 0 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: white;
+            font-size: 14px;
+        }
+
+        .message.bot .message-avatar {
+            background: #1F4FA3;
+            order: 0;
+        }
+
+        .message.user .message-avatar {
+            background: #64748b;
+            order: 1;
+        }
+
+        .typing-indicator {
+            display: none;
+            align-items: center;
+            padding: 12px 16px;
+            margin-bottom: 16px;
+        }
+
+        .typing-indicator.show {
+            display: flex;
+        }
+
+        .typing-dots {
+            display: flex;
+            gap: 4px;
+        }
+
+        .typing-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #64748b;
+            animation: typing 1.4s infinite ease-in-out;
+        }
+
+        .typing-dot:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .typing-dot:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+
+        @keyframes typing {
+            0%, 60%, 100% { transform: translateY(0); }
+            30% { transform: translateY(-10px); }
+        }
+
+        /* 반응형 디자인 */
+        @media (max-width: 480px) {
+            .chatbot-window {
+                width: calc(100vw - 40px);
+                height: 70vh;
+                right: -10px;
+                bottom: 70px;
+            }
+
+            .chatbot-messages {
+                padding: 16px;
+            }
+
+            .message-bubble {
+                font-size: 13px;
+            }
+        }
+
+        /* 스크롤바 스타일 */
+        .chatbot-messages::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .chatbot-messages::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+
+        .chatbot-messages::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 3px;
+        }
+
+        .chatbot-messages::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+    </style>
+
+</body>
+</html>
