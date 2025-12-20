@@ -974,15 +974,9 @@
     <script>
         // PDF 열기 함수
         function openPdf() {
-            // PDF 다운로드 방식으로 열기
+            // PDF를 브라우저에서 바로 열기
             const pdfUrl = './2026학년도신입생합격자안내사항(20251212).pdf';
-            const link = document.createElement('a');
-            link.href = pdfUrl;
-            link.download = '2026학년도신입생합격자안내사항(20251212).pdf';
-            link.target = '_blank';
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
+            window.open(pdfUrl, '_blank');
         }
 
         // 날짜 텍스트에서 기간 추출 함수 (전역 스코프로 이동)
