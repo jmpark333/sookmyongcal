@@ -668,7 +668,7 @@
             } catch (error) {
                 console.warn('설정 로드 중 오류:', error);
                 window.CHATBOT_SECURE_CONFIG = {
-                    getApiUrl: () => '/api/chatbot',
+                    getApiUrl: () => '/.netlify/functions/chat',
                     getApiKey: () => apiKeyManager.getApiKey(),
                     MODEL: 'glm-4.6', // GLM-4.6 모델로 변경
                     MAX_CALLS: 10,
