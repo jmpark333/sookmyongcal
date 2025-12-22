@@ -314,6 +314,11 @@
             100% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
         }
         
+        /* 부드러운 앵커 스크롤 */
+        html {
+            scroll-behavior: smooth;
+        }
+        
         /* 월별 일정에서 Now 표시 스타일 */
         .event-now {
             display: inline-block !important;
@@ -445,7 +450,7 @@
     
     <!-- 합격자 안내사항 보기 버튼 -->
     <div style="text-align: center; margin: 30px 0;">
-        <button onclick="openPdf()" style="background: var(--primary-color); color: var(--white); border: none; padding: 12px 25px; border-radius: 8px; cursor: pointer; font-size: 15px; font-weight: 600; box-shadow: 0 3px 10px rgba(14, 45, 108, 0.2); transition: all 0.2s ease; display: inline-flex; align-items: center; gap: 8px;">
+        <button onclick="openPdf()" style="background: var(--primary-color); color: var(--white); border: none; padding: 12px 25px; border-radius: 8px; cursor: pointer; font-size: 15px; font-weight: 600; box-shadow: 0 3px 10px rgba(14, 45, 108, 0.2); transition: all 0.2s ease; display: inline-flex; align-items: center; gap: 8px; margin: 0 10px;">
             📄 합격자 안내사항 보기
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: inline-block;">
                 <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
@@ -453,6 +458,16 @@
                 <line x1="12" y1="15" x2="12" y2="3"/>
             </svg>
         </button>
+        <a href="#toeic-schedule" style="background: linear-gradient(135deg, #4CAF50, #45a049); color: var(--white); border: none; padding: 12px 25px; border-radius: 8px; cursor: pointer; font-size: 15px; font-weight: 600; box-shadow: 0 3px 10px rgba(76, 175, 80, 0.2); transition: all 0.2s ease; display: inline-flex; align-items: center; gap: 8px; text-decoration: none;">
+            📝 TOEIC 시험 일정표
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: inline-block;">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                <polyline points="14,2 14,8 20,8"/>
+                <line x1="16" y1="13" x2="8" y2="13"/>
+                <line x1="16" y1="17" x2="8" y2="17"/>
+                <polyline points="10,9 9,9 8,9"/>
+            </svg>
+        </a>
     </div>
 
     <div class="calendar-container">
@@ -2168,6 +2183,79 @@ ${knowledgeContext}
             return context;
         }
 
+        // 주소 복사 기능
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(function() {
+                // 성공 메시지 표시
+                showCopyMessage('주소가 클립보드에 복사되었습니다!');
+            }).catch(function(err) {
+                // 실패 시 대체 방법
+                const textArea = document.createElement("textarea");
+                textArea.value = text;
+                textArea.style.position = "fixed";
+                textArea.style.left = "-999999px";
+                textArea.style.top = "-999999px";
+                document.body.appendChild(textArea);
+                textArea.focus();
+                textArea.select();
+                try {
+                    document.execCommand('copy');
+                    showCopyMessage('주소가 클립보드에 복사되었습니다!');
+                } catch (err) {
+                    showCopyMessage('복사에 실패했습니다. 다시 시도해주세요.');
+                }
+                document.body.removeChild(textArea);
+            });
+        }
+        
+        // 복사 메시지 표시 기능
+        function showCopyMessage(message) {
+            // 기존 메시지 제거
+            const existingMessage = document.querySelector('.copy-message');
+            if (existingMessage) {
+                existingMessage.remove();
+            }
+            
+            // 새 메시지 생성
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'copy-message';
+            messageDiv.textContent = message;
+            messageDiv.style.cssText = `
+                position: fixed;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                background: rgba(0, 0, 0, 0.8);
+                color: white;
+                padding: 12px 20px;
+                border-radius: 6px;
+                z-index: 10000;
+                font-size: 14px;
+                animation: fadeInOut 2s ease-in-out;
+            `;
+            
+            // 애니메이션 추가
+            const style = document.createElement('style');
+            style.textContent = `
+                @keyframes fadeInOut {
+                    0% { opacity: 0; transform: translate(-50%, -50%) scale(0.9); }
+                    20% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+                    80% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+                    100% { opacity: 0; transform: translate(-50%, -50%) scale(0.9); }
+                }
+            `;
+            document.head.appendChild(style);
+            
+            document.body.appendChild(messageDiv);
+            
+            // 2초 후 메시지 제거
+            setTimeout(() => {
+                if (messageDiv.parentNode) {
+                    messageDiv.parentNode.removeChild(messageDiv);
+                }
+            }, 2000);
+        }
+        
         // 지식 베이스 스크립트 로드
         // 지식 베이스 내용 추출 함수
         function extractKnowledgeContent() {
@@ -2570,7 +2658,7 @@ ${knowledgeContext}
     </style>
 
     <!-- 토익 시험 일정표 섹션 -->
-    <div style="max-width: 1200px; margin: 40px auto; padding: 20px; background-color: var(--white); border-radius: 8px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
+    <div id="toeic-schedule" style="max-width: 1200px; margin: 40px auto; padding: 20px; background-color: var(--white); border-radius: 8px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
         <h2 style="text-align: center; color: var(--primary-color); margin-bottom: 25px; border-bottom: 2px solid var(--primary-color); padding-bottom: 10px;">📝 TOEIC 시험 일정표</h2>
         
         <div style="overflow-x: auto;">
@@ -2647,6 +2735,17 @@ ${knowledgeContext}
         <p style="text-align: center; color: var(--text-secondary); margin-top: 15px; font-size: 0.9em;">
             ※ 본 일정은 예정이며, 변동될 수 있습니다. 정확한 일정은 TOEIC 공식 홈페이지에서 확인해주세요.
         </p>
+        
+        <!-- 웹주소 바로가기 -->
+        <div style="text-align: center; margin-top: 20px; padding: 15px; background-color: rgba(76, 175, 80, 0.05); border-radius: 6px; border: 1px solid rgba(76, 175, 80, 0.2);">
+            <p style="margin: 0; font-weight: 600; color: #2e7d32; margin-bottom: 8px;">📱 바로가기 링크</p>
+            <p style="margin: 0; font-family: 'Courier New', monospace; font-size: 0.85em; color: var(--text-primary); background: white; padding: 8px 12px; border-radius: 4px; display: inline-block;">
+                https://sookmyongcal.netlify.app/#toeic-schedule
+            </p>
+            <button onclick="copyToClipboard('https://sookmyongcal.netlify.app/#toeic-schedule')" style="margin-top: 10px; background: #4CAF50; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 0.85em; transition: background-color 0.2s;">
+                📋 주소 복사
+            </button>
+        </div>
     </div>
 
 </body>
