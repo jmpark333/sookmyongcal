@@ -2657,43 +2657,43 @@ ${knowledgeContext}
             }
         }
         
-        /* TOEIC 표는 모든 화면에서 동일하게 표시 */
-        #toeic-schedule {
-            min-width: 900px; /* 표의 최소 넓이 설정 */
+        /* TOEIC 표는 컨테이너 폭에 맞추되 내부 표만 스크롤 */
+        #toeic-schedule .overflow-x-auto {
+            width: 100%;
         }
         
         #toeic-schedule table {
             table-layout: fixed; /* 칸 넓이 고정 */
-            width: 900px; /* 표 넓이 고정 */
+            min-width: 900px; /* 표의 최소 넓이 */
         }
         
         #toeic-schedule th:first-child,
         #toeic-schedule td:first-child {
-            width: 130px !important; /* 회차 칸 넓이 고정 */
+            width: 130px; /* 회차 칸 넓이 고정 */
             min-width: 130px;
         }
         
         #toeic-schedule th:nth-child(2),
         #toeic-schedule td:nth-child(2) {
-            width: 140px !important; /* 시험일 칸 넓이 */
+            width: 140px; /* 시험일 칸 넓이 */
             min-width: 140px;
         }
         
         #toeic-schedule th:nth-child(3),
         #toeic-schedule td:nth-child(3) {
-            width: 140px !important; /* 성적발표 칸 넓이 */
+            width: 140px; /* 성적발표 칸 넓이 */
             min-width: 140px;
         }
         
         #toeic-schedule th:nth-child(4),
         #toeic-schedule td:nth-child(4) {
-            width: 240px !important; /* 정기접수 칸 넓이 */
+            width: 240px; /* 정기접수 칸 넓이 */
             min-width: 240px;
         }
         
         #toeic-schedule th:nth-child(5),
         #toeic-schedule td:nth-child(5) {
-            width: 250px !important; /* 특별추가 칸 넓이 */
+            width: 250px; /* 특별추가 칸 넓이 */
             min-width: 250px;
         }
 
