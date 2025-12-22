@@ -2663,38 +2663,80 @@ ${knowledgeContext}
         }
         
         #toeic-schedule table {
-            table-layout: fixed; /* 칸 넓이 고정 */
-            min-width: 750px; /* 표의 최소 넓이 (900px → 750px으로 축소) */
+            width: 100%; /* 컨테이너에 맞게 넓이 조정 */
+            min-width: 900px; /* 최소 넓이는 유지 */
+            table-layout: auto; /* 자동 넓이 조정 */
         }
         
-        #toeic-schedule th:first-child,
-        #toeic-schedule td:first-child {
-            width: 100px; /* 회차 칸 넓이 (110px → 100px) */
-            min-width: 100px;
+        /* PC에서는 넓이 고정, 모바일에서는 최소 넓이만 적용 */
+        @media (min-width: 769px) {
+            #toeic-schedule table {
+                width: 100%; /* PC에서도 컨테이너에 맞게 */
+                table-layout: auto;
+            }
+            
+            #toeic-schedule th:first-child,
+            #toeic-schedule td:first-child {
+                width: 130px; /* PC에서는 더 넓게 */
+            }
+            
+            #toeic-schedule th:nth-child(2),
+            #toeic-schedule td:nth-child(2) {
+                width: 140px;
+            }
+            
+            #toeic-schedule th:nth-child(3),
+            #toeic-schedule td:nth-child(3) {
+                width: 140px;
+            }
+            
+            #toeic-schedule th:nth-child(4),
+            #toeic-schedule td:nth-child(4) {
+                width: 240px;
+            }
+            
+            #toeic-schedule th:nth-child(5),
+            #toeic-schedule td:nth-child(5) {
+                width: 250px;
+            }
         }
         
-        #toeic-schedule th:nth-child(2),
-        #toeic-schedule td:nth-child(2) {
-            width: 120px; /* 시험일 칸 넓이 (140px → 120px) */
-            min-width: 120px;
-        }
-        
-        #toeic-schedule th:nth-child(3),
-        #toeic-schedule td:nth-child(3) {
-            width: 120px; /* 성적발표 칸 넓이 (140px → 120px) */
-            min-width: 120px;
-        }
-        
-        #toeic-schedule th:nth-child(4),
-        #toeic-schedule td:nth-child(4) {
-            width: 200px; /* 정기접수 칸 넓이 (240px → 200px) */
-            min-width: 200px;
-        }
-        
-        #toeic-schedule th:nth-child(5),
-        #toeic-schedule td:nth-child(5) {
-            width: 190px; /* 특별추가 칸 넓이 (250px → 190px) */
-            min-width: 190px;
+        /* 모바일에서는 축소된 넓이 적용 */
+        @media (max-width: 768px) {
+            #toeic-schedule table {
+                min-width: 750px; /* 모바일 최소 넓이 */
+                table-layout: fixed; /* 모바일에서는 고정 */
+            }
+            
+            #toeic-schedule th:first-child,
+            #toeic-schedule td:first-child {
+                width: 100px; /* 모바일에서는 좁게 */
+                min-width: 100px;
+            }
+            
+            #toeic-schedule th:nth-child(2),
+            #toeic-schedule td:nth-child(2) {
+                width: 120px;
+                min-width: 120px;
+            }
+            
+            #toeic-schedule th:nth-child(3),
+            #toeic-schedule td:nth-child(3) {
+                width: 120px;
+                min-width: 120px;
+            }
+            
+            #toeic-schedule th:nth-child(4),
+            #toeic-schedule td:nth-child(4) {
+                width: 200px;
+                min-width: 200px;
+            }
+            
+            #toeic-schedule th:nth-child(5),
+            #toeic-schedule td:nth-child(5) {
+                width: 190px;
+                min-width: 190px;
+            }
         }
 
         /* 스크롤바 스타일 */
@@ -2766,7 +2808,7 @@ ${knowledgeContext}
         <h2 style="text-align: center; color: var(--primary-color); margin-bottom: 25px; border-bottom: 2px solid var(--primary-color); padding-bottom: 10px;">📝 TOEIC 시험 일정표</h2>
         
         <div style="overflow-x: auto;">
-            <table style="width: 750px; table-layout: fixed; border-collapse: collapse; margin-bottom: 20px;">
+            <table style="border-collapse: collapse; margin-bottom: 20px;">
                 <thead>
                     <tr style="background-color: var(--primary-color);">
                         <th style="color: var(--white); padding: 12px 15px; text-align: center; border: 1px solid var(--primary-color); font-size: 0.95em;">회차</th>
