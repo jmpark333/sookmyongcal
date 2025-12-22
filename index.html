@@ -2655,6 +2655,22 @@ ${knowledgeContext}
             .message-bubble {
                 font-size: 13px;
             }
+            
+            /* 모바일에서 토익 표 회차 칸 넓히기 */
+            #toeic-schedule th:first-child,
+            #toeic-schedule td:first-child {
+                width: 120px !important;
+                padding: 10px 15px !important;
+            }
+        }
+        
+        /* 태블릿 및 작은 화면에서도 약간 넓히기 */
+        @media (max-width: 768px) {
+            #toeic-schedule th:first-child,
+            #toeic-schedule td:first-child {
+                width: 115px !important;
+                padding: 10px 12px !important;
+            }
         }
 
         /* 스크롤바 스타일 */
