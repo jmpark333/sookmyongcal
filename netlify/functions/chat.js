@@ -36,13 +36,23 @@ function generateResponse(prompt, context) {
 
     const messages = [];
     if (context && context !== "관련 정보를 찾을 수 없습니다. 더 구체적인 질문을 해주세요.") {
+      // 클라이언트에서 온 전체 지식 베이스 컨텍스트 또는 간단 매칭 결과
       messages.push({
         "role": "system",
-        "content": `당신은 숙명여자대학교 신입생 안내 챗봇입니다. 다음 정보를 바탕으로 질문에 답변해주세요: ${context}`
+        "content": `당신은 숙명여자대학교 학생 도우미 챗봇입니다. 신입생 합격자 안내사항과 재학생 수강가이드 정보를 모두 제공합니다. 다음 지식 베이스를 기반으로 답변해주세요.
+
+${context}
+
+**중요 지침:**
+1. 위 지식 베이스에 있는 정보만 정확하게 바탕으로 답변하세요
+2. 지식 베이스에 없는 내용(특정 인물, 개인 정보 등)에 대해서는 솔직하게 "그 정보는 제가 가진 자료에 없습니다"라고 답변하세요
+3. 숙명여대 신입생 및 재학생 관련 일반적인 질문에 대해서는 지식 베이스의 내용을 활용하여 친절하게 답변하세요
+4. 한국어로, 친절하고 전문적인 어조로 답변하세요
+5. 질문의 의도를 정확히 파악하여 관련 있는 정보만 제공하세요`
       });
     } else {
       messages.push({
-        "role": "system", 
+        "role": "system",
         "content": "당신은 숙명여자대학교 신입생 안내 챗봇입니다. 친절하고 정확하게 답변해주세요."
       });
     }
@@ -154,10 +164,13 @@ exports.handler = async function(event, context) {
       }
 
       const userMessage = body.message.trim();
-      
-      // 먼저 간단한 매칭으로 응답 시도
-      const context = findContext(userMessage);
-      
+
+      // 클라이언트에서 보낸 컨텍스트 사용 (우선), 없으면 하드코딩된 매칭 사용
+      let context = body.context;
+      if (!context) {
+        context = findContext(userMessage);
+      }
+
       try {
         const botResponse = await generateResponse(userMessage, context);
         
@@ -175,11 +188,12 @@ exports.handler = async function(event, context) {
       } catch (apiError) {
         console.error('API Error:', apiError);
         
-        // API 실패시 하드코딩된 응답 반환
+        // API 실패시 컨텍스트 응답 반환
+        const fallbackResponse = typeof context === 'string' ? context : '관련 정보를 찾을 수 없습니다. 더 구체적인 질문을 해주세요.';
         return {
           statusCode: 200,
           body: JSON.stringify({
-            response: context,
+            response: fallbackResponse,
             context_used: true
           }),
           headers: {
