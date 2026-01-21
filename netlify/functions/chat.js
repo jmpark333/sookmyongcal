@@ -63,10 +63,13 @@ ${context}
     });
 
     const data = {
-      "model": "glm-4.6",
+      "model": "glm-4.7",
       "messages": messages,
-      "max_tokens": 500,
-      "temperature": 0.3
+      "thinking": {
+        "type": "disabled"
+      },
+      "max_tokens": 2000,
+      "temperature": 0.7
     };
 
     const postData = JSON.stringify(data);
