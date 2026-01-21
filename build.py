@@ -25,6 +25,8 @@ def main():
         "screenshot.png",
         "knowledge_base.js",
         "emblem-1_Color.png",
+        "2026학년도신입생합격자안내사항(20251212).pdf",
+        "course-registration-guide-2026-1.pdf",
     ]
     for static_file in static_files:
         if os.path.exists(static_file):
