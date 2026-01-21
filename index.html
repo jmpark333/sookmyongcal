@@ -531,6 +531,38 @@
             color: var(--text-primary);
         }
 
+        /* ========== 버튼 모바일 반응형 ========== */
+        @media (max-width: 768px) {
+            /* 버튼 컨테이너를 세로로 배치 */
+            div[style*="text-align: center; margin: 30px 0;"] {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                gap: 10px;
+            }
+
+            /* 버튼 너비를 100%로 설정 */
+            div[style*="text-align: center; margin: 30px 0;"] button,
+            div[style*="text-align: center; margin: 30px 0;"] a {
+                width: 90%;
+                max-width: 300px;
+                justify-content: center;
+                padding: 12px 20px !important;
+            }
+
+            /* 검색창 모바일 대응 */
+            #searchInput {
+                width: 250px !important;
+                font-size: 13px !important;
+            }
+
+            /* 검색 버튼 모바일 대응 */
+            button[onclick="searchEvents()"],
+            button[onclick="clearSearch()"] {
+                padding: 8px 15px !important;
+                font-size: 13px !important;
+            }
+        }
 
     </style>
 </head>
@@ -552,7 +584,7 @@
     <!-- 검색창 추가 -->
     <div style="text-align: center; margin: 20px 0;">
         <div class="search-container">
-            <input type="text" id="searchInput" placeholder="일정 검색 (예: 입학식, 영어배치고사, 등록금)" autocomplete="off" style="padding: 10px; width: 300px; border: 1px solid var(--text-secondary); border-radius: 5px; font-size: 14px;">
+            <input type="text" id="searchInput" placeholder="일정 검색 (예: 입학식, 영어배치고사, 수강신청, 성적평가)" autocomplete="off" style="padding: 10px; width: 300px; border: 1px solid var(--text-secondary); border-radius: 5px; font-size: 14px;">
             <div id="searchDropdown" class="search-dropdown"></div>
         </div>
         <button onclick="searchEvents()" style="background-color: var(--primary-color); color: var(--white); border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; font-size: 14px; margin-left: 5px; transition: background-color 0.3s;">검색</button>
@@ -569,7 +601,7 @@
     
     <!-- 합격자 안내사항 보기 버튼 -->
     <div style="text-align: center; margin: 30px 0;">
-        <button onclick="openPdf()" style="background: var(--primary-color); color: var(--white); border: none; padding: 12px 25px; border-radius: 8px; cursor: pointer; font-size: 15px; font-weight: 600; box-shadow: 0 3px 10px rgba(14, 45, 108, 0.2); transition: all 0.2s ease; display: inline-flex; align-items: center; gap: 8px; margin: 0 10px;">
+        <button onclick="openPdf()" style="background: var(--primary-color); color: var(--white); border: none; padding: 12px 25px; border-radius: 8px; cursor: pointer; font-size: 15px; font-weight: 600; box-shadow: 0 3px 10px rgba(14, 45, 108, 0.2); transition: all 0.2s ease; display: inline-flex; align-items: center; gap: 8px; margin: 5px;">
             📄 합격자 안내사항 보기
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: inline-block;">
                 <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
@@ -577,7 +609,14 @@
                 <line x1="12" y1="15" x2="12" y2="3"/>
             </svg>
         </button>
-        <a href="#toeic-schedule" style="background: linear-gradient(135deg, #4CAF50, #45a049); color: var(--white); border: none; padding: 12px 25px; border-radius: 8px; cursor: pointer; font-size: 15px; font-weight: 600; box-shadow: 0 3px 10px rgba(76, 175, 80, 0.2); transition: all 0.2s ease; display: inline-flex; align-items: center; gap: 8px; text-decoration: none;">
+        <button onclick="openCourseRegistrationPdf()" style="background: linear-gradient(135deg, #FF6B6B, #ee5a5a); color: var(--white); border: none; padding: 12px 25px; border-radius: 8px; cursor: pointer; font-size: 15px; font-weight: 600; box-shadow: 0 3px 10px rgba(255, 107, 107, 0.2); transition: all 0.2s ease; display: inline-flex; align-items: center; gap: 8px; margin: 5px;">
+            📚 수강신청 가이드
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: inline-block;">
+                <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
+                <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
+            </svg>
+        </button>
+        <a href="#toeic-schedule" style="background: linear-gradient(135deg, #4CAF50, #45a049); color: var(--white); border: none; padding: 12px 25px; border-radius: 8px; cursor: pointer; font-size: 15px; font-weight: 600; box-shadow: 0 3px 10px rgba(76, 175, 80, 0.2); transition: all 0.2s ease; display: inline-flex; align-items: center; gap: 8px; text-decoration: none; margin: 5px;">
             📝 TOEIC 시험 일정표
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: inline-block;">
                 <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
@@ -1114,6 +1153,13 @@
             window.open(pdfUrl, '_blank');
         }
 
+        // 수강신청 가이드 PDF 열기 함수
+        function openCourseRegistrationPdf() {
+            // PDF를 브라우저에서 바로 열기
+            const pdfUrl = encodeURI('★26-1 재학생 수강가이드_공지용v1_교필 수정(0112).pdf');
+            window.open(pdfUrl, '_blank');
+        }
+
         // 날짜 텍스트에서 기간 추출 함수 (전역 스코프로 이동)
         function extractDateRange(text, month) {
             const patterns = [
@@ -1152,12 +1198,21 @@
                 '배치고사',
                 '등록금',
                 '수강신청',
+                '수강포기',
+                '성적평가',
                 '입학식',
                 '신입생 환영회',
                 '신입생 오리엔테이션',
                 '영어배치고사',
                 '영어 집중과정',
-                '신체검사'
+                '신체검사',
+                '수강확정',
+                '여석배분',
+                '폐강기준',
+                '복학',
+                '휴학',
+                '중간고사',
+                '기말고사'
             ];
             
             // 페이지 로드 시에는 드롭다운을 표시하지 않음
@@ -1699,7 +1754,34 @@
                     { month: '3월', date: '3월 3일', desc: '도서관 이용 안내', fullDesc: '모바일 학생증으로 도서관 출입이 가능하며, 대출도 이날부터 가능합니다.' },
                     { month: '3월', date: '3월 3일', desc: '신입생 첫 대출 이벤트 시작', fullDesc: '도서 2권 이상 첫 대출하는 신입생 대상 선물 증정 이벤트가 상품 소진 시까지 시작됩니다.' },
                     { month: '3월', date: '3월 4일', desc: '영어배치고사(GELT) 4차 응시', fullDesc: '10:00부터 16:00까지 응시 가능합니다.' },
-                    { month: '3월', date: '3월 31일', desc: '영어 교양필수 이수면제 신청 기간 마감', fullDesc: '입학 후 1년 이내 신청 기한 중 3월 신청 기간의 마지막 날입니다.' }
+                    { month: '3월', date: '3월 31일', desc: '영어 교양필수 이수면제 신청 기간 마감', fullDesc: '입학 후 1년 이내 신청 기한 중 3월 신청 기간의 마지막 날입니다.' },
+
+                    // 수강신청 관련 일정 (2026-1학기 재학생 수강가이드)
+                    { month: '수강신청', date: '2/5(목) 9시 ~ 2/9(월) 17시', desc: '1차 수강신청', fullDesc: '대상: 전체 재학생. 확정방식: 선착순 아님 (약대과목만 선착순). 접속: 학교 홈페이지 > 우측 사용자 메뉴 > 재학생 > 수강신청' },
+                    { month: '수강신청', date: '2/12(목) 16시 이후', desc: '수강확정 결과조회', fullDesc: '대상: 전체 재학생. 접속: 숙명포털 > 학사 > 수강신청 > 수강조회' },
+                    { month: '수강신청', date: '2/13(금) 9시~17시', desc: '2차 수강신청 (3/4학년/약대)', fullDesc: '대상: 3학년/4학년/약대5학년. 폐강과목 신청자, 탈락과목 신청자, 미수강자. 확정방식: 선착순' },
+                    { month: '수강신청', date: '2/19(목) 9시~17시', desc: '2차 수강신청 (1/2학년)', fullDesc: '대상: 1학년/2학년(약대 2+4년제: 1~4학년). 폐강과목 신청자, 탈락과목 신청자, 미수강자. 확정방식: 선착순' },
+                    { month: '수강신청', date: '2/20(금) 9시~17시', desc: '개강전 수강정정', fullDesc: '대상: 전체 재학생. 확정방식: 선착순' },
+                    { month: '수강신청', date: '3/3(화) 8시 ~ 3/9(월) 17시', desc: '3차 수강신청', fullDesc: '대상: 전체 재학생. 확정방식: 선착순' },
+                    { month: '수강신청', date: '3/10(화) 10시~17시', desc: '4차 수강신청', fullDesc: '대상: 최종폐강과목 신청자 등. 확정방식: 선착순' },
+                    { month: '수강신청', date: '3/24(화) 10시 ~ 3/30(월) 24시', desc: '수강포기 기간', fullDesc: '개강 후 4주차. 수강포기 처리 후 취소 불가. 수강최저학점(2학점) 미만으로 수강포기 불가' },
+                    { month: '성적평가', date: '2026-1학기', desc: '성적평가 방법', fullDesc: '상대평가로 운영. A학점 50% 이내, B~F학점 제한 없음. 기타 학부 성적관리 내규에 따라 절대평가 및 P/F 교과목으로 적용 가능' },
+                    { month: '수업운영', date: '2026-1학기', desc: '수업 운영 방식', fullDesc: '대면수업 전면 실시. 원격(사이버) 100% 동영상 콘텐츠 강의는 교수학습센터 사이버강의 공모 선정 강좌만 운영' },
+                    { month: '학점', date: '2026-1학기', desc: '수강신청 가능학점', fullDesc: '~15학번: 학기 최대 21학점, 연간 39학점. 16학번~: 학기 최대 19학점, 연간 36학점. 교육/약학부: 학기 최대 26학점, 연간 50학점' },
+                    { month: '폐강', date: '2026-1학기', desc: '폐강기준', fullDesc: '교양필수 20명 미만, 교양선택(강의형) 40명 미만, 교양선택(참여형) 30명 미만, 전공과목은 입학정원에 따라 6~10명 미만' },
+                    { month: '수강신청', date: '2026-1학기', desc: '수강신청 방법', fullDesc: '학교 홈페이지 > 우측 사용자 메뉴 > 재학생 > 수강신청. STEP1(학사정보), STEP2(성적정보), STEP3(수강신청) 순서대로 실행' },
+                    { month: '수강순위', date: '2026-1학기', desc: '수강확정 기준', fullDesc: '교양과목: 학년순(4-1-3-2) → 이수학점순 → 성적순. 전공과목: 제1전공 → 복수/부전공/연계전공자. 동일조건: 학년순 → 이수학점순 → 성적순' },
+                    { month: '여석', date: '2차 수강신청', desc: '여석배분 적용', fullDesc: '3/4학년: 전공 50%, 교양 40%. 1/2학년: 전공 50%, 교양 60%. 2/20 전체학년: 전체 여석' },
+                    { month: '일정', date: '2026-1학기', desc: '학사일정', fullDesc: '2/1 복학신청 시작, 2/5 수강신청 시작, 2/12 수강확정, 2/13-20 수강정정, 3/3 개강, 3/24-30 수강포기, 4/21-27 중간고사, 6/9-22 기말고사, 6/23 여름방학' },
+                    { month: '복학', date: '2/1(일)-3/9(월)', desc: '1학기 복학신청', fullDesc: '2026-1학기 복학신청 기간' },
+                    { month: '휴학', date: '2/13(금)-3/16(월)', desc: '1학기 휴학신청', fullDesc: '휴학 시 등록금 전액반환. 2/13(금)-3/16(월) 신청 기간' },
+                    { month: '중간고사', date: '4/21(화)-27(월)', desc: '1학기 중간고사', fullDesc: '2026-1학기 중간고사 기간' },
+                    { month: '기말고사', date: '6/9(화)-22(월)', desc: '1학기 기말고사', fullDesc: '2026-1학기 기말고사 기간' },
+                    { month: '성적', date: '7/8(수) 17:00-', desc: '1학기 성적확정', fullDesc: '1학기 성적확정 및 학기석차 조회' },
+                    { month: '여름계절', date: '6/23(화)-7/13(월)', desc: '여름계절학기', fullDesc: '여름계절학기 기간' },
+                    { month: '전공선택', date: '6/2(화)-19(금)', desc: '2026-2학기 전공선택', fullDesc: '2026-2학기 전공선택 신청 기간' },
+                    { month: '학위수여', date: '2/20(금)', desc: '2025학년도 전기 학위수여식', fullDesc: '2025학년도 전기 학위수여식' },
+                    { month: '입학식', date: '2/23(월)', desc: '2026학년도 입학식', fullDesc: '2026학년도 입학식' }
                 ];
                 
                 // 검색 결과 필터링
@@ -2068,7 +2150,7 @@
     <!-- 플로팅 챗봇 -->
     <div class="chatbot-container">
         <!-- 챗봇 토글 버튼 -->
-        <div class="chatbot-toggle" onclick="toggleChatbot()" title="숙명여대 신입생 도우미">
+        <div class="chatbot-toggle" onclick="toggleChatbot()" title="숙명여대 학생 도우미 (신입생/재학생)">
             <img src="emblem-1_Color.png" alt="챗봇 아이콘" style="width: 48px; height: 48px; object-fit: contain; cursor: pointer; transition: transform 0.3s ease;">
         </div>
 
@@ -2076,7 +2158,7 @@
         <div class="chatbot-window" id="chatbotWindow">
             <!-- 헤더 -->
             <div class="chatbot-header">
-                <span>숙명여대 신입생 도우미 🎓</span>
+                <span>숙명여대 학생 도우미 🎓</span>
                 <button class="chatbot-close" onclick="toggleChatbot()">×</button>
             </div>
 
@@ -2088,9 +2170,10 @@
                         <img src="emblem-1_Color.png" alt="챗봇" style="width: 32px; height: 32px; object-fit: contain;">
                     </div>
                     <div class="message-bubble">
-                        안녕하세요! 숙명여자대학교 2026학년도 신입생 합격자 안내사항 전문 챗봇입니다.<br><br>
-                        등록금, 수강신청, 장학금, 영어배치고사, 기숙사 등 신입생 관련 궁금한 점을 물어보세요.<br><br>
-                        무엇을 도와드릴까요? 😊
+                        안녕하세요! 숙명여자대학교 학생 도우미 챗봇입니다.<br><br>
+                        🎓 <strong>신입생</strong>: 등록금, 입학식, 영어배치고사, 기숙사, 신체검사, 오리엔테이션, 장학금 등<br>
+                        📚 <strong>재학생</strong>: 수강신청 일정, 수업운영, 성적평가, 수강포기, 학사일정 등<br><br>
+                        궁금한 점을 물어보세요! 😊
                     </div>
                 </div>
             </div>
@@ -2231,14 +2314,14 @@
                         messages: [
                             {
                                 role: 'system',
-                                content: `당신은 숙명여자대학교 2026학년도 신입생 합격자 안내사항 전문 챗봇입니다. 다음 지식 베이스를 기반으로 답변해주세요.
+                                content: `당신은 숙명여자대학교 학생 도우미 챗봇입니다. 신입생 합격자 안내사항과 재학생 수강가이드 정보를 모두 제공합니다. 다음 지식 베이스를 기반으로 답변해주세요.
 
 ${knowledgeContext}
 
 **중요 지침:**
 1. 위 지식 베이스에 있는 정보만 정확하게 바탕으로 답변하세요
 2. 지식 베이스에 없는 내용(특정 인물, 개인 정보 등)에 대해서는 솔직하게 "그 정보는 제가 가진 자료에 없습니다"라고 답변하세요
-3. 숙명여대 신입생 관련 일반적인 질문에 대해서는 지식 베이스의 내용을 활용하여 친절하게 답변하세요
+3. 숙명여대 신입생 및 재학생 관련 일반적인 질문에 대해서는 지식 베이스의 내용을 활용하여 친절하게 답변하세요
 4. 한국어로, 친절하고 전문적인 어조로 답변하세요
 5. 질문의 의도를 정확히 파악하여 관련 있는 정보만 제공하세요
 6. Rocky Bonnell 교수님 같은 특정 인물에 대해 물어보면 "신입생 예비대학 프로그램 관련 교수님"이라고만 답변하고, 구체적인 개인 정보는 제공하지 마세요`
