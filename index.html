@@ -2249,6 +2249,31 @@
             typingIndicator.classList.remove('show');
         }
 
+        // 마크다운을 HTML로 변환하는 함수
+        function parseMarkdown(text) {
+            if (!text) return '';
+
+            let html = text;
+
+            // **굵은 텍스트** → <strong>굵은 텍스트</strong>
+            html = html.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+
+            // *기울임 텍스트* → <em>기울임 텍스트</em> (줄 시작의 *는 제외)
+            html = html.replace(/(?<!^)\*([^*]+)\*/g, '<em>$1</em>');
+
+            // 줄바꿈을 <br>로 변환
+            html = html.replace(/\n/g, '<br>');
+
+            // • 또는 * 로 시작하는 목록 처리
+            html = html.replace(/<br>[\s•]*\*/g, '<br>•');
+            html = html.replace(/^[\s•]*\*/gm, '•');
+
+            // 【대괄호 텍스트】 → <span class="highlight">대괄호 텍스트</span>
+            html = html.replace(/【([^】]+)】/g, '<span class="highlight">【$1】</span>');
+
+            return html;
+        }
+
         function addMessage(content, isUser = false) {
             const messagesContainer = document.getElementById('chatMessages');
             const messageDiv = document.createElement('div');
@@ -2268,7 +2293,8 @@
             
             const bubble = document.createElement('div');
             bubble.className = 'message-bubble';
-            bubble.innerHTML = content;
+            // 봇 메시지인 경우 마크다운을 HTML로 변환
+            bubble.innerHTML = isUser ? content : parseMarkdown(content);
             
             if (isUser) {
                 messageDiv.appendChild(bubble);
@@ -2700,6 +2726,24 @@
             background: #0E2D6C;
             color: white;
             border-bottom-right-radius: 4px;
+        }
+
+        /* 마크다운 스타일링 */
+        .message.bot .message-bubble strong {
+            font-weight: 700;
+            color: #0E2D6C;
+        }
+
+        .message.bot .message-bubble em {
+            font-style: normal;
+            color: #4a5568;
+        }
+
+        .message.bot .message-bubble .highlight {
+            background: #fff9c4;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-weight: 600;
         }
 
         .message-avatar {
