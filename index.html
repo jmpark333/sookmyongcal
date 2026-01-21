@@ -2211,7 +2211,7 @@
 
     <script>
         let isOpen = false;
-        const API_URL = 'https://blogchatbot-proxy.netlify.app/api/chatbot'; // 프록시 사용
+        const API_URL = '/.netlify/functions/chat'; // 로컬 Netlify 함수 사용
 
         function toggleChatbot() {
             const chatbotWindow = document.getElementById('chatbotWindow');
