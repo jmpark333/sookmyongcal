@@ -33,10 +33,8 @@ def main():
             shutil.copy(static_file, f"output/{static_file}")
             print(f"Copied {static_file} to output")
 
-    # Copy functions directory
-    if os.path.exists("functions"):
-        shutil.copytree("functions", "output/functions", dirs_exist_ok=True)
-        print("Copied functions directory to output")
+    # Note: Netlify functions are auto-deployed from netlify/functions/ directory
+    # No need to copy them to output
 
     print("Build completed successfully!")
     return 0
